@@ -1276,6 +1276,148 @@ body {
   color: black;
 }
 
+/* 🌍 AuthAction Page - Responsive Styles */
+.auth-action-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #0f0f1a;
+  color: #ffffff;
+  flex-direction: column;
+  text-align: center;
+  padding: 20px;
+}
+
+.auth-action-box {
+  background: #1a1a2e;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 10px rgba(255, 204, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+}
+
+.auth-action-box h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  color: #ffcc00;
+}
+
+.auth-action-box p {
+  font-size: 14px;
+  margin-bottom: 15px;
+  color: #bbbbbb;
+}
+
+.auth-action-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: #252545;
+  border: 1px solid #ffcc00;
+  color: white;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.auth-action-box input::placeholder {
+  color: #cccccc;
+}
+
+.auth-action-box button {
+  width: 100%;
+  padding: 12px;
+  background: #ffcc00;
+  border: none;
+  color: #0f0f1a;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.3s;
+  font-size: 16px;
+}
+
+.auth-action-box button:hover {
+  background: #ffdb4d;
+}
+
+.auth-action-box .error-message {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.auth-action-box .success-message {
+  color: #66ff66;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.back-to-home {
+  margin-top: 15px;
+  font-size: 14px;
+  text-decoration: underline;
+  color: #ffcc00;
+  cursor: pointer;
+}
+
+.back-to-home:hover {
+  color: #ffdb4d;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 768px) {
+  .auth-action-box {
+    padding: 20px;
+    max-width: 350px;
+  }
+
+  .auth-action-box h2 {
+    font-size: 20px;
+  }
+
+  .auth-action-box p,
+  .auth-action-box .error-message,
+  .auth-action-box .success-message {
+    font-size: 13px;
+  }
+
+  .auth-action-box input,
+  .auth-action-box button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-action-box {
+    padding: 18px;
+    max-width: 90%;
+  }
+
+  .auth-action-box h2 {
+    font-size: 18px;
+  }
+
+  .auth-action-box p,
+  .auth-action-box .error-message,
+  .auth-action-box .success-message {
+    font-size: 12px;
+  }
+
+  .auth-action-box input,
+  .auth-action-box button {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .back-to-home {
+    font-size: 12px;
+  }
+}
+
+
 /* 📱 Responsive Design */
 @media (max-width: 480px) {
   .auth-modal {
@@ -1305,7 +1447,7 @@ body {
   }
 }
 
-/* 📱 Responsive Design */
+/* 📱 Mobile Responsive */
 @media (max-width: 1024px) {
   .header {
     flex-direction: column;
@@ -1316,6 +1458,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .user-profile {
@@ -1342,6 +1485,10 @@ body {
     width: 90%;
     text-align: center;
   }
+
+  .search-bar input {
+    width: 120px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1365,8 +1512,15 @@ body {
   .logout-button {
     width: 100%;
   }
-}
 
+  .search-bar {
+    width: 100%;
+  }
+
+  .search-bar input {
+    width: 100%;
+  }
+}
 
 /* 📱 Responsive Design */
 @media (max-width: 768px) {
@@ -1482,9 +1636,11 @@ body {
 @media (max-width: 1024px) {
   .sidebar {
     width: 100%;
+    min-height: unset;
     border-right: none;
     border-bottom: 4px solid #ffcc00;
     text-align: center;
+    padding: 15px;
   }
 
   .sidebar ul {
@@ -1501,29 +1657,48 @@ body {
   }
 }
 
+/* 📱 Mobile Sidebar (Adjust for Small Screens) */
 @media (max-width: 768px) {
-  .sidebar-item {
-    font-size: 10px;
-    padding: 8px;
+  .sidebar {
+    overflow-x: auto; /* Enables horizontal scrolling if needed */
+    white-space: nowrap;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding: 10px;
+    gap: 10px;
   }
 
-  .sidebar h3 {
-    font-size: 12px;
+  .sidebar ul {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: thin;
   }
-  .clear-filters {
-    font-size: 10px;
+
+  .sidebar-item {
+    font-size: 12px;
     padding: 8px;
+    flex: 0 0 auto;
+    min-width: 120px;
   }
 }
 
+/* 📱 Ultra Small Screens (Phones) */
 @media (max-width: 480px) {
   .sidebar h3 {
-    font-size: 10px;
+    font-size: 11px;
+  }
+
+  .sidebar ul {
+    gap: 5px;
   }
 
   .sidebar-item {
-    font-size: 9px;
+    font-size: 10px;
     padding: 6px;
+    min-width: 100px;
   }
 }
 

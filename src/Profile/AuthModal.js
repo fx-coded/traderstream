@@ -1,193 +1,270 @@
 import React, { useState } from "react";
-import "../styles/global.css"; // Updated styles in a separate file for clarity
+import { auth, db } from "../firebaseConfig"; // Ensure Firebase is configured
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { getDocs, collection, query, where, setDoc, doc } from "firebase/firestore";
+import "../styles/global.css";
 
 const AuthModal = ({ type, setShowAuthModal, setUser }) => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
-    birthDay: "",
-    birthMonth: "",
-    birthYear: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [useEmail, setUseEmail] = useState(true); // Toggle for phone/email signup
-  const [authType, setAuthType] = useState(type);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
+  // 📌 Handle Input Changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // 📌 Toggle Show/Hide Password
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-    // If signing up, check password confirmation
-    if (authType === "signup" && formData.password !== formData.confirmPassword) {
-      setError("⚠ Passwords do not match!");
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  // 📌 Validate Username (only letters, numbers, and `_`)
+  const isValidUsername = (username) => /^[a-zA-Z0-9_]+$/.test(username);
+
+  // 📌 Handle Forgot Password
+  const handleForgotPassword = async () => {
+    if (!resetEmail) {
+      setError("⚠ Please enter your email to reset the password.");
       return;
     }
 
-    // Mock authentication - Replace with API later
-    setUser({
-      username: formData.username,
-      profilePic: "https://via.placeholder.com/50",
-      experience: Math.floor(Math.random() * 10) + 1,
-      instruments: "Forex, Crypto",
-      bio: "Passionate trader navigating the markets!",
-    });
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetEmailSent(true);
+      setError("");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-    setShowAuthModal(null);
+  // 📌 Sign Up / Login Logic
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (type === "signup") {
+        if (!isValidUsername(formData.username)) {
+          setError("❌ Username can only contain letters, numbers, and '_'.");
+          setLoading(false);
+          return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+          setError("⚠ Passwords do not match!");
+          setLoading(false);
+          return;
+        }
+
+        // ✅ Check if username already exists
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", "==", formData.username)
+        );
+        const userSnapshot = await getDocs(userQuery);
+
+        if (!userSnapshot.empty) {
+          setError("❌ Username is already taken.");
+          setLoading(false);
+          return;
+        }
+
+        // 🔥 Email/Password Sign Up
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        // Send Email Verification
+        await sendEmailVerification(userCredential.user);
+
+        // Store user in Firestore
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          username: formData.username,
+          email: formData.email,
+          emailVerified: false, // Store verification status
+        });
+
+        setError("✅ Verification email sent! Please check your inbox.");
+        setLoading(false);
+        return; // 🚀 Stop further execution until email is verified
+      } else {
+        // 🔥 LOGIN LOGIC: Email OR Username Support
+        let emailToUse = formData.email;
+
+        if (!formData.email.includes("@")) {
+          // Assume user entered a username, so look up the email in Firestore
+          const userQuery = query(
+            collection(db, "users"),
+            where("username", "==", formData.email)
+          );
+          const querySnapshot = await getDocs(userQuery);
+
+          if (querySnapshot.empty) {
+            setError("❌ Username not found!");
+            setLoading(false);
+            return;
+          }
+
+          // Retrieve email from Firestore
+          emailToUse = querySnapshot.docs[0].data().email;
+        }
+
+        // 🔥 Email Login
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          emailToUse,
+          formData.password
+        );
+
+        // ✅ Check if the email is verified before allowing access
+        if (!userCredential.user.emailVerified) {
+          setError("⚠ Please verify your email before logging in.");
+          setLoading(false);
+          return;
+        }
+
+        setUser({ uid: userCredential.user.uid, email: emailToUse });
+      }
+
+      setShowAuthModal(null);
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
   };
 
   return (
     <div className="auth-overlay">
       <div className="auth-modal">
         <div className="auth-header">
-          <h2>{authType === "login" ? "🔑 Login" : "🚀 Join TradeStream"}</h2>
+          <h2>{type === "login" ? "🔑 Login" : "🚀 Join TradeStream"}</h2>
           <button className="close-btn" onClick={() => setShowAuthModal(null)}>✖</button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          {authType === "signup" && (
-            <>
-              <label>Username:</label>
-              <input 
-                type="text" 
-                name="username" 
-                placeholder="Choose a unique username" 
-                value={formData.username} 
-                onChange={handleChange} 
-                required 
-              />
-
-              <label>Sign up with:</label>
-              <div className="toggle-email-phone">
-                <button 
-                  type="button" 
-                  className={useEmail ? "active" : ""}
-                  onClick={() => setUseEmail(true)}
-                >
-                  Email
-                </button>
-                <button 
-                  type="button" 
-                  className={!useEmail ? "active" : ""}
-                  onClick={() => setUseEmail(false)}
-                >
-                  Phone
-                </button>
-              </div>
-
-              {useEmail ? (
-                <input 
-                  type="email" 
-                  name="email" 
-                  placeholder="Enter your email" 
-                  value={formData.email} 
-                  onChange={handleChange} 
-                  required 
-                />
-              ) : (
-                <input 
-                  type="tel" 
-                  name="phone" 
-                  placeholder="Enter your phone number" 
-                  value={formData.phone} 
-                  onChange={handleChange} 
-                  required 
-                />
-              )}
-
-              <label>Date of Birth:</label>
-              <div className="dob-container">
-                <select name="birthDay" value={formData.birthDay} onChange={handleChange} required>
-                  <option value="">Day</option>
-                  {[...Array(31)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-
-                <select name="birthMonth" value={formData.birthMonth} onChange={handleChange} required>
-                  <option value="">Month</option>
-                  {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, i) => (
-                    <option key={i} value={m}>{m}</option>
-                  ))}
-                </select>
-
-                <select name="birthYear" value={formData.birthYear} onChange={handleChange} required>
-                  <option value="">Year</option>
-                  {[...Array(100)].map((_, i) => (
-                    <option key={i} value={2025 - i}>{2025 - i}</option>
-                  ))}
-                </select>
-              </div>
-            </>
-          )}
-
-          <label>Password:</label>
-          <div className="password-container">
-            <input 
-              type={showPassword ? "text" : "password"} 
-              name="password" 
-              placeholder="Enter Password" 
-              value={formData.password} 
-              onChange={handleChange} 
-              required 
+        {showForgotPassword ? (
+          <>
+            <h3>🔑 Forgot Password</h3>
+            <p>Enter your email below, and we'll send you a reset link.</p>
+            <input
+              type="email"
+              name="resetEmail"
+              placeholder="Enter your email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              required
             />
-            <button 
-              type="button" 
-              className="toggle-password" 
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "🙈" : "👁️"}
+            <button className="auth-btn" onClick={handleForgotPassword}>
+              📩 Send Reset Link
             </button>
-          </div>
-
-          {authType === "signup" && (
-            <>
-              <label>Confirm Password:</label>
-              <div className="password-container">
-                <input 
-                  type={showConfirmPassword ? "text" : "password"} 
-                  name="confirmPassword" 
-                  placeholder="Re-enter Password" 
-                  value={formData.confirmPassword} 
-                  onChange={handleChange} 
-                  required 
+            {resetEmailSent && <p className="success-message">✅ Check your email for the reset link.</p>}
+            <button className="back-btn" onClick={() => setShowForgotPassword(false)}>← Back to Login</button>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {type === "signup" && (
+              <>
+                <label>Username:</label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Choose a unique username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
                 />
-                <button 
-                  type="button" 
-                  className="toggle-password" 
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? "🙈" : "👁️"}
-                </button>
-              </div>
-            </>
-          )}
+                <label>Email:</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </>
+            )}
 
-          {error && <p className="error-message">{error}</p>}
+            {type === "login" && (
+              <>
+                <label>Username or Email:</label>
+                <input
+                  type="text"
+                  name="email"
+                  placeholder="Enter your username or email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </>
+            )}
 
-          {authType === "login" && (
-            <p className="forgot-password">❓ <span>Forgot Password?</span></p>
-          )}
+            <label>Password:</label>
+            <div className="password-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <button type="button" className="toggle-password" onClick={togglePasswordVisibility}>
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
 
-          <button type="submit" className="auth-btn">
-            {authType === "login" ? "🚀 Login" : "🆕 Sign Up"}
-          </button>
-        </form>
+            {type === "signup" && (
+              <>
+                <label>Confirm Password:</label>
+                <div className="password-container">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Re-enter Password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button type="button" className="toggle-password" onClick={toggleConfirmPasswordVisibility}>
+                    {showConfirmPassword ? "🙈" : "👁️"}
+                  </button>
+                </div>
+              </>
+            )}
 
-        <p>
-          {authType === "login" ? "New here?" : "Already have an account?"} 
-          <span className="switch-auth" onClick={() => setAuthType(authType === "login" ? "signup" : "login")}>
-            {authType === "login" ? " Sign Up" : " Login"}
-          </span>
-        </p>
+            {error && <p className="error-message">{error}</p>}
+
+            <p className="forgot-password" onClick={() => setShowForgotPassword(true)}>❓ Forgot Password?</p>
+
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? "⏳ Processing..." : type === "login" ? "🚀 Login" : "🆕 Sign Up"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
