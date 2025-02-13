@@ -1,0 +1,1709 @@
+/* 🌐 Global Styles for the Retro Trading Streaming Website */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&display=swap');
+
+:root {
+  --primary-color: #ff0077;
+  --secondary-color: #ffcc00;
+  --background-color: #1b1f27;
+  --text-color: #f5f5f5;
+  --accent-color: #00ff99;
+}
+
+/* 🌌 Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: "Orbitron", sans-serif;
+  overflow-x: hidden;
+}
+
+/* 🔹 Main Layout */
+/* 🌍 Main Layout */
+.main-layout {
+  display: flex;
+  align-items: flex-start;  /* Ensure it aligns to the top */
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 📌 Sidebar */
+.sidebar {
+  width: 250px; /* Set fixed width */
+  min-height: 100vh; /* Ensure it fills height */
+  background: #0f0f1a;
+  padding: 20px;
+  border-right: 4px solid #ffcc00;
+  color: #ffcc00;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+/* 🚀 Main Content */
+.content-wrapper {
+  flex-grow: 1;
+  padding: 20px;
+  min-width: calc(100% - 250px); /* Prevent layout shifting */
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+
+/* 🔥 Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-bottom: 4px solid var(--accent-color);
+  box-shadow: 0px 4px 20px rgba(0, 255, 247, 0.3);
+  text-transform: uppercase;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--accent-color);
+  text-shadow: 4px 4px var(--primary-color);
+}
+
+/* 🏆 Sidebar Container */
+.sidebar {
+  width: 280px;
+  background: #1b1f27;
+  padding: 20px;
+  border-right: 4px solid #ffcc00;
+  color: white;
+  box-shadow: inset -3px 0px 12px rgba(0, 255, 153, 0.2);
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 🎯 Sidebar Headings */
+.sidebar h3 {
+  font-size: 14px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px #ff0077;
+}
+
+/* 📜 Sidebar Lists */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+/* 🔥 Sidebar Items */
+.sidebar-item {
+  padding: 12px;
+  cursor: pointer;
+  border: 2px solid #ff0077;
+  transition: background 0.3s, transform 0.2s;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  margin-bottom: 8px;
+  background: linear-gradient(145deg, #1b1f27, #292929);
+  box-shadow: 0 0 10px rgba(255, 0, 119, 0.5);
+}
+
+/* 🖱️ Hover Effect */
+.sidebar-item:hover {
+  background: #ff0077;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 0, 119, 0.8);
+}
+
+/* 🌟 Active Category */
+.sidebar-item.active {
+  background: #ffcc00;
+  color: black;
+  font-weight: bold;
+  border-color: #1b1f27;
+}
+
+/* ❌ Clear Filters Button */
+.clear-filters {
+  width: 100%;
+  padding: 10px;
+  background: #ff0077;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid #ffcc00;
+  border-radius: 6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.clear-filters:hover {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.05);
+}
+
+
+/* 🔥 Chat Box */
+.chat-container {
+  width: 100%;
+  max-width: 400px;
+  background: var(--background-color);
+  border: 3px solid var(--primary-color);
+  box-shadow: 0px 0px 15px rgba(255, 0, 119, 0.5);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: "Press Start 2P", Arial, sans-serif;
+}
+
+/* 💬 Chat Header */
+.chat-header {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color: var(--background-color);
+  font-size: 14px;
+  font-weight: bold;
+  padding: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* 📜 Chat Messages */
+.chat-messages {
+  padding: 10px;
+  flex-grow: 1;
+  overflow-y: auto;
+  height: 250px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-color);
+  background: #0d1117;
+  border-bottom: 3px solid var(--primary-color);
+}
+
+/* 📩 Chat Message */
+.chat-message {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  word-wrap: break-word;
+}
+
+/* 🟢 Received Messages */
+.received {
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--primary-color);
+  color: var(--text-color);
+  text-align: left;
+}
+
+/* 🔵 Sent Messages */
+.sent {
+  background: rgba(0, 255, 119, 0.2);
+  border-right: 4px solid var(--accent-color);
+  color: var(--accent-color);
+  text-align: right;
+  align-self: flex-end;
+}
+
+/* ✍️ Chat Input */
+.chat-input {
+  display: flex;
+  padding: 8px;
+  background: var(--background-color);
+  border-top: 3px solid var(--primary-color);
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid var(--secondary-color);
+  background: #121826;
+  color: white;
+  font-size: 13px;
+  outline: none;
+}
+
+.chat-input button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-left: 8px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 13px;
+  transition: background 0.3s;
+}
+
+.chat-input button:hover {
+  background: var(--secondary-color);
+  color: black;
+}
+
+/* 🌀 Scrollbar */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #121826;
+}
+
+/* 🔥 Trading Room Form - Retro Futuristic Aesthetic */
+.trading-room-form {
+  max-width: 500px;
+  background: #1b1f27;
+  padding: 25px;
+  border-radius: 10px;
+  border: 3px solid #ff0077;
+  box-shadow: 0 0 20px rgba(255, 0, 119, 0.5);
+  margin: 30px auto;
+  text-align: center;
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 🏆 Title */
+.trading-room-form h2 {
+  color: #ffcc00;
+  text-transform: uppercase;
+  font-size: 16px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px #ff0077;
+}
+
+/* 📌 Form Labels */
+.trading-room-form label {
+  display: block;
+  margin-top: 15px;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  text-align: left;
+}
+
+/* ✍️ Input Fields */
+.trading-room-form input,
+.trading-room-form select,
+.trading-room-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  background: #0d1117;
+  border: 2px solid #ffcc00;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.3s ease-in-out;
+}
+
+/* 🌟 Glowing Effect on Focus */
+.trading-room-form input:focus,
+.trading-room-form select:focus,
+.trading-room-form textarea:focus {
+  border: 2px solid #ff0077;
+  box-shadow: 0px 0px 10px rgba(255, 0, 119, 0.6);
+  outline: none;
+}
+
+/* 🎟️ Checkbox Styling */
+.trading-room-form input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* 🚀 Submit Button */
+.trading-room-form button {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s, transform 0.3s;
+  margin-top: 20px;
+  width: 100%;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.trading-room-form button:hover {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.05);
+}
+
+.footer {
+  width: 100%;
+  background: #1b1f27;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  margin-top: 40px;
+  border-top: 4px solid #ffcc00;
+  box-shadow: 0px -4px 15px rgba(255, 204, 0, 0.3);
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 📌 Footer Text */
+.footer p {
+  margin: 5px 0;
+  color: #ffcc00;
+  font-size: 12px;
+}
+
+/* 🔗 Footer Links */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.footer-links a {
+  color: #00ff99;
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.3s ease-in-out, text-shadow 0.3s;
+}
+
+/* 🎯 Hover Effect */
+.footer-links a:hover {
+  color: #ff0077;
+  text-shadow: 0px 0px 10px rgba(255, 0, 119, 0.6);
+}
+
+/* 🌟 Retro Futuristic Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 15px 30px;
+  background: linear-gradient(90deg, #ff0077, #ffcc00);
+  border-bottom: 4px solid #00ff99;
+  box-shadow: 0px 4px 20px rgba(0, 255, 247, 0.3);
+  text-transform: uppercase;
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 🎮 Logo */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1b1f27;
+  text-shadow: 3px 3px #ff0077;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.logo:hover {
+  transform: scale(1.1);
+}
+
+/* 🏆 Navigation */
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-button {
+  background: none;
+  border: 2px solid #ffcc00;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 10px 15px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+
+.nav-button:hover {
+  color: #ffcc00;
+  background: rgba(255, 204, 0, 0.2);
+  transform: scale(1.1);
+}
+
+/* 🔥 Active Tab */
+.nav-button.active {
+  background: #ffcc00;
+  color: black;
+  font-weight: bold;
+  border-color: #1b1f27;
+}
+
+/* 🔍 Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.search-bar input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #ffcc00;
+  background: #121826;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-bar button {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.search-bar button:hover {
+  background: #ffcc00;
+  color: black;
+}
+
+/* 🚀 Authentication Buttons */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-buttons button {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.auth-buttons button:hover {
+  background: #ffcc00;
+  color: black;
+}
+
+/* 🎥 Live Streams Section */
+.live-streams {
+  text-align: center;
+  padding: 30px;
+  background: #121826;
+  color: white;
+}
+
+/* 🎮 Title */
+.live-streams h2 {
+  font-size: 22px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px #ff0077;
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 🔥 Streams Grid - Now Side by Side */
+.streams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+  gap: 20px;
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 300px; /* Ensures the layout holds even if empty */
+}
+
+/* 🚀 No Streams Available */
+.no-streams {
+  grid-column: 1 / -1; /* Full width */
+  text-align: center;
+  font-size: 18px;
+  color: #ffcc00;
+  background: rgba(255, 0, 128, 0.1);
+  padding: 20px;
+  border: 2px dashed #ffcc00;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+/* 🎬 Stream Card */
+.stream-card {
+  background: linear-gradient(145deg, #1b1f27, #292929);
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none;
+  box-shadow: 0 0 15px rgba(255, 0, 119, 0.5);
+  overflow: hidden;
+  max-width: 400px; 
+  text-align: center;
+}
+
+/* 🔥 Stream Card Hover */
+.stream-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 119, 0.8);
+}
+
+/* 🎥 Stream Video */
+.stream-video {
+  width: 100%;
+  height: 200px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* ℹ️ Stream Info */
+.stream-info {
+  padding: 10px 0;
+}
+
+.stream-info h3 {
+  font-size: 16px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.stream-info p {
+  font-size: 14px;
+  color: white;
+  margin-bottom: 3px;
+}
+
+/* 🎛️ Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.3s, transform 0.3s;
+  font-weight: bold;
+}
+
+.pagination button:disabled {
+  background: #333;
+  cursor: not-allowed;
+  border: 2px solid #777;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.1);
+}
+
+.pagination span {
+  color: #ffcc00;
+  font-size: 14px;
+}
+
+/* 🚀 Trending Streams Section */
+.trending-streams {
+  text-align: center;
+  padding: 30px;
+  background: #121826;
+  color: white;
+}
+
+/* 🔥 Title */
+.trending-streams h2 {
+  font-size: 22px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px #ff0077;
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 🎬 Streams Grid - Ensures Side-by-Side Layout */
+.streams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  justify-items: center;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 300px; /* Ensures the layout holds even if empty */
+}
+
+/* 🚀 No Trending Streams Available */
+.no-trending-streams {
+  grid-column: 1 / -1; /* Full width */
+  text-align: center;
+  font-size: 18px;
+  color: #ffcc00;
+  background: rgba(255, 0, 128, 0.1);
+  padding: 20px;
+  border: none;
+  font-weight: bold;
+}
+
+/* 🚀 Trending Stream Card */
+.stream-card.trending {
+  background: linear-gradient(145deg, #1b1f27, #292929);
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none;
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.5);
+  overflow: hidden;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* 🚀 Hover Effect */
+.stream-card.trending:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
+}
+
+/* 📸 Stream Thumbnail */
+.stream-thumbnail {
+  width: 100%;
+  height: 200px;
+  border-radius: 6px;
+  border: 2px solid #ffcc00;
+}
+
+/* ℹ️ Stream Info */
+.stream-info {
+  padding: 10px 0;
+}
+
+.stream-info h3 {
+  font-size: 16px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.stream-info p {
+  font-size: 14px;
+  color: white;
+  margin-bottom: 3px;
+}
+
+/* 🎛️ Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background: #00ff99;
+  color: black;
+  border: 2px solid #ffcc00;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.3s, transform 0.3s;
+  font-weight: bold;
+}
+
+.pagination button:disabled {
+  background: #333;
+  cursor: not-allowed;
+  border: 2px solid #777;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.1);
+}
+
+.pagination span {
+  color: #ffcc00;
+  font-size: 14px;
+}
+
+/* 🏆 Trading Rooms Section */
+.trading-rooms {
+  text-align: center;
+  padding: 30px;
+  background: #121826;
+  color: white;
+}
+
+
+
+/* 🎯 Title */
+.trading-rooms h2 {
+  font-size: 22px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px #ff0077;
+  font-family: "Press Start 2P", sans-serif;
+}
+
+/* 🔥 Rooms Grid */
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  justify-items: center;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 🏆 Room Card */
+.room-card {
+  background: linear-gradient(145deg, #1b1f27, #292929);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #ff0077;
+  box-shadow: 0 0 15px rgba(255, 0, 119, 0.5);
+  overflow: hidden;
+  max-width: 400px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* 🎮 Hover Effect */
+.room-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 119, 0.8);
+}
+
+/* 📌 Room Details */
+.room-card h3 {
+  font-size: 18px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.room-card p {
+  font-size: 14px;
+  color: white;
+  margin-bottom: 8px;
+}
+
+/* 🚀 Join Room Button */
+.join-room-btn {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.3s, transform 0.3s;
+  font-weight: bold;
+  width: 100%;
+}
+
+.join-room-btn:hover {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.05);
+}
+
+/* 🎥 Room Content */
+.room-content {
+  margin-top: 15px;
+  background: #0d1117;
+  padding: 15px;
+  border-radius: 6px;
+  border: 2px solid #ff0077;
+  text-align: center;
+}
+
+/* 🎬 Stream Placeholder */
+.stream-placeholder {
+  background: #222;
+  color: #ffcc00;
+  font-size: 14px;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border: 2px solid #ffcc00;
+}
+
+/* 🎥 Streamer Profile Section */
+.streamer-profile {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background: linear-gradient(145deg, #1b1f27, #292929);
+  border-radius: 10px;
+  text-align: center;
+  border: 3px solid #ff0077;
+  box-shadow: 0 0 20px rgba(255, 0, 119, 0.6);
+  font-family: "Press Start 2P", sans-serif;
+  color: white;
+}
+
+/* 🔙 Back Button */
+.back-button {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.3s, transform 0.3s;
+  font-weight: bold;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+.back-button:hover {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.05);
+}
+
+/* 🎭 Profile Header */
+.profile-header {
+  padding: 20px;
+  border-bottom: 2px solid #ffcc00;
+}
+
+.profile-header h2 {
+  font-size: 20px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.profile-header .bio {
+  font-size: 14px;
+  color: #d3d3d3;
+  margin-bottom: 10px;
+}
+
+.profile-header .viewers {
+  font-size: 14px;
+  color: #00ff99;
+  font-weight: bold;
+}
+
+/* 🎬 Past Streams */
+.past-streams {
+  margin-top: 20px;
+  padding: 15px;
+  background: #0d1117;
+  border-radius: 6px;
+  border: 2px solid #ff0077;
+}
+
+.past-streams h3 {
+  font-size: 16px;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.past-streams ul {
+  list-style: none;
+  padding: 0;
+}
+
+.past-streams li {
+  background: #222;
+  color: white;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 5px;
+  transition: background 0.3s ease-in-out;
+}
+
+.past-streams li:hover {
+  background: #ff0077;
+}
+
+/* 🎭 User Profile Section */
+.user-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 2px solid #ffcc00;
+  background: rgba(255, 0, 119, 0.2);
+}
+
+/* 👤 Profile Image */
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #ffcc00;
+}
+
+/* 👤 Profile Info */
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+/* 📜 Profile Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 220px;
+  background: #1a1a2e;
+  border: 2px solid #ffcc00;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(255, 204, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+/* 🎭 Profile Text */
+.profile-dropdown p {
+  font-size: 13px;
+  color: white;
+  margin: 5px 0;
+}
+
+/* 🚪 Logout Button */
+.logout-button {
+  background: #ff0077;
+  color: white;
+  border: 2px solid #ffcc00;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background 0.3s;
+  text-align: center;
+}
+
+.logout-button:hover {
+  background: #ffcc00;
+  color: black;
+}
+
+/* 🌫 Background Blur */
+.auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* 🎯 Authentication Modal */
+.auth-modal {
+  background: #1b1e24;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  color: white;
+  font-family: "Arial", sans-serif;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 🎬 Fade-in Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🚀 Modal Header */
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.auth-header h2 {
+  font-size: 18px;
+  color: #ffcc00;
+}
+
+/* ❌ Close Button */
+.close-btn {
+  background: none;
+  border: none;
+  color: #ff0077;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #ffcc00;
+}
+
+/* 📩 Form Inputs */
+.auth-modal label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  color: #ffcc00;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.auth-modal input {
+  width: 100%;
+  padding: 12px;
+  background: #252932;
+  border: 1px solid #ffcc00;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  text-align: center;
+  transition: border 0.3s;
+}
+
+.auth-modal input:focus {
+  border: 1px solid #ff0077;
+}
+
+/* 📅 Date of Birth */
+.dob-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.dob-container select {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ffcc00;
+  background: #252932;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.dob-container select:focus {
+  border: 1px solid #ff0077;
+}
+
+/* 👀 Password Container */
+.password-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.password-container input {
+  flex-grow: 1;
+  padding-right: 40px;
+}
+
+/* 👁️ Toggle Password Button */
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ffcc00;
+}
+
+.toggle-password:hover {
+  color: #ff0077;
+}
+
+/* ⚠ Error Message */
+.error-message {
+  color: #ff4444;
+  font-size: 12px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* 🔄 Forgot Password */
+.forgot-password {
+  font-size: 12px;
+  color: #ffcc00;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: color 0.3s;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+  color: #ff0077;
+}
+
+/* 🔥 Login / Sign-Up Button */
+.auth-btn {
+  background: linear-gradient(90deg, #ffcc00, #ff9900);
+  color: black;
+  padding: 14px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.auth-btn:hover {
+  background: linear-gradient(90deg, #ff9900, #ffcc00);
+  transform: scale(1.05);
+}
+
+/* 🔄 Switch between Login and Sign Up */
+.switch-auth {
+  color: #ff0077;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.switch-auth:hover {
+  text-decoration: underline;
+  color: #ffcc00;
+}
+
+/* 📧 Email / Phone Toggle */
+.toggle-email-phone {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.toggle-email-phone button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background: #252932;
+  color: white;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.toggle-email-phone .active {
+  background: #ffcc00;
+  color: black;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 480px) {
+  .auth-modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .auth-header h2 {
+    font-size: 16px;
+  }
+
+  .auth-modal input {
+    font-size: 12px;
+  }
+
+  .auth-btn {
+    font-size: 14px;
+  }
+  
+  .dob-container {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .toggle-email-phone {
+    flex-direction: column;
+  }
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .user-profile {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 10px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .user-profile {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .profile-dropdown {
+    width: 90%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .profile-pic {
+    width: 35px;
+    height: 35px;
+  }
+
+  .profile-dropdown {
+    width: 100%;
+    right: auto;
+    left: 0;
+  }
+
+  .logout-button {
+    width: 100%;
+  }
+}
+
+
+/* 📱 Responsive Design */
+@media (max-width: 768px) {
+  .streamer-profile {
+    max-width: 90%;
+  }
+
+  .back-button {
+    font-size: 12px;
+  }
+
+  .profile-header h2 {
+    font-size: 18px;
+  }
+
+  .past-streams li {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .streamer-profile {
+    padding: 15px;
+  }
+
+  .profile-header h2 {
+    font-size: 16px;
+  }
+
+  .back-button {
+    font-size: 10px;
+  }
+
+  .past-streams li {
+    font-size: 10px;
+    padding: 6px;
+  }
+}
+
+
+/* 📱 Responsive Design */
+@media (max-width: 1200px) {
+  .rooms-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .rooms-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .join-room-btn {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trading-rooms h2 {
+    font-size: 18px;
+  }
+
+  .room-card {
+    max-width: 100%;
+  }
+}
+
+
+/* 📱 Responsive Design */
+@media (max-width: 1200px) {
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .stream-thumbnail {
+    height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .pagination button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .stream-thumbnail {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trending-streams h2 {
+    font-size: 18px;
+  }
+
+  .stream-card {
+    max-width: 100%;
+  }
+
+  .stream-thumbnail {
+    height: 140px;
+  }
+}
+
+
+/* 📱 Responsive Sidebar */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 4px solid #ffcc00;
+    text-align: center;
+  }
+
+  .sidebar ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sidebar-item {
+    flex: 1 1 auto;
+    padding: 10px;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-item {
+    font-size: 10px;
+    padding: 8px;
+  }
+
+  .sidebar h3 {
+    font-size: 12px;
+  }
+  .clear-filters {
+    font-size: 10px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar h3 {
+    font-size: 10px;
+  }
+
+  .sidebar-item {
+    font-size: 9px;
+    padding: 6px;
+  }
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 1200px) {
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  }
+
+  .stream-video {
+    height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .pagination button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .stream-video {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .live-streams h2 {
+    font-size: 18px;
+  }
+
+  .stream-card {
+    max-width: 100%;
+  }
+
+  .stream-video {
+    height: 140px;
+  }
+}
+
+
+/* 📱 Responsive Header */
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .search-bar {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .auth-buttons {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .search-bar input {
+    font-size: 12px;
+  }
+
+  .auth-buttons button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 18px;
+  }
+
+  .header {
+    padding: 5px;
+  }
+}
+
+
+/* 🎯 Responsive Design */
+@media (max-width: 768px) {
+  .trading-room-form {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .trading-room-form {
+    padding: 20px;
+  }
+
+  .trading-room-form h2 {
+    font-size: 14px;
+  }
+
+  .trading-room-form button {
+    font-size: 12px;
+  }
+}
+
+
+/* 📱 Responsive Design */
+@media (max-width: 1024px) {
+  .main-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 4px solid var(--accent-color);
+  }
+}
+
+@media (max-width: 768px) {
+  .streams-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .chat-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .chat-input {
+    flex-direction: column;
+  }
+
+  .chat-input input {
+    margin-bottom: 10px;
+  }
+
+  .chat-messages {
+    height: 200px;
+  }
+}
+
+/* 🏆 Responsive Footer */
+@media (max-width: 768px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer {
+    font-size: 12px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer p {
+    font-size: 10px;
+  }
+
+  .footer-links a {
+    font-size: 10px;
+  }
+}
