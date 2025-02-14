@@ -1,87 +1,105 @@
 import React, { useState } from "react";
+import { db, storage } from "../firebaseConfig";
+import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/global.css";
 
-const CreateTradingRoom = ({ onRoomCreated }) => {
+const bannedWords = ["racistword1", "racistword2", "badword1", "badword2"];
+
+const isValidRoomName = (name) => {
+  if (!name.trim() || name.length < 3) return false;
+  const words = name.toLowerCase().split(/\s+/);
+  return !words.some((word) => bannedWords.includes(word)) && /[aeiouy]/gi.test(name);
+};
+
+const isValidDescription = (desc) => {
+  if (!desc.trim() || desc.length < 5) return false;
+  const words = desc.toLowerCase().split(/\s+/);
+  return !words.some((word) => bannedWords.includes(word)) && /[aeiouy]/gi.test(desc);
+};
+
+const CreateTradingRoom = ({ user }) => {
   const [roomName, setRoomName] = useState("");
   const [category, setCategory] = useState("Forex Trading");
-  const [isPaid, setIsPaid] = useState(false);
-  const [price, setPrice] = useState("");
-  const [billingCycle, setBillingCycle] = useState("weekly");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [description, setDescription] = useState("");
+  const [thumbnail, setThumbnail] = useState(null);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!user) {
+      setError("You need to log in to create a room!");
+      return;
+    }
+    if (!isValidRoomName(roomName)) {
+      setError("❌ Room name must be meaningful & contain real words!");
+      return;
+    }
+    if (!isValidDescription(description)) {
+      setError("❌ Description must be clear & at least 5 characters long!");
+      return;
+    }
+
+    let imageUrl = "";
+    if (thumbnail) {
+      const fileRef = ref(storage, `trading_rooms/${user.uid}_${Date.now()}`);
+      await uploadBytes(fileRef, thumbnail);
+      imageUrl = await getDownloadURL(fileRef);
+    }
+
     const newRoom = {
-      id: Date.now(),
       roomName,
       category,
-      isPaid,
-      price: isPaid ? price : "Free",
-      billingCycle: isPaid ? billingCycle : "N/A",
+      isPrivate,
       description,
+      thumbnail: imageUrl,
+      adminId: user.uid,
+      members: [user.uid],
+      pendingUsers: [],
+      createdAt: new Date(),
     };
-    onRoomCreated(newRoom);
+
+    await addDoc(collection(db, "rooms"), newRoom);
     setRoomName("");
-    setPrice("");
     setDescription("");
+    setThumbnail(null);
   };
 
   return (
     <div className="trading-room-form">
-      <h2>🎯 Create Your Trading Room</h2>
+      <h2>🚀 Create Your Trading Room</h2>
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleSubmit}>
         <label>Room Name:</label>
-        <input
-          type="text"
-          value={roomName}
-          onChange={(e) => setRoomName(e.target.value)}
-          required
-        />
+        <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} required />
 
         <label>Category:</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="Forex Trading">Forex Trading</option>
-          <option value="Crypto Trading">Crypto Trading</option>
-          <option value="Futures & Commodities">Futures & Commodities</option>
-          <option value="Meme Coin Degens">Meme Coin Degens</option>
-          <option value="Gold, Oil & Indices">Gold, Oil & Indices</option>
+          <option>Forex Trading</option>
+          <option>Crypto Trading</option>
+          <option>Futures & Commodities</option>
+          <option>Meme Coin Degens</option>
+          <option>Gold, Oil & Indices</option>
         </select>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={isPaid}
-            onChange={() => setIsPaid(!isPaid)}
-          />
-          Paid Room?
-        </label>
+        <label>Privacy:</label>
+        <div>
+          <label>
+            <input type="radio" checked={!isPrivate} onChange={() => setIsPrivate(false)} /> Public
+          </label>
+          <label>
+            <input type="radio" checked={isPrivate} onChange={() => setIsPrivate(true)} /> Private (Approval Required)
+          </label>
+        </div>
 
-        {isPaid && (
-          <>
-            <label>Price ($):</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
-
-            <label>Billing Cycle:</label>
-            <select
-              value={billingCycle}
-              onChange={(e) => setBillingCycle(e.target.value)}
-            >
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </>
-        )}
+        <label>Upload Thumbnail (JPEG/PNG):</label>
+        <input type="file" accept="image/png, image/jpeg" onChange={(e) => setThumbnail(e.target.files[0])} />
 
         <label>Description:</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
 
         <button type="submit">🚀 Create Room</button>
       </form>

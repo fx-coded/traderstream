@@ -1,7 +1,7 @@
 // Import Firebase SDKs
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -22,6 +22,11 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+// 🔥 Set Firebase Authentication Persistence
+setPersistence(auth, browserLocalPersistence)
+  .then(() => console.log("✅ Firebase Auth persistence set to LOCAL"))
+  .catch((error) => console.error("⚠️ Error setting auth persistence:", error));
 
 // Export Firebase modules
 export { app, analytics, auth, db, storage };
