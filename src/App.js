@@ -15,7 +15,6 @@ import AuthAction from "./Profile/AuthAction"; // ✅ Email Verification & Passw
 import "./styles/global.css";
 
 const App = () => {
-  const [selectedStreamer, setSelectedStreamer] = useState(null);
   const [activeTab, setActiveTab] = useState("live");
   const [tradingRooms, setTradingRooms] = useState([]);
   const [showAuthModal, setShowAuthModal] = useState(null);
@@ -70,25 +69,24 @@ const App = () => {
               <Route 
                 path="/" 
                 element={
-                  selectedStreamer ? (
-                    <StreamerProfile 
-                      streamer={selectedStreamer} 
-                      setSelectedStreamer={setSelectedStreamer} 
-                    />
-                  ) : activeTab === "rooms" ? (
+                  activeTab === "rooms" ? (
                     <>
                       <CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />
                       <TradingRoomsList tradingRooms={tradingRooms} user={user} />
                     </>
                   ) : (
                     <>
-                      <TrendingStreams setSelectedStreamer={setSelectedStreamer} />
-                      <LiveStreams setSelectedStreamer={setSelectedStreamer} />
+                      <TrendingStreams />
+                      <LiveStreams />
                       <Footer />
                     </>
                   )
                 } 
               />
+              
+              {/* ✅ Full-Page Profile Route */}
+              <Route path="/profile/:streamerId" element={<StreamerProfile user={user} />} />
+
               {/* ✅ Route for Email Verification & Password Reset */}
               <Route path="/auth-action" element={<AuthAction />} />
             </Routes>

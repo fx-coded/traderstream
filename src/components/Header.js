@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import "../styles/global.css";
 
 const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -20,18 +20,12 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
 
   return (
     <header className="header">
-      <div className="logo"> TraderStream</div>
+      <div className="logo">TraderStream</div>
       <nav className="nav-links">
-        <button 
-          className={`nav-button ${activeTab === "live" ? "active" : ""}`} 
-          onClick={() => setActiveTab("live")}
-        >
+        <button className={`nav-button ${activeTab === "live" ? "active" : ""}`} onClick={() => setActiveTab("live")}>
           Live Streams
         </button>
-        <button 
-          className={`nav-button ${activeTab === "rooms" ? "active" : ""}`} 
-          onClick={() => setActiveTab("rooms")}
-        >
+        <button className={`nav-button ${activeTab === "rooms" ? "active" : ""}`} onClick={() => setActiveTab("rooms")}>
           Trading Rooms
         </button>
       </nav>
@@ -48,12 +42,11 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
             <span>{user.username} ⬇</span>
           </div>
 
-          {/* 🎭 Profile Dropdown */}
           {showDropdown && (
             <div className="profile-dropdown">
-              <p><strong>📅 Experience:</strong> {user.experience} years</p>
-              <p><strong>📈 Instruments:</strong> {user.instruments}</p>
-              <p><strong>📝 Bio:</strong> {user.bio}</p>
+              <Link to={`/profile/${user.uid}`} className="view-profile">
+                👤 View Profile
+              </Link>
               <button onClick={logout} className="logout-button">🚪 Sign Out</button>
             </div>
           )}

@@ -1,30 +1,43 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { db, storage } from "../firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/global.css";
 
-const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
-  const [bio, setBio] = useState("");
+const StreamerProfile = ({ user }) => {
+  const { streamerId } = useParams(); // Get streamer ID from URL
+  const navigate = useNavigate();
+  const [streamer, setStreamer] = useState(null);
   const [editing, setEditing] = useState(false);
-  const [profilePic, setProfilePic] = useState("");
   const [username, setUsername] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [bio, setBio] = useState("");
+  const [profilePic, setProfilePic] = useState("");
   const [experience, setExperience] = useState("Beginner");
+  const [socialLinks, setSocialLinks] = useState({ twitter: "", youtube: "", tiktok: "" });
+  const [followers, setFollowers] = useState([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
+  // 🔥 Fetch streamer profile data
   useEffect(() => {
-    if (!streamer) return;
+    if (!streamerId) return;
 
     const fetchUserData = async () => {
       try {
-        const userDoc = await getDoc(doc(db, "users", streamer.id));
+        const userDoc = await getDoc(doc(db, "users", streamerId));
         if (userDoc.exists()) {
           const userData = userDoc.data();
+          setStreamer(userData);
+          setUsername(userData.username || "");
           setBio(userData.bio || "");
           setProfilePic(userData.profilePic || "");
-          setUsername(userData.username || "");
           setExperience(userData.experience || "Beginner");
+          setSocialLinks(userData.socialLinks || { twitter: "", youtube: "", tiktok: "" });
+          setFollowers(userData.followers || []);
+        } else {
+          navigate("/"); // Redirect if user not found
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -32,8 +45,15 @@ const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
     };
 
     fetchUserData();
-  }, [streamer]);
+  }, [streamerId, navigate]);
 
+  useEffect(() => {
+    if (user) {
+      setIsFollowing(followers.includes(user.uid));
+    }
+  }, [followers, user]);
+
+  // 📸 Handle profile picture upload
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -42,11 +62,11 @@ const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
     setError("");
 
     try {
-      const fileRef = ref(storage, `profile_pictures/${streamer.id}`);
+      const fileRef = ref(storage, `profile_pictures/${streamerId}`);
       await uploadBytes(fileRef, file);
       const imageUrl = await getDownloadURL(fileRef);
 
-      await updateDoc(doc(db, "users", streamer.id), { profilePic: imageUrl });
+      await updateDoc(doc(db, "users", streamerId), { profilePic: imageUrl });
       setProfilePic(imageUrl);
     } catch (err) {
       setError("⚠️ Error uploading image. Try again.");
@@ -55,6 +75,7 @@ const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
     setUploading(false);
   };
 
+  // ✅ Save profile updates
   const handleSaveProfile = async () => {
     if (!username.trim()) {
       setError("⚠️ Username cannot be empty.");
@@ -62,11 +83,30 @@ const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
     }
 
     try {
-      await updateDoc(doc(db, "users", streamer.id), { bio, username, experience });
+      await updateDoc(doc(db, "users", streamerId), {
+        username,
+        bio,
+        experience,
+        socialLinks,
+      });
       setEditing(false);
     } catch (err) {
       setError("⚠️ Error updating profile. Try again.");
     }
+  };
+
+  // ➕ Follow / Unfollow streamer
+  const handleFollow = async () => {
+    if (!user) return alert("You need to log in to follow streamers!");
+
+    const userRef = doc(db, "users", streamerId);
+    let updatedFollowers = isFollowing
+      ? followers.filter((followerId) => followerId !== user.uid)
+      : [...followers, user.uid];
+
+    await updateDoc(userRef, { followers: updatedFollowers });
+    setFollowers(updatedFollowers);
+    setIsFollowing(!isFollowing);
   };
 
   if (!streamer) {
@@ -74,40 +114,34 @@ const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
   }
 
   return (
-    <div className="streamer-profile">
-      <button className="back-button" onClick={() => setSelectedStreamer(null)}>
+    <div className={`streamer-profile ${editing ? "fullscreen-edit" : ""}`}>
+      <button className="back-button" onClick={() => navigate("/")}>
         ← Back
       </button>
 
-      <div className="profile-header">
+      <div className="profile-container">
         <div className="profile-pic-container">
-          <img src={profilePic} alt="Profile" className="profile-pic" />
-          {user?.uid === streamer.id && (
+          <img src={profilePic || "/default-profile.png"} alt="Profile" className="profile-pic" />
+          {user?.uid === streamerId && editing && (
             <>
-              <input type="file" accept="image/*" onChange={handleProfilePicUpload} className="upload-input" />
+              <label className="upload-btn">
+                📸 Change Profile
+                <input type="file" accept="image/*" onChange={handleProfilePicUpload} />
+              </label>
               {uploading && <p className="uploading-text">Uploading...</p>}
             </>
           )}
         </div>
 
-        <div>
+        <div className="profile-info">
           {editing ? (
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="editable-input"
-            />
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="editable-input" />
           ) : (
             <h2>{username}</h2>
           )}
 
           {editing ? (
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="editable-input"
-            />
+            <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="editable-input" />
           ) : (
             <p className="bio">{bio}</p>
           )}
@@ -120,43 +154,36 @@ const StreamerProfile = ({ streamer, user, setSelectedStreamer }) => {
               <option value="Pro">Pro - Lost a sh*t ton of money</option>
             </select>
           )}
-        </div>
-      </div>
 
-      {streamer.isLive ? (
-        <div className="live-stream-section">
-          <h3>🔴 Live Now</h3>
-          <p>🚀 Streaming in progress...</p>
-        </div>
-      ) : (
-        <p className="offline-text">⚫ {username} is currently offline.</p>
-      )}
+          {user?.uid === streamerId && <p className="followers-count">👥 {followers.length} Followers</p>}
 
-      <div className="past-streams">
-        <h3>📺 Past Streams</h3>
-        {streamer.streams.length > 0 ? (
-          <ul>
-            {streamer.streams.map((stream, index) => (
-              <li key={index}>{stream}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No past streams available.</p>
-        )}
-      </div>
-
-      {user?.uid === streamer.id && (
-        <div className="edit-profile">
-          {editing ? (
-            <button className="edit-btn" onClick={handleSaveProfile}>
-              ✅ Save Changes
-            </button>
-          ) : (
-            <button className="edit-btn" onClick={() => setEditing(true)}>
-              ✏️ Edit Profile
+          {user && user.uid !== streamerId && (
+            <button className="follow-btn" onClick={handleFollow}>
+              {isFollowing ? "✅ Following" : "➕ Follow"}
             </button>
           )}
         </div>
+      </div>
+
+      {editing && (
+        <div className="social-links">
+          <label>Twitter:</label>
+          <input type="text" value={socialLinks.twitter} onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })} />
+
+          <label>YouTube:</label>
+          <input type="text" value={socialLinks.youtube} onChange={(e) => setSocialLinks({ ...socialLinks, youtube: e.target.value })} />
+
+          <label>TikTok:</label>
+          <input type="text" value={socialLinks.tiktok} onChange={(e) => setSocialLinks({ ...socialLinks, tiktok: e.target.value })} />
+        </div>
+      )}
+
+      {editing && <button className="save-btn" onClick={handleSaveProfile}>✅ Save Profile</button>}
+
+      {!editing && user?.uid === streamerId && (
+        <button className="edit-btn" onClick={() => navigate(`/profile/edit/${user.uid}`)}>
+          ✏️ Edit Profile
+        </button>
       )}
 
       {error && <p className="error-message">{error}</p>}

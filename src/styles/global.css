@@ -185,120 +185,202 @@ strong, b {
 
 
 /* 🔥 Chat Box */
-.chat-container {
+/* Global Chat Styling */
+.chat-fullscreen {
   width: 100%;
-  max-width: 400px;
-  background: var(--background-color);
-  border: 3px solid var(--primary-color);
-  box-shadow: 0px 0px 15px rgba(255, 0, 119, 0.5);
-  border-radius: 10px;
-  overflow: hidden;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: "Press Start 2P", Arial, sans-serif;
-}
-
-/* 💬 Chat Header */
-.chat-header {
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  color: var(--background-color);
-  font-size: 14px;
-  font-weight: bold;
-  padding: 12px;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* 📜 Chat Messages */
-.chat-messages {
-  padding: 10px;
-  flex-grow: 1;
-  overflow-y: auto;
-  height: 250px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary-color) var(--background-color);
-  background: #0d1117;
-  border-bottom: 3px solid var(--primary-color);
-}
-
-/* 📩 Chat Message */
-.chat-message {
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  word-wrap: break-word;
-}
-
-/* 🟢 Received Messages */
-.received {
-  background: rgba(255, 255, 255, 0.1);
-  border-left: 4px solid var(--primary-color);
-  color: var(--text-color);
-  text-align: left;
-}
-
-/* 🔵 Sent Messages */
-.sent {
-  background: rgba(0, 255, 119, 0.2);
-  border-right: 4px solid var(--accent-color);
-  color: var(--accent-color);
-  text-align: right;
-  align-self: flex-end;
-}
-
-/* ✍️ Chat Input */
-.chat-input {
-  display: flex;
-  padding: 8px;
-  background: var(--background-color);
-  border-top: 3px solid var(--primary-color);
-}
-
-.chat-input input {
-  flex-grow: 1;
-  padding: 10px;
-  border-radius: 5px;
-  border: 2px solid var(--secondary-color);
-  background: #121826;
+  background: #1a1a1a;
   color: white;
-  font-size: 13px;
-  outline: none;
 }
 
-.chat-input button {
-  background: var(--primary-color);
-  color: white;
+/* Chat Navbar (Top Bar) */
+.chat-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ff6700;
+  padding: 12px 20px;
+}
+
+.exit-room-btn {
+  background: none;
   border: none;
-  padding: 10px 15px;
-  margin-left: 8px;
+  font-size: 20px;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 13px;
-  transition: background 0.3s;
+  color: white;
 }
 
-.chat-input button:hover {
-  background: var(--secondary-color);
+/* 🎉 Reaction Container */
+.reaction-container {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+/* 🎭 Reaction Button */
+.reaction-btn {
+  font-size: 14px;
+  padding: 4px;
+  background: black;
+  border: 1px solid white;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.reaction-btn:hover {
+  background: white;
   color: black;
 }
 
-/* 🌀 Scrollbar */
-.chat-messages::-webkit-scrollbar {
-  width: 6px;
+/* 🛑 Delete Message Button */
+.delete-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  background: red;
+  color: white;
+  border: none;
+  padding: 4px 6px;
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
 }
 
-.chat-messages::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color);
-  border-radius: 6px;
+.delete-btn:hover {
+  background: black;
+  color: red;
 }
 
-.chat-messages::-webkit-scrollbar-track {
-  background: #121826;
+/* 🚫 Remove User Button (Admin) */
+.remove-user-btn {
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
+  background: yellow;
+  color: black;
+  border: none;
+  padding: 4px 6px;
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
 }
+
+.remove-user-btn:hover {
+  background: black;
+  color: yellow;
+}
+
+
+.chat-navbar h2 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.chat-navbar p {
+  font-size: 16px;
+}
+
+/* Chat Messages Container */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  max-height: calc(100vh - 150px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Individual Messages */
+.chat-message {
+  background: #333;
+  padding: 8px;
+  border-radius: 5px;
+  margin: 5px 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+  font-size: 14px;
+}
+
+/* Sent Message (Align Right) */
+.sent {
+  background: #007bff;
+  color: white;
+  align-self: flex-end;
+  text-align: right;
+}
+
+/* Received Message (Align Left) */
+.received {
+  background: #444;
+  color: white;
+  align-self: flex-start;
+}
+
+/* Message Timestamp */
+.message-time {
+  font-size: 12px;
+  color: #ccc;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Chat Image Upload Preview */
+.chat-image {
+  max-width: 100%;
+  max-height: 200px;
+  display: block;
+  margin-top: 5px;
+  border-radius: 8px;
+}
+
+/* Chat Input Section */
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background: #222;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-input input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #333;
+  color: white;
+}
+
+.upload-icon {
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease-in-out;
+}
+
+.upload-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+button[type="submit"] {
+  background: #ff007b;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 
 /* 🔥 Trading Room Form - Retro Futuristic Aesthetic */
 .trading-room-form {
@@ -993,9 +1075,10 @@ strong, b {
 }
 
 /* 🎥 Streamer Profile Section */
+/* 🎮 Streamer Profile Styling */
 .streamer-profile {
-  max-width: 700px;
-  margin: 50px auto;
+  max-width: 600px;
+  margin: 0 auto;
   padding: 25px;
   background: linear-gradient(145deg, #1b1f27, #292929);
   border-radius: 12px;
@@ -1005,10 +1088,7 @@ strong, b {
   font-family: "Press Start 2P", sans-serif;
   color: var(--text-color);
   transition: transform 0.3s ease-in-out;
-}
-
-.streamer-profile:hover {
-  transform: scale(1.02);
+  position: relative;
 }
 
 /* 🔙 Back Button */
@@ -1036,31 +1116,10 @@ strong, b {
 .profile-header {
   padding: 20px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
   border-bottom: 3px solid var(--secondary-color);
-  flex-wrap: wrap;
-}
-
-.profile-header h2 {
-  font-size: 22px;
-  color: var(--secondary-color);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.profile-header .bio {
-  font-size: 14px;
-  color: #d3d3d3;
-  font-style: italic;
-  margin-bottom: 12px;
-}
-
-.profile-header .followers {
-  font-size: 14px;
-  color: var(--accent-color);
-  font-weight: bold;
+  gap: 15px;
 }
 
 /* 👤 Profile Picture Section */
@@ -1072,21 +1131,133 @@ strong, b {
 }
 
 .profile-pic {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   border: 3px solid var(--secondary-color);
   transition: transform 0.3s ease-in-out;
+  object-fit: cover;
 }
 
 .profile-pic:hover {
   transform: scale(1.1);
 }
 
-.upload-input {
-  margin-top: 8px;
+/* 📸 Upload Button (Visible & Clickable) */
+.upload-btn {
+  background: var(--accent-color);
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
   font-size: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
 }
+
+.upload-btn:hover {
+  background: var(--secondary-color);
+}
+
+.upload-btn input {
+  display: none;
+}
+
+/* 📝 Username & Bio */
+.profile-header h2 {
+  font-size: 20px;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.bio {
+  font-size: 14px;
+  color: #d3d3d3;
+  font-style: italic;
+  max-width: 80%;
+}
+
+/* 👥 Followers */
+.followers-count {
+  font-size: 14px;
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+/* ✅ Follow Button */
+.follow-btn {
+  background: var(--primary-color);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.follow-btn:hover {
+  background: var(--secondary-color);
+}
+
+/* 🎯 Experience Level */
+.experience {
+  font-size: 14px;
+  color: var(--text-color);
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* 🎮 Social Media Links */
+.social-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.social-links label {
+  font-size: 12px;
+  color: var(--text-color);
+  margin-top: 5px;
+}
+
+.social-links input {
+  padding: 8px;
+  width: 80%;
+  background: #222;
+  color: white;
+  border: 1px solid var(--secondary-color);
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* 📺 Past Streams */
+.past-streams {
+  margin-top: 20px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.past-streams h3 {
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.past-streams ul {
+  list-style: none;
+  padding: 0;
+}
+
+.past-streams li {
+  font-size: 14px;
+  color: var(--text-color);
+  margin: 5px 0;
+}
+
 
 /* ✏️ Editable Fields */
 .editable-input {
@@ -1642,10 +1813,6 @@ strong, b {
     gap: 10px;
     flex-wrap: wrap;
   }
-
-  .user-profile {
-    flex-direction: row;
-  }
 }
 
 @media (max-width: 768px) {
@@ -1678,78 +1845,37 @@ strong, b {
     width: 100%;
   }
 }
-
-/* 📱 RESPONSIVE DESIGN */
-@media (max-width: 768px) {
+/* 🎨 Mobile Responsiveness */
+@media screen and (max-width: 768px) {
   .streamer-profile {
-    width: 90%;
+    width: 95%;
     padding: 20px;
   }
 
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
   .profile-pic {
-    width: 70px;
-    height: 70px;
+    width: 90px;
+    height: 90px;
   }
 
-  .editable-input {
-    font-size: 13px;
+  .bio {
+    font-size: 12px;
   }
 
-  .preference-list p {
-    font-size: 13px;
+  .followers-count,
+  .experience {
+    font-size: 12px;
   }
 
-  .past-streams h3 {
-    font-size: 16px;
+  .follow-btn {
+    font-size: 12px;
+    padding: 8px 15px;
   }
 
-  .past-streams li {
-    font-size: 13px;
-  }
-
-  .edit-btn {
-    font-size: 13px;
-    padding: 8px;
+  .past-streams {
+    font-size: 12px;
   }
 }
 
-@media (max-width: 480px) {
-  .streamer-profile {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .profile-pic {
-    width: 60px;
-    height: 60px;
-  }
-
-  .profile-header h2 {
-    font-size: 18px;
-  }
-
-  .editable-input {
-    font-size: 12px;
-  }
-
-  .preference-list p {
-    font-size: 12px;
-  }
-
-  .past-streams li {
-    font-size: 12px;
-  }
-
-  .edit-btn {
-    font-size: 12px;
-    padding: 6px;
-  }
-}
 
 
 /* 📱 Responsive Design */
@@ -2025,10 +2151,6 @@ strong, b {
   .streams-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
-
-  .chat-container {
-    max-width: 100%;
-  }
 }
 
 @media (max-width: 480px) {
@@ -2036,19 +2158,99 @@ strong, b {
     flex-direction: column;
     text-align: center;
   }
+}
 
-  .chat-input {
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+  .chat-navbar {
     flex-direction: column;
+    text-align: center;
+    padding: 10px;
   }
 
-  .chat-input input {
-    margin-bottom: 10px;
+  .chat-navbar h2 {
+    font-size: 18px;
+  }
+
+  .chat-navbar p {
+    font-size: 14px;
+  }
+  .delete-chat-btn {
+    font-size: 10px;
+    padding: 6px;
+  }
+  .reaction-btn {
+    font-size: 12px;
+  }
+
+  .delete-btn,
+  .remove-user-btn {
+    font-size: 9px;
+  }
+  .chat-messages {
+    max-height: calc(100vh - 170px);
+    padding: 5px;
+  }
+
+  .chat-message {
+    font-size: 13px;
+    max-width: 80%;
+  }
+
+  .chat-input {
+    flex-direction: row;
+    gap: 5px;
+  }
+
+  .chat-input input[type="text"] {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .upload-icon {
+    font-size: 18px;
+  }
+
+  button[type="submit"] {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .chat-navbar {
+    padding: 8px;
   }
 
   .chat-messages {
-    height: 200px;
+    max-height: calc(100vh - 180px);
+  }
+
+  .chat-message {
+    font-size: 12px;
+    max-width: 90%;
+  }
+
+  .chat-input {
+    flex-direction: row;
+    padding: 8px;
+  }
+
+  .chat-input input[type="text"] {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .upload-icon {
+    font-size: 16px;
+  }
+
+  button[type="submit"] {
+    font-size: 12px;
+    padding: 6px 10px;
   }
 }
+
 
 /* 📱 Mobile Responsive Fixes */
 @media (max-width: 768px) {
