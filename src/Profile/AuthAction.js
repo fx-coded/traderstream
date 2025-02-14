@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebaseConfig"; // Ensure Firebase is configured
-import { applyActionCode, verifyPasswordResetCode, confirmPasswordReset } from "firebase/auth";
+import { applyActionCode, verifyPasswordResetCode, confirmPasswordReset, checkActionCode, sendPasswordResetEmail } from "firebase/auth";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../styles/global.css"
+import "../styles/global.css";
 
 const AuthAction = () => {
   const [actionMode, setActionMode] = useState(null);
@@ -10,6 +10,7 @@ const AuthAction = () => {
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,6 +22,16 @@ const AuthAction = () => {
 
     setActionMode(mode);
     setOobCode(code);
+
+    if (code) {
+      checkActionCode(auth, code)
+        .then((info) => {
+          setEmail(info.data.email || "");
+        })
+        .catch(() => {
+          setError("⚠️ This link has expired or is invalid. Please request a new one.");
+        });
+    }
   }, [location]);
 
   // 📌 Handle Email Verification
@@ -31,7 +42,9 @@ const AuthAction = () => {
           setSuccess(true);
           setTimeout(() => navigate("/"), 3000);
         })
-        .catch((err) => setError("⚠ Email verification failed."));
+        .catch(() => {
+          setError("⚠️ Email verification link has expired or is invalid. Please request a new one.");
+        });
     }
   }, [actionMode, oobCode, navigate]);
 
@@ -39,7 +52,7 @@ const AuthAction = () => {
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     if (newPassword.length < 6) {
-      setError("⚠ Password must be at least 6 characters long.");
+      setError("⚠️ Password must be at least 6 characters long.");
       return;
     }
 
@@ -48,8 +61,23 @@ const AuthAction = () => {
       await confirmPasswordReset(auth, oobCode, newPassword);
       setSuccess(true);
       setTimeout(() => navigate("/"), 3000);
-    } catch (err) {
-      setError("⚠ Password reset failed.");
+    } catch {
+      setError("⚠️ Password reset link has expired or is invalid. Request a new link below.");
+    }
+  };
+
+  // 📌 Request New Password Reset Link
+  const requestNewPasswordReset = async () => {
+    if (!email) {
+      setError("⚠️ Unable to request a new reset link. Try again later.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setSuccess("✅ A new password reset link has been sent to your email.");
+    } catch {
+      setError("⚠️ Failed to send a new password reset link. Please try again.");
     }
   };
 
@@ -73,7 +101,16 @@ const AuthAction = () => {
         </form>
       )}
 
-      {error && <p className="error-message">{error}</p>}
+      {error && (
+        <div className="error-message">
+          <p>{error}</p>
+          {actionMode === "resetPassword" && (
+            <button onClick={requestNewPasswordReset} className="resend-link-btn">
+              🔄 Request New Password Reset Link
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

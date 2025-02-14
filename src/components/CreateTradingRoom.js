@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db, storage } from "../firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/global.css";
 
@@ -25,10 +25,12 @@ const CreateTradingRoom = ({ user }) => {
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (!user) {
       setError("You need to log in to create a room!");
@@ -43,11 +45,24 @@ const CreateTradingRoom = ({ user }) => {
       return;
     }
 
+    // 🔥 Check if the room name already exists
+    const roomQuery = query(collection(db, "rooms"), where("roomName", "==", roomName));
+    const roomSnapshot = await getDocs(roomQuery);
+    if (!roomSnapshot.empty) {
+      setError("❌ A room with this name already exists! Choose a different name.");
+      return;
+    }
+
     let imageUrl = "";
     if (thumbnail) {
-      const fileRef = ref(storage, `trading_rooms/${user.uid}_${Date.now()}`);
-      await uploadBytes(fileRef, thumbnail);
-      imageUrl = await getDownloadURL(fileRef);
+      try {
+        const fileRef = ref(storage, `trading_rooms/${user.uid}_${Date.now()}`);
+        await uploadBytes(fileRef, thumbnail);
+        imageUrl = await getDownloadURL(fileRef);
+      } catch (uploadError) {
+        setError("⚠️ Error uploading image. Try again.");
+        return;
+      }
     }
 
     const newRoom = {
@@ -62,16 +77,22 @@ const CreateTradingRoom = ({ user }) => {
       createdAt: new Date(),
     };
 
-    await addDoc(collection(db, "rooms"), newRoom);
-    setRoomName("");
-    setDescription("");
-    setThumbnail(null);
+    try {
+      await addDoc(collection(db, "rooms"), newRoom);
+      setSuccess("✅ Room created successfully!");
+      setRoomName("");
+      setDescription("");
+      setThumbnail(null);
+    } catch (dbError) {
+      setError("⚠️ Error creating room. Try again.");
+    }
   };
 
   return (
     <div className="trading-room-form">
       <h2>🚀 Create Your Trading Room</h2>
       {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
       <form onSubmit={handleSubmit}>
         <label>Room Name:</label>
         <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} required />
