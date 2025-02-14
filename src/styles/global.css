@@ -781,21 +781,19 @@ body {
 /* 🏆 Trading Rooms Section */
 .trading-rooms {
   text-align: center;
-  padding: 30px;
-  background: #121826;
+  padding: 40px 20px;
+  background: #0d0f18;
   color: white;
 }
 
-
-
 /* 🎯 Title */
 .trading-rooms h2 {
-  font-size: 22px;
+  font-size: 24px;
   color: #ffcc00;
   text-transform: uppercase;
   font-weight: bold;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px #ff0077;
+  margin-bottom: 30px;
+  text-shadow: 3px 3px #ff0077, 0px 0px 15px rgba(255, 0, 119, 0.8);
   font-family: "Press Start 2P", sans-serif;
 }
 
@@ -803,7 +801,7 @@ body {
 .rooms-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  gap: 25px;
   justify-items: center;
   width: 100%;
   max-width: 1400px;
@@ -813,65 +811,154 @@ body {
 
 /* 🏆 Room Card */
 .room-card {
-  background: linear-gradient(145deg, #1b1f27, #292929);
+  background: linear-gradient(145deg, #1b1f27, #252a34);
   padding: 20px;
-  border-radius: 10px;
-  border: 2px solid #ff0077;
-  box-shadow: 0 0 15px rgba(255, 0, 119, 0.5);
+  border-radius: 12px;
+  border: 3px solid #ff0077;
+  box-shadow: 0 0 18px rgba(255, 0, 119, 0.6);
   overflow: hidden;
   max-width: 400px;
   text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
 }
 
-/* 🎮 Hover Effect */
+/* 🎮 Room Hover Effect */
 .room-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(255, 0, 119, 0.8);
+  box-shadow: 0 0 25px rgba(255, 0, 119, 0.9);
+}
+
+/* 🖼️ Room Thumbnail */
+.room-thumbnail {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0px 0px 15px rgba(255, 0, 119, 0.7);
 }
 
 /* 📌 Room Details */
 .room-card h3 {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffcc00;
   text-transform: uppercase;
   margin-bottom: 5px;
+  letter-spacing: 1px;
 }
 
 .room-card p {
   font-size: 14px;
-  color: white;
-  margin-bottom: 8px;
+  color: #e0e0e0;
+  margin-bottom: 10px;
 }
 
 /* 🚀 Join Room Button */
 .join-room-btn {
   background: #ff0077;
   color: white;
-  border: 2px solid #ffcc00;
+  border: 3px solid #ffcc00;
   padding: 12px;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: background 0.3s, transform 0.3s;
+  border-radius: 6px;
+  font-size: 15px;
   font-weight: bold;
+  transition: background 0.3s ease, transform 0.3s ease;
   width: 100%;
+  box-shadow: 0 0 10px rgba(255, 0, 119, 0.6);
 }
 
 .join-room-btn:hover {
   background: #ffcc00;
   color: black;
-  transform: scale(1.05);
+  transform: scale(1.06);
+  box-shadow: 0 0 15px rgba(255, 204, 0, 0.9);
+}
+
+/* 🚪 Leave Room Button */
+.leave-room-btn {
+  background: #ff4444;
+  color: white;
+  border: 3px solid #ffcc00;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.3s ease;
+  width: 100%;
+  margin-top: 10px;
+  box-shadow: 0 0 10px rgba(255, 69, 58, 0.7);
+}
+
+.leave-room-btn:hover {
+  background: #ffcc00;
+  color: black;
+  transform: scale(1.06);
+  box-shadow: 0 0 15px rgba(255, 204, 0, 0.9);
 }
 
 /* 🎥 Room Content */
 .room-content {
   margin-top: 15px;
-  background: #0d1117;
-  padding: 15px;
-  border-radius: 6px;
+  background: #10151f;
+  padding: 18px;
+  border-radius: 8px;
   border: 2px solid #ff0077;
   text-align: center;
+  box-shadow: 0 0 12px rgba(255, 0, 119, 0.5);
+}
+
+/* 🌟 Live Stream Placeholder */
+.stream-placeholder {
+  font-size: 16px;
+  color: #ffcc00;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* 🛠️ Pending Approval Button */
+.pending-btn {
+  background: #ffcc00;
+  color: black;
+  border: 3px solid #ff0077;
+  padding: 12px;
+  cursor: not-allowed;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  width: 100%;
+  opacity: 0.7;
+}
+
+/* 👑 Admin Panel */
+.admin-approvals {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 0, 119, 0.1);
+  border: 2px solid #ff0077;
+  border-radius: 8px;
+}
+
+.admin-approvals h4 {
+  color: #ffcc00;
+  margin-bottom: 10px;
+}
+
+/* 🖥️ Responsive Grid */
+@media (max-width: 768px) {
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-card {
+    max-width: 95%;
+  }
+
+  .room-thumbnail {
+    height: 140px;
+  }
 }
 
 /* 🎬 Stream Placeholder */
