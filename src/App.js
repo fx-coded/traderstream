@@ -19,6 +19,7 @@ const App = () => {
   const [tradingRooms, setTradingRooms] = useState([]);
   const [showAuthModal, setShowAuthModal] = useState(null);
   const [user, setUser] = useState(null);
+  const [filteredCategory, setFilteredCategory] = useState(null); // ✅ Category Filtering State
 
   // 🔥 Detect Firebase Auth Changes
   useEffect(() => {
@@ -63,7 +64,8 @@ const App = () => {
         />
         
         <div className="main-layout">
-          <Sidebar />
+          <Sidebar setFilteredCategories={setFilteredCategory} activeTab={activeTab} /> {/* ✅ Pass Filter Function */}
+
           <div className="content-wrapper">
             <Routes>
               <Route 
@@ -72,12 +74,12 @@ const App = () => {
                   activeTab === "rooms" ? (
                     <>
                       <CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />
-                      <TradingRoomsList tradingRooms={tradingRooms} user={user} />
+                      <TradingRoomsList tradingRooms={tradingRooms} user={user} filteredCategory={filteredCategory} /> {/* ✅ Pass Filtered Category */}
                     </>
                   ) : (
                     <>
                       <TrendingStreams />
-                      <LiveStreams />
+                      <LiveStreams setSelectedStreamer={() => {}} filteredCategory={filteredCategory} /> {/* ✅ Pass Filtered Category */}
                       <Footer />
                     </>
                   )
@@ -89,6 +91,9 @@ const App = () => {
 
               {/* ✅ Route for Email Verification & Password Reset */}
               <Route path="/auth-action" element={<AuthAction />} />
+              <Route path="/create-room" element={<CreateTradingRoom user={user} />} />
+<Route path="/trading-rooms" element={<TradingRoomsList user={user} />} />
+
             </Routes>
           </div>
         </div>

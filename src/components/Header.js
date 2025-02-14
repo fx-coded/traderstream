@@ -1,11 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebaseConfig";
 import "../styles/global.css";
 
 const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [profilePic, setProfilePic] = useState("/default-profile.png");
+  const [username, setUsername] = useState("Trader");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Fetch user profile in real-time
+  useEffect(() => {
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      const unsubscribe = onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setProfilePic(data.profilePic || "/default-profile.png");
+          setUsername(data.username || "Trader");
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -48,12 +68,8 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
       {user ? (
         <div className="user-profile" ref={dropdownRef}>
           <div className="profile-info" onClick={() => setShowDropdown(!showDropdown)}>
-            <img 
-              src={user.profilePic || "/default-profile.png"} 
-              alt="User" 
-              className="profile-pic"
-            />
-            <span>{user.username || "Trader"} ⬇</span>
+            <img src={profilePic} alt="User" className="profile-pic" />
+            <span>{username} ⬇</span>
           </div>
 
           {/* 🔻 Profile Dropdown */}

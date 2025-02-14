@@ -404,6 +404,40 @@ button[type="submit"] {
 
 
 /* 🔥 Trading Room Form - Retro Futuristic Aesthetic */
+
+/* ➕ Create Room Button */
+.create-room-button {
+  background: linear-gradient(90deg, #ff0077, #ffcc00);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 12px rgba(255, 0, 119, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 20px auto;
+}
+
+/* 🖱 Hover & Click Effects */
+.create-room-button:hover {
+  background: linear-gradient(90deg, #ffcc00, #ff0077);
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(255, 204, 0, 0.9);
+}
+
+.create-room-button:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 8px rgba(255, 0, 119, 0.5);
+}
+
 .trading-room-form {
   max-width: 500px;
   background: #1b1f27;
@@ -805,6 +839,30 @@ button[type="submit"] {
   min-height: 300px; /* Ensures the layout holds even if empty */
 }
 
+/* 🎥 Go Live Button */
+.go-live-btn {
+  display: inline-block;
+  background: linear-gradient(90deg, #ff0077, #ffcc00);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px rgba(255, 0, 119, 0.6);
+  transition: all 0.3s ease-in-out;
+  margin-top: 20px;
+}
+
+.go-live-btn:hover {
+  background: linear-gradient(90deg, #ffcc00, #ff0077);
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(255, 204, 0, 0.9);
+}
+
+
 /* 🚀 No Trending Streams Available */
 .no-trending-streams {
   grid-column: 1 / -1; /* Full width */
@@ -923,7 +981,7 @@ button[type="submit"] {
 /* 🔥 Rooms Grid */
 .rooms-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 25px;
   justify-items: center;
   width: 100%;
@@ -932,7 +990,7 @@ button[type="submit"] {
   padding: 20px;
 }
 
-/* 🏆 Room Card */
+/* 🏆 Room Card (Ensures all cards are the same size) */
 .room-card {
   background: linear-gradient(145deg, #1b1f27, #252a34);
   padding: 20px;
@@ -940,10 +998,15 @@ button[type="submit"] {
   border: 3px solid #ff0077;
   box-shadow: 0 0 18px rgba(255, 0, 119, 0.6);
   overflow: hidden;
-  max-width: 400px;
+  width: 100%;
+  max-width: 350px;
+  height: 420px; /* Ensures uniform height */
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* 🎮 Room Hover Effect */
@@ -958,13 +1021,13 @@ button[type="submit"] {
   height: 180px;
   object-fit: cover;
   border-radius: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   box-shadow: 0px 0px 15px rgba(255, 0, 119, 0.7);
 }
 
 /* 📌 Room Details */
 .room-card h3 {
-  font-size: 20px;
+  font-size: 18px;
   color: #ffcc00;
   text-transform: uppercase;
   margin-bottom: 5px;
@@ -1024,13 +1087,32 @@ button[type="submit"] {
 
 /* 🎥 Room Content */
 .room-content {
-  margin-top: 15px;
+  margin-top: 10px;
   background: #10151f;
-  padding: 18px;
+  padding: 15px;
   border-radius: 8px;
   border: 2px solid #ff0077;
   text-align: center;
   box-shadow: 0 0 12px rgba(255, 0, 119, 0.5);
+}
+
+/* 🏷 Room Privacy Badge */
+.room-privacy {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.room-privacy.public {
+  background-color: #007bff;
+}
+
+.room-privacy.private {
+  background-color: #ff0077;
 }
 
 /* 🌟 Live Stream Placeholder */
@@ -1740,6 +1822,22 @@ button[type="submit"] {
   color: #ffdb4d;
 }
 
+
+/* 🎯 Responsive Adjustments */
+@media (max-width: 768px) {
+  .create-room-button {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-room-button {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+}
+
 /* 📱 Responsive Design */
 @media (max-width: 768px) {
   .auth-action-box {
@@ -1869,8 +1967,39 @@ button[type="submit"] {
 /* 🎨 Mobile Responsiveness */
 @media screen and (max-width: 768px) {
   .streamer-profile {
-    width: 95%;
+    width: 100vw;
+    height: 100vh;
     padding: 20px;
+    overflow-y: auto; /* Allow scrolling */
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--background-color);
+    z-index: 1000;
+  }
+
+  .back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 14px;
+  }
+
+  .profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .edit-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  .chat-input input,
+  .chat-input textarea {
+    font-size: 16px; /* Prevents zooming issue */
   }
 
   .profile-pic {

@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { db, storage } from "../firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/global.css";
 
 const StreamerProfile = ({ user }) => {
-  const { streamerId } = useParams(); // Get streamer ID from URL
+  const { streamerId } = useParams();
   const navigate = useNavigate();
   const [streamer, setStreamer] = useState(null);
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [profilePic, setProfilePic] = useState("");
+  const [profilePic, setProfilePic] = useState("/default-profile.png");
   const [experience, setExperience] = useState("Beginner");
   const [socialLinks, setSocialLinks] = useState({ twitter: "", youtube: "", tiktok: "" });
   const [followers, setFollowers] = useState([]);
@@ -20,31 +20,27 @@ const StreamerProfile = ({ user }) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔥 Fetch streamer profile data
+  // 🔥 Fetch user profile in real-time
   useEffect(() => {
     if (!streamerId) return;
 
-    const fetchUserData = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", streamerId));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setStreamer(userData);
-          setUsername(userData.username || "");
-          setBio(userData.bio || "");
-          setProfilePic(userData.profilePic || "");
-          setExperience(userData.experience || "Beginner");
-          setSocialLinks(userData.socialLinks || { twitter: "", youtube: "", tiktok: "" });
-          setFollowers(userData.followers || []);
-        } else {
-          navigate("/"); // Redirect if user not found
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+    const userRef = doc(db, "users", streamerId);
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setStreamer(userData);
+        setUsername(userData.username || "");
+        setBio(userData.bio || "");
+        setProfilePic(userData.profilePic || "/default-profile.png");
+        setExperience(userData.experience || "Beginner");
+        setSocialLinks(userData.socialLinks || { twitter: "", youtube: "", tiktok: "" });
+        setFollowers(userData.followers || []);
+      } else {
+        navigate("/"); // Redirect if user not found
       }
-    };
+    });
 
-    fetchUserData();
+    return () => unsubscribe();
   }, [streamerId, navigate]);
 
   useEffect(() => {
@@ -90,11 +86,6 @@ const StreamerProfile = ({ user }) => {
         socialLinks,
       });
 
-      // Ensure username updates everywhere (chat, profile, etc.)
-      if (user?.uid === streamerId) {
-        user.displayName = username;
-      }
-
       setEditing(false);
     } catch (err) {
       setError("⚠️ Error updating profile. Try again.");
@@ -120,14 +111,14 @@ const StreamerProfile = ({ user }) => {
   }
 
   return (
-    <div className={`streamer-profile ${editing ? "fullscreen-edit" : ""}`}>
+    <div className="streamer-profile">
       <button className="back-button" onClick={() => navigate("/")}>
         ← Back
       </button>
 
       <div className="profile-container">
         <div className="profile-pic-container">
-          <img src={profilePic || "/default-profile.png"} alt="Profile" className="profile-pic" />
+          <img src={profilePic} alt="Profile" className="profile-pic" />
           {user?.uid === streamerId && editing && (
             <>
               <label className="upload-btn">

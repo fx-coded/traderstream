@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db, storage } from "../firebaseConfig";
-import { doc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, onSnapshot, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/global.css";
 
@@ -21,7 +21,26 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
   const [roomOwner, setRoomOwner] = useState(null);
   const [activeReactions, setActiveReactions] = useState(null);
   const [showRemoveUser, setShowRemoveUser] = useState(null);
+  const [username, setUsername] = useState(user?.email?.split("@")[0] || "Guest");
   const chatEndRef = useRef(null);
+
+  // ✅ Fetch username from Firestore
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const fetchUsername = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setUsername(userDoc.data().username || "Trader");
+        }
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      }
+    };
+
+    fetchUsername();
+  }, [user?.uid]);
 
   useEffect(() => {
     const roomRef = doc(db, "rooms", roomId);
@@ -53,12 +72,10 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
       imageUrl = await getDownloadURL(imageRef);
     }
 
-    const username = user?.displayName || user?.email.split("@")[0] || "Guest";
-
     const messageData = {
       id: Date.now(),
       userId: user.uid,
-      user: username,
+      user: username, // ✅ Now using Firestore username
       text: newMessage,
       imageUrl,
       timestamp: new Date().toLocaleTimeString(),
@@ -135,7 +152,7 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
             </strong>
             {msg.text}
             {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded" className="chat-image" />}
-            <span className="message-time">⏳ {msg.timestamp}</span>
+            <span className="message-time"> {msg.timestamp}</span>
 
             {/* 🔥 Clickable Reaction Container */}
             {activeReactions === msg.id && (

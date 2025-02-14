@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/global.css";
 
-const Sidebar = ({ popularChannels = [], setFilteredCategories }) => {
+const Sidebar = ({ popularChannels = [], setFilteredCategories, activeTab }) => {
   const categories = [
     "Forex Trading",
     "Crypto Trading",
@@ -10,23 +10,17 @@ const Sidebar = ({ popularChannels = [], setFilteredCategories }) => {
     "Gold, Oil & Indices",
   ];
 
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const toggleCategory = (category) => {
-    let updatedCategories;
-    if (selectedCategories.includes(category)) {
-      updatedCategories = selectedCategories.filter((cat) => cat !== category);
-    } else {
-      updatedCategories = [...selectedCategories, category];
-    }
-
-    setSelectedCategories(updatedCategories);
-    setFilteredCategories && setFilteredCategories(updatedCategories); // Prevents crashes
+  const handleCategoryClick = (category) => {
+    const newCategory = selectedCategory === category ? null : category;
+    setSelectedCategory(newCategory);
+    setFilteredCategories && setFilteredCategories(newCategory); // Update filters
   };
 
   const clearFilters = () => {
-    setSelectedCategories([]);
-    setFilteredCategories && setFilteredCategories([]); // Clears filters
+    setSelectedCategory(null);
+    setFilteredCategories && setFilteredCategories(null); // Reset filters
   };
 
   return (
@@ -37,30 +31,34 @@ const Sidebar = ({ popularChannels = [], setFilteredCategories }) => {
         {categories.map((category, index) => (
           <li
             key={index}
-            className={`sidebar-item ${selectedCategories.includes(category) ? "selected" : ""}`}
-            onClick={() => toggleCategory(category)}
+            className={`sidebar-item ${selectedCategory === category ? "selected" : ""}`}
+            onClick={() => handleCategoryClick(category)}
           >
             {category}
           </li>
         ))}
       </ul>
 
-      {selectedCategories.length > 0 && (
+      {selectedCategory && (
         <button className="clear-filter-btn" onClick={clearFilters}>
           ✖ Clear Filters
         </button>
       )}
 
-      {/* 🔥 Popular Channels */}
-      <h3 className="sidebar-title popular">🔥 Popular Channels</h3>
-      {popularChannels.length > 0 ? (
-        <ul className="sidebar-list">
-          {popularChannels.map((channel, index) => (
-            <li key={index} className="sidebar-item">{channel}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="no-channels">Be the first to go live!</p>
+      {/* 🔥 Popular Channels (Only for Streams) */}
+      {activeTab === "Streams" && (
+        <>
+          <h3 className="sidebar-title popular">🔥 Popular Channels</h3>
+          {popularChannels.length > 0 ? (
+            <ul className="sidebar-list">
+              {popularChannels.map((channel, index) => (
+                <li key={index} className="sidebar-item">{channel}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="no-channels">Be the first to go live!</p>
+          )}
+        </>
       )}
     </aside>
   );

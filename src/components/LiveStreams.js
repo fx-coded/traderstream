@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/global.css";
 
-const LiveStreams = ({ setSelectedStreamer, filteredCategories = [] }) => {
+const LiveStreams = ({ setSelectedStreamer, filteredCategory }) => {
   const [displayedStreams, setDisplayedStreams] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch live streams from an API (or WebSocket in the future)
-    // Simulating an API fetch with an empty result for now
+    // Future: Fetch live streams dynamically (e.g., from an API or WebSocket)
     const fetchStreams = async () => {
-      const response = []; // Simulating an empty API response
-      setDisplayedStreams(response);
+      // Placeholder for API fetch
+      setDisplayedStreams([]); // No hardcoded streams
     };
 
     fetchStreams();
   }, []);
 
   useEffect(() => {
-    if (!Array.isArray(filteredCategories) || filteredCategories.length === 0) {
-      setDisplayedStreams([]);
+    if (!filteredCategory) {
+      setDisplayedStreams((prevStreams) => prevStreams);
     } else {
-      setDisplayedStreams([]); // Filtering logic should go here when API is available
+      setDisplayedStreams((prevStreams) =>
+        prevStreams.filter((stream) => stream.category === filteredCategory)
+      );
     }
-  }, [filteredCategories]);
+  }, [filteredCategory]);
 
   const streamsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +48,12 @@ const LiveStreams = ({ setSelectedStreamer, filteredCategories = [] }) => {
           {paginatedStreams.map((stream) => (
             <div key={stream.id} className="stream-card" onClick={() => setSelectedStreamer(stream)}>
               <div className="live-badge">🔴 Live</div>
-              <iframe src={stream.videoUrl} title={stream.name} className="stream-video" allowFullScreen></iframe>
+              <iframe
+                src={stream.videoUrl}
+                title={stream.name}
+                className="stream-video"
+                allowFullScreen
+              ></iframe>
               <div className="stream-info">
                 <h3>{stream.name}</h3>
                 <p>{stream.category}</p>
@@ -56,15 +64,23 @@ const LiveStreams = ({ setSelectedStreamer, filteredCategories = [] }) => {
         </div>
       ) : (
         <div className="no-streams">
-          🚀 No live streams available right now. Be the first to go live!
+          🚀 No live streams available right now.
+          <br />
+          <button className="go-live-btn" onClick={() => navigate("/go-live")}>
+            🎥 Go Live
+          </button>
         </div>
       )}
 
       {displayedStreams.length > streamsPerPage && (
         <div className="pagination">
-          <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>◀ Prev</button>
+          <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+            ◀ Prev
+          </button>
           <span>Page {currentPage} of {totalPages}</span>
-          <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>Next ▶</button>
+          <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
+            Next ▶
+          </button>
         </div>
       )}
     </section>

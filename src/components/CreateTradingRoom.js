@@ -78,7 +78,7 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
         thumbnail: imageUrl,
         adminId: user.uid,
         members: [user.uid],
-        pendingUsers: [],
+        pendingUsers: [], // Stores pending user requests if private
         messages: [],
         createdAt: new Date(),
       });
@@ -142,6 +142,18 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
               <option>Gold, Oil & Indices</option>
             </select>
 
+            <label>Privacy:</label>
+            <div className="privacy-options">
+              <label>
+                <input type="radio" name="privacy" checked={!isPrivate} onChange={() => setIsPrivate(false)} />
+                🔓 Public (Anyone can join)
+              </label>
+              <label>
+                <input type="radio" name="privacy" checked={isPrivate} onChange={() => setIsPrivate(true)} />
+                🔒 Private (Admin approval required)
+              </label>
+            </div>
+
             <label>Upload Thumbnail (JPEG/PNG, max 2MB):</label>
             <input type="file" accept="image/png, image/jpeg" onChange={handleFileChange} />
 
@@ -162,4 +174,3 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
 };
 
 export default CreateTradingRoom;
-
