@@ -19,7 +19,7 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
   const [imageUpload, setImageUpload] = useState(null);
   const [roomData, setRoomData] = useState(null);
   const [roomOwner, setRoomOwner] = useState(null);
-  const [showReactions, setShowReactions] = useState(null);
+  const [activeReactions, setActiveReactions] = useState(null);
   const [showRemoveUser, setShowRemoveUser] = useState(null);
   const chatEndRef = useRef(null);
 
@@ -101,7 +101,7 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
       return msg;
     });
     await updateDoc(roomRef, { messages: updatedMessages });
-    setShowReactions(null);
+    setActiveReactions(null);
   };
 
   return (
@@ -120,12 +120,16 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
           <div
             key={msg.id}
             className={`chat-message ${msg.userId === user.uid ? "sent" : "received"}`}
-            onTouchStart={() => setShowReactions(msg.id)} // Hold to react
-            onTouchEnd={() => setShowReactions(null)}
+            onContextMenu={(e) => {
+              e.preventDefault(); 
+              setActiveReactions(msg.id);
+            }}
           >
             <strong
-              onTouchStart={() => isAdmin && setShowRemoveUser(msg.userId)} // Hold to remove user
-              onTouchEnd={() => setShowRemoveUser(null)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                isAdmin && setShowRemoveUser(msg.userId);
+              }}
             >
               {msg.user}:
             </strong>
@@ -133,7 +137,8 @@ const Chat = ({ roomId, user, isAdmin, onExit }) => {
             {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded" className="chat-image" />}
             <span className="message-time">⏳ {msg.timestamp}</span>
 
-            {showReactions === msg.id && (
+            {/* 🔥 Clickable Reaction Container */}
+            {activeReactions === msg.id && (
               <div className="reaction-container">
                 {reactions.map((emoji) => (
                   <button key={emoji} className="reaction-btn" onClick={() => reactToMessage(msg.id, emoji)}>
