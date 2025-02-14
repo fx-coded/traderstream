@@ -75,7 +75,7 @@ const StreamerProfile = ({ user }) => {
     setUploading(false);
   };
 
-  // ✅ Save profile updates
+  // ✅ Save profile updates (username, bio, experience, links)
   const handleSaveProfile = async () => {
     if (!username.trim()) {
       setError("⚠️ Username cannot be empty.");
@@ -89,6 +89,12 @@ const StreamerProfile = ({ user }) => {
         experience,
         socialLinks,
       });
+
+      // Ensure username updates everywhere (chat, profile, etc.)
+      if (user?.uid === streamerId) {
+        user.displayName = username;
+      }
+
       setEditing(false);
     } catch (err) {
       setError("⚠️ Error updating profile. Try again.");
@@ -178,12 +184,12 @@ const StreamerProfile = ({ user }) => {
         </div>
       )}
 
-      {editing && <button className="save-btn" onClick={handleSaveProfile}>✅ Save Profile</button>}
-
-      {!editing && user?.uid === streamerId && (
-        <button className="edit-btn" onClick={() => navigate(`/profile/edit/${user.uid}`)}>
-          ✏️ Edit Profile
-        </button>
+      {editing ? (
+        <button className="save-btn" onClick={handleSaveProfile}>✅ Save Profile</button>
+      ) : (
+        user?.uid === streamerId && (
+          <button className="edit-btn" onClick={() => setEditing(true)}>✏️ Edit Profile</button>
+        )
       )}
 
       {error && <p className="error-message">{error}</p>}

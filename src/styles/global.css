@@ -21,6 +21,7 @@ body {
   color: var(--text-color);
   font-family: "Roboto", sans-serif; /* ✅ More legible font for body text */
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%; /* ✅ Prevents iOS text zoom */
 }
 
 /* 🎯 Headings (Keep Press Start 2P for a retro feel) */
@@ -43,7 +44,6 @@ strong, b {
   color: var(--accent-color);
 }
 
-
 /* 🌍 Main Layout */
 .main-layout {
   display: flex;
@@ -51,6 +51,27 @@ strong, b {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* ✅ Fix: Prevent iOS input zoom */
+input, textarea, select, button {
+  font-size: 16px !important;
+  -webkit-appearance: none; /* Removes native styling on iOS */
+}
+
+/* ✅ Prevent iOS zooming in when tapping inputs */
+input:focus, textarea:focus {
+  font-size: 16px !important;
+}
+
+/* ✅ Prevent accidental text zooming */
+html {
+  touch-action: manipulation; /* Prevents accidental zooming on double tap */
+}
+
+/* ✅ Prevent buttons from triggering zoom */
+button {
+  font-size: 16px !important;
 }
 
 /* 📌 Sidebar */
