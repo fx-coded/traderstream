@@ -13,7 +13,6 @@
 
 # misc
 .env
-.env
 firebase-adminsdk.json
 .DS_Store
 .env.local
