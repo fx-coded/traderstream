@@ -2002,10 +2002,10 @@ button[type="submit"] {
     font-size: 16px; /* Prevents zooming issue */
   }
 
-  .profile-pic {
-    width: 90px;
-    height: 90px;
-  }
+    .profile-pic {
+      width: 35px;
+      height: 35px;
+    }
 
   .bio {
     font-size: 12px;
