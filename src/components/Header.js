@@ -20,7 +20,7 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
 
   return (
     <header className="header">
-      <div className="logo">📈 TradeStream</div>
+      <div className="logo"> TraderStream</div>
       <nav className="nav-links">
         <button 
           className={`nav-button ${activeTab === "live" ? "active" : ""}`} 
