@@ -37,39 +37,44 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setUploading(true); // ✅ Start loading state
 
     if (!user) {
       setError("❌ You need to log in to create a room!");
+      setUploading(false);
       return;
     }
     if (!roomName.trim()) {
       setError("❌ Room name is required!");
+      setUploading(false);
       return;
     }
     if (!description.trim()) {
       setError("❌ Description is required!");
+      setUploading(false);
       return;
     }
 
     try {
-      // Check for existing room
+      console.log("🚀 Checking if room name exists...");
       const roomQuery = query(collection(db, "rooms"), where("roomName", "==", roomName.trim()));
       const roomSnapshot = await getDocs(roomQuery);
       if (!roomSnapshot.empty) {
         setError("❌ A room with this name already exists!");
+        setUploading(false);
         return;
       }
 
       let imageUrl = "";
       if (thumbnail) {
-        setUploading(true);
+        console.log("📸 Uploading thumbnail...");
         const fileRef = ref(storage, `trading_rooms/${user.uid}_${Date.now()}`);
         const snapshot = await uploadBytes(fileRef, thumbnail);
         imageUrl = await getDownloadURL(snapshot.ref);
-        setUploading(false);
+        console.log("✅ Thumbnail uploaded:", imageUrl);
       }
 
-      // Store Room in Firestore
+      console.log("📝 Creating room in Firestore...");
       const roomRef = await addDoc(collection(db, "rooms"), {
         roomName: roomName.trim(),
         category,
@@ -83,8 +88,10 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
         createdAt: new Date(),
       });
 
-      // 📌 If the room is private, add a system-generated notification
+      console.log("📢 Room created:", roomRef.id);
+
       if (isPrivate) {
+        console.log("🔒 Setting up private room system message...");
         await updateDoc(doc(db, "rooms", roomRef.id), {
           messages: [
             {
@@ -97,7 +104,12 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
       }
 
       setSuccess("✅ Room created successfully!");
-      onRoomCreated();
+      setUploading(false);
+
+      // 🔄 Trigger parent update without full page reload
+      if (onRoomCreated) {
+        onRoomCreated();
+      }
 
       // Reset form
       setRoomName("");
@@ -112,6 +124,7 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
         setSuccess(""); // Clear success message
       }, 1000);
     } catch (err) {
+      console.error("🔥 Error creating room:", err);
       setError("⚠️ Something went wrong. Try again.");
       setUploading(false);
     }
@@ -128,7 +141,7 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
           <h2>🚀 Create Trading Room</h2>
           {error && <p className="error-message">{error}</p>}
           {success && <p className="success-message">{success}</p>}
-          
+
           <form onSubmit={handleSubmit}>
             <label>Room Name:</label>
             <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} required />
@@ -161,11 +174,10 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
 
             <button type="submit" disabled={uploading}>
-              {uploading ? "⏳ Uploading..." : "🚀 Create Room"}
+              {uploading ? "⏳ Creating..." : "🚀 Create Room"}
             </button>
           </form>
 
-          {/* Close Button */}
           <button className="close-form-button" onClick={() => setShowForm(false)}>❌ Cancel</button>
         </div>
       )}

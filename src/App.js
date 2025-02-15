@@ -91,9 +91,6 @@ const App = () => {
 
               {/* ✅ Route for Email Verification & Password Reset */}
               <Route path="/auth-action" element={<AuthAction />} />
-              <Route path="/create-room" element={<CreateTradingRoom user={user} />} />
-<Route path="/trading-rooms" element={<TradingRoomsList user={user} />} />
-
             </Routes>
           </div>
         </div>
