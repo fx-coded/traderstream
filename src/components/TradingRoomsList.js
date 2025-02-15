@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate for redirection
 import Chat from "./Chat";
 import { db } from "../firebaseConfig";
 import { collection, doc, updateDoc, arrayUnion, getDoc, onSnapshot } from "firebase/firestore";
@@ -9,6 +10,7 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const navigate = useNavigate(); // ✅ Navigation hook
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "rooms"), (snapshot) => {
@@ -20,7 +22,7 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
     return () => unsubscribe();
   }, []);
 
-  // Apply Category Filter
+  // ✅ Apply Category Filter
   useEffect(() => {
     if (!filteredCategory) {
       setFilteredRooms(tradingRooms);
@@ -44,6 +46,11 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
     setIsChatOpen(true);
   };
 
+  // ✅ Redirect to the Create Room Page
+  const goToCreateRoom = () => {
+    navigate("/create-room");
+  };
+
   // Pagination Logic
   const roomsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,7 +69,14 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
     <div className={isChatOpen ? "chat-room-container" : "trading-rooms-container"}>
       {!isChatOpen && (
         <>
-          <h2>🔥 Active Trading Rooms</h2>
+          <div className="trading-room-header">
+            <h2>🔥 Active Trading Rooms</h2>
+            {/* ✅ Add "Create Room" Button */}
+            <button className="create-room-btn" onClick={goToCreateRoom}>
+              ➕ Create Room
+            </button>
+          </div>
+
           {paginatedRooms.length > 0 ? (
             <div className="rooms-grid">
               {paginatedRooms.map((room) => (

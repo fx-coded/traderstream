@@ -9,8 +9,9 @@ import TrendingStreams from "./components/TrendingStreams";
 import StreamerProfile from "./components/StreamerProfile";
 import CreateTradingRoom from "./components/CreateTradingRoom";
 import TradingRoomsList from "./components/TradingRoomsList";
+import Chat from "./components/Chat"; // ✅ Import Chat Component
 import Footer from "./components/Footer";
-import AuthModal from "./Profile/AuthModal"; 
+import AuthModal from "./Profile/AuthModal";
 import AuthAction from "./Profile/AuthAction"; // ✅ Email Verification & Password Reset Page
 import "./styles/global.css";
 
@@ -36,7 +37,7 @@ const App = () => {
     return () => unsubscribe(); // Cleanup listener
   }, []);
 
-  // ✅ Ensure User is Logged In Before Creating Trading Room
+  // ✅ Handle New Trading Room Creation
   const handleRoomCreated = (newRoom) => {
     if (!user) {
       alert("❌ You must be logged in to create a trading room!");
@@ -45,6 +46,7 @@ const App = () => {
     setTradingRooms([...tradingRooms, newRoom]);
   };
 
+  // ✅ User Logout
   const logout = () => {
     auth.signOut().then(() => {
       console.log("✅ User logged out");
@@ -68,24 +70,34 @@ const App = () => {
 
           <div className="content-wrapper">
             <Routes>
+              {/* ✅ Default Homepage (Shows Either Trading Rooms or Streams) */}
               <Route 
                 path="/" 
                 element={
                   activeTab === "rooms" ? (
-                    <>
-                      <CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />
-                      <TradingRoomsList tradingRooms={tradingRooms} user={user} filteredCategory={filteredCategory} /> {/* ✅ Pass Filtered Category */}
-                    </>
+                    <TradingRoomsList tradingRooms={tradingRooms} user={user} filteredCategory={filteredCategory} />
                   ) : (
                     <>
                       <TrendingStreams />
-                      <LiveStreams setSelectedStreamer={() => {}} filteredCategory={filteredCategory} /> {/* ✅ Pass Filtered Category */}
+                      <LiveStreams setSelectedStreamer={() => {}} filteredCategory={filteredCategory} />
                       <Footer />
                     </>
                   )
                 } 
               />
-              
+
+              {/* ✅ Dedicated Route for Creating a Trading Room */}
+              <Route 
+                path="/create-room" 
+                element={<CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />}
+              />
+
+              {/* ✅ Chat Room Route (After Room Creation) */}
+              <Route 
+                path="/chat/:roomId" 
+                element={<Chat user={user} />} 
+              />
+
               {/* ✅ Full-Page Profile Route */}
               <Route path="/profile/:streamerId" element={<StreamerProfile user={user} />} />
 

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { db, storage } from "../firebaseConfig";
 import { collection, addDoc, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/global.css";
 
-const CreateTradingRoom = ({ user, onRoomCreated }) => {
+const CreateTradingRoom = ({ user }) => {
+  const navigate = useNavigate(); // 🔄 React Router Navigation
   const [roomName, setRoomName] = useState("");
   const [category, setCategory] = useState("Forex Trading");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -13,7 +15,6 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
 
   // 📌 Handle File Upload
   const handleFileChange = (e) => {
@@ -37,7 +38,7 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setUploading(true); // ✅ Start loading state
+    setUploading(true);
 
     if (!user) {
       setError("❌ You need to log in to create a room!");
@@ -68,10 +69,17 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
       let imageUrl = "";
       if (thumbnail) {
         console.log("📸 Uploading thumbnail...");
-        const fileRef = ref(storage, `trading_rooms/${user.uid}_${Date.now()}`);
-        const snapshot = await uploadBytes(fileRef, thumbnail);
-        imageUrl = await getDownloadURL(snapshot.ref);
-        console.log("✅ Thumbnail uploaded:", imageUrl);
+        try {
+          const fileRef = ref(storage, `trading_rooms/${user.uid}_${Date.now()}.jpg`);
+          const snapshot = await uploadBytes(fileRef, thumbnail);
+          imageUrl = await getDownloadURL(snapshot.ref);
+          console.log("✅ Thumbnail uploaded successfully:", imageUrl);
+        } catch (uploadError) {
+          console.error("❌ Upload failed:", uploadError);
+          setError("⚠️ Image upload failed. Try again.");
+          setUploading(false);
+          return;
+        }
       }
 
       console.log("📝 Creating room in Firestore...");
@@ -83,7 +91,7 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
         thumbnail: imageUrl,
         adminId: user.uid,
         members: [user.uid],
-        pendingUsers: [], // Stores pending user requests if private
+        pendingUsers: [],
         messages: [],
         createdAt: new Date(),
       });
@@ -106,22 +114,9 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
       setSuccess("✅ Room created successfully!");
       setUploading(false);
 
-      // 🔄 Trigger parent update without full page reload
-      if (onRoomCreated) {
-        onRoomCreated();
-      }
-
-      // Reset form
-      setRoomName("");
-      setCategory("Forex Trading");
-      setIsPrivate(false);
-      setDescription("");
-      setThumbnail(null);
-
-      // Auto-close form after success
+      // 🔄 Redirect to the new room's chat after success
       setTimeout(() => {
-        setShowForm(false);
-        setSuccess(""); // Clear success message
+        navigate(`/chat/${roomRef.id}`);
       }, 1000);
     } catch (err) {
       console.error("🔥 Error creating room:", err);
@@ -131,56 +126,46 @@ const CreateTradingRoom = ({ user, onRoomCreated }) => {
   };
 
   return (
-    <div className="trading-room-container">
-      {!showForm ? (
-        <button className="create-room-button" onClick={() => setShowForm(true)}>
-          ➕ Create Trading Room
-        </button>
-      ) : (
-        <div className="trading-room-form">
-          <h2>🚀 Create Trading Room</h2>
-          {error && <p className="error-message">{error}</p>}
-          {success && <p className="success-message">{success}</p>}
+    <div className="trading-room-form-page">
+      <h2>🚀 Create Trading Room</h2>
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
 
-          <form onSubmit={handleSubmit}>
-            <label>Room Name:</label>
-            <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} required />
+      <form onSubmit={handleSubmit}>
+        <label>Room Name:</label>
+        <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} required />
 
-            <label>Category:</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option>Forex Trading</option>
-              <option>Crypto Trading</option>
-              <option>Futures & Commodities</option>
-              <option>Meme Coin Degens</option>
-              <option>Gold, Oil & Indices</option>
-            </select>
+        <label>Category:</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option>Forex Trading</option>
+          <option>Crypto Trading</option>
+          <option>Futures & Commodities</option>
+          <option>Meme Coin Degens</option>
+          <option>Gold, Oil & Indices</option>
+        </select>
 
-            <label>Privacy:</label>
-            <div className="privacy-options">
-              <label>
-                <input type="radio" name="privacy" checked={!isPrivate} onChange={() => setIsPrivate(false)} />
-                🔓 Public (Anyone can join)
-              </label>
-              <label>
-                <input type="radio" name="privacy" checked={isPrivate} onChange={() => setIsPrivate(true)} />
-                🔒 Private (Admin approval required)
-              </label>
-            </div>
-
-            <label>Upload Thumbnail (JPEG/PNG, max 2MB):</label>
-            <input type="file" accept="image/png, image/jpeg" onChange={handleFileChange} />
-
-            <label>Description:</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
-
-            <button type="submit" disabled={uploading}>
-              {uploading ? "⏳ Creating..." : "🚀 Create Room"}
-            </button>
-          </form>
-
-          <button className="close-form-button" onClick={() => setShowForm(false)}>❌ Cancel</button>
+        <label>Privacy:</label>
+        <div className="privacy-options">
+          <label>
+            <input type="radio" name="privacy" checked={!isPrivate} onChange={() => setIsPrivate(false)} />
+            🔓 Public (Anyone can join)
+          </label>
+          <label>
+            <input type="radio" name="privacy" checked={isPrivate} onChange={() => setIsPrivate(true)} />
+            🔒 Private (Admin approval required)
+          </label>
         </div>
-      )}
+
+        <label>Upload Thumbnail (JPEG/PNG, max 2MB):</label>
+        <input type="file" accept="image/png, image/jpeg" onChange={handleFileChange} />
+
+        <label>Description:</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
+
+        <button type="submit" disabled={uploading}>
+          {uploading ? "⏳ Creating..." : "🚀 Create Room"}
+        </button>
+      </form>
     </div>
   );
 };
