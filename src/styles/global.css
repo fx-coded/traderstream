@@ -1246,16 +1246,21 @@ button {
 
 /* 🖥️ Responsive Grid */
 @media (max-width: 768px) {
-  .rooms-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .room-card {
-    max-width: 95%;
-  }
-
-  .room-thumbnail {
-    height: 140px;
+  @media (max-width: 768px) {
+    .rooms-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .room-card {
+      width: 90%;
+    }
+  
+    .create-room-btn {
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 
@@ -2059,62 +2064,117 @@ button {
 }
 /* 🎨 Mobile Responsiveness */
 @media screen and (max-width: 768px) {
+  /* 🔹 Full-Screen Mobile Profile */
   .streamer-profile {
     width: 100vw;
     height: 100vh;
     padding: 20px;
-    overflow-y: auto; /* Allow scrolling */
+    overflow-y: auto; /* ✅ Allow scrolling */
     position: fixed;
     top: 0;
     left: 0;
-    background-color: var(--background-color);
+    background-color: #121212;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
+  /* 🔙 Back Button (Top Left) */
   .back-button {
     position: absolute;
     top: 10px;
     left: 10px;
     font-size: 14px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
   }
 
+  .back-button:hover {
+    opacity: 0.7;
+  }
+
+  /* 📸 Profile Container */
   .profile-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 50px; /* ✅ Spacing for header */
   }
 
+  /* 🔄 Profile Image */
+  .profile-pic {
+    width: 80px; /* ✅ Bigger size */
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-bottom: 10px;
+  }
+
+  /* 📝 Editable Fields */
+  .editable-input,
+  .social-links input {
+    width: 90%;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  /* ✏️ Edit Button (Top Right) */
   .edit-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-
-    .profile-pic {
-      width: 45px;
-      height: 45px;
-    }
-
-  .bio {
+    top: 10px;
+    right: 10px;
     font-size: 12px;
+    padding: 6px 12px;
   }
 
-  .followers-count,
+  /* 📝 Bio Section */
+  .bio {
+    font-size: 13px;
+    color: #ccc;
+    max-width: 90%;
+  }
+
+  /* 🎯 Experience */
   .experience {
     font-size: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 8px;
+    border-radius: 5px;
+    margin-top: 10px;
   }
 
+  /* 👥 Followers */
+  .followers-count {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  /* ➕ Follow Button */
   .follow-btn {
     font-size: 12px;
     padding: 8px 15px;
+    width: 90%;
   }
 
+  /* 🔗 Social Links */
+  .social-links label {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  /* 🎥 Past Streams */
   .past-streams {
     font-size: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 10px;
   }
 }
-
-
 
 /* 📱 Responsive Design */
 @media (max-width: 1200px) {
