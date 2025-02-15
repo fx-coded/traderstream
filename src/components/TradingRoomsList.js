@@ -70,7 +70,7 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
       {!isChatOpen && (
         <>
           <div className="trading-room-header">
-            <h2>🔥 Active Trading Rooms</h2>
+            <h2> Active Trading Rooms</h2>
             {/* ✅ Add "Create Room" Button */}
             <button className="create-room-btn" onClick={goToCreateRoom}>
               ➕ Create Room
@@ -87,13 +87,13 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
                   <p>👥 Members: {room.members?.length || 0}</p>
                   <p>{room.isPrivate ? "🔒 Private" : "🔓 Public"}</p>
                   <button className="join-room-btn" onClick={() => joinRoom(room.id)}>
-                    ✅ Join Room
+                     Join Room
                   </button>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="no-rooms">🚀 No trading rooms available for this category.</p>
+            <p className="no-rooms"> No trading rooms available for this category.</p>
           )}
 
           {/* Pagination */}

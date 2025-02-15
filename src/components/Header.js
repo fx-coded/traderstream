@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import "../styles/global.css";
+import "../styles/global.css"; // Updated CSS file for styling
 
 const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -42,37 +42,42 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
 
   return (
     <header className="header">
-      <div className="logo" onClick={() => navigate("/")}>TraderStream</div>
+      {/* 🔹 Logo */}
+      <div className="logo" onClick={() => navigate("/")}>
+        TraderStream
+      </div>
+
+      {/* 🔹 Navigation */}
       <nav className="nav-links">
         <button 
           className={`nav-button ${activeTab === "live" ? "active" : ""}`} 
           onClick={() => setActiveTab("live")}
         >
-          🎥 Live Streams
+          Live Streams
         </button>
         <button 
           className={`nav-button ${activeTab === "rooms" ? "active" : ""}`} 
           onClick={() => setActiveTab("rooms")}
         >
-          🏠 Trading Rooms
+          Trading Rooms
         </button>
       </nav>
 
-      {/* 🔍 Search Bar */}
+      {/* 🔹 Search Bar */}
       <div className="search-bar">
-        <input type="text" placeholder="🔎 Search traders, streams..." />
-        <button>🔍</button>
+        <input type="text" placeholder="Search traders, streams..." />
+        <button className="search-btn">🔍</button>
       </div>
 
-      {/* 👤 Show Profile if Logged In, Otherwise Show Login/Signup Buttons */}
+      {/* 🔹 User Profile or Auth Options */}
       {user ? (
         <div className="user-profile" ref={dropdownRef}>
           <div className="profile-info" onClick={() => setShowDropdown(!showDropdown)}>
             <img src={profilePic} alt="User" className="profile-pic" />
-            <span>{username} ⬇</span>
+            <span className="username">{username} ⬇</span>
           </div>
 
-          {/* 🔻 Profile Dropdown */}
+          {/* 🔻 Dropdown Menu */}
           {showDropdown && (
             <div className="profile-dropdown">
               <Link 
@@ -80,16 +85,18 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
                 className="view-profile" 
                 onClick={() => setShowDropdown(false)}
               >
-                👤 View Profile
+                View Profile
               </Link>
-              <button onClick={logout} className="logout-button">🚪 Sign Out</button>
+              <button onClick={logout} className="logout-button">
+                Sign Out
+              </button>
             </div>
           )}
         </div>
       ) : (
         <div className="auth-buttons">
-          <button onClick={() => setShowAuthModal("login")}>Login</button>
-          <button onClick={() => setShowAuthModal("signup")}>Sign Up</button>
+          <button onClick={() => setShowAuthModal("login")} className="login-btn">Login</button>
+          <button onClick={() => setShowAuthModal("signup")} className="signup-btn">Sign Up</button>
         </div>
       )}
     </header>

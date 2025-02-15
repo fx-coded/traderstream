@@ -76,14 +76,97 @@ button {
 
 /* 📌 Sidebar */
 .sidebar {
-  width: 250px; /* Set fixed width */
-  min-height: 100vh; /* Ensure it fills height */
-  background: #0f0f1a;
+  width: 250px;
+  background: #101217;
+  margin-top: 75px;
+  color: #ffffff;
   padding: 20px;
-  border-right: 4px solid #ffcc00;
-  color: #ffcc00;
-  box-sizing: border-box; /* Ensure padding doesn't affect width */
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 255, 255, 0.2);
+  z-index: 1000; /* Ensure sidebar stays on top */
 }
+
+/* Sidebar Titles */
+.sidebar-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  color: #ffcc00;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Sidebar List */
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Sidebar Items */
+.sidebar-item {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+/* Active/Selected Category */
+.selected {
+  background: #ffcc00;
+  color: #101217;
+  font-weight: bold;
+  text-shadow: 0 0 8px #ffcc00;
+}
+
+/* Clear Filters Button */
+.clear-filter-btn {
+  margin-top: 10px;
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.clear-filter-btn:hover {
+  background: #ff2222;
+}
+
+/* Popular Channels Section */
+.popular-channels-section {
+  margin-top: 20px;
+}
+
+.no-channels {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+
 
 /* 🚀 Main Content */
 .content-wrapper {
@@ -101,130 +184,222 @@ button {
   width: 100%;
 }
 
-
-/* 🔥 Header */
+/* 🔥 HEADER STYLING - Modern Twitch-Style Header */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #1a1a1a; /* Dark sleek background */
+  padding: 15px 30px;
+  border-bottom: 3px solid #ff9800;
+  position: fixed;
+  top: 0;
   width: 100%;
-  padding: 20px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  border-bottom: 4px solid var(--accent-color);
-  box-shadow: 0px 4px 20px rgba(0, 255, 247, 0.3);
-  text-transform: uppercase;
+  z-index: 1000;
 }
 
+/* 🟢 LOGO */
 .logo {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
-  color: var(--accent-color);
-  text-shadow: 4px 4px var(--primary-color);
-}
-
-/* 🏆 Sidebar Container */
-.sidebar {
-  width: 280px;
-  background: #1b1f27;
-  padding: 20px;
-  border-right: 4px solid #ffcc00;
-  color: white;
-  box-shadow: inset -3px 0px 12px rgba(0, 255, 153, 0.2);
-  font-family: "Press Start 2P", sans-serif;
-}
-
-/* 🎯 Sidebar Headings */
-.sidebar h3 {
-  font-size: 14px;
-  color: #ffcc00;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px #ff0077;
-}
-
-/* 📜 Sidebar Lists */
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 20px;
-}
-
-/* 🔥 Sidebar Items */
-.sidebar-item {
-  padding: 12px;
+  color: #fff;
   cursor: pointer;
-  border: 2px solid #ff0077;
-  transition: background 0.3s, transform 0.2s;
-  border-radius: 6px;
-  text-transform: uppercase;
-  font-size: 12px;
-  color: white;
-  text-align: center;
-  margin-bottom: 8px;
-  background: linear-gradient(145deg, #1b1f27, #292929);
-  box-shadow: 0 0 10px rgba(255, 0, 119, 0.5);
 }
 
-/* 🖱️ Hover Effect */
-.sidebar-item:hover {
-  background: #ff0077;
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 0, 119, 0.8);
+/* 🟠 NAVIGATION */
+.nav-links {
+  display: flex;
+  gap: 15px;
 }
 
-/* ✖ Clear Filter Button */
-.clear-filter-btn {
-  background: #2a2d3a; /* Subtle dark background */
-  color: #d1d1d1; /* Soft muted text color */
-  border: 1px solid #444857; /* Minimal border */
-  padding: 8px 12px;
+.nav-button {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-button:hover, .nav-button.active {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+/* 🔍 SEARCH BAR */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #2b2b2b;
+  border-radius: 20px;
+  padding: 8px;
+  width: 300px;
+}
+
+.search-bar input {
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 5px;
+  outline: none;
+  width: 100%;
+}
+
+.search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff9800;
+  font-size: 18px;
+}
+
+/* 👤 USER PROFILE */
+.user-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+}
+
+.profile-pic {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.username {
+  color: #fff;
   font-size: 14px;
-  font-weight: 500;
+}
+
+/* 🔻 PROFILE DROPDOWN */
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #2b2b2b;
+  padding: 10px;
+  border-radius: 5px;
+  width: 150px;
+  text-align: left;
+}
+
+.profile-dropdown a,
+.logout-button {
+  display: block;
+  padding: 8px;
+  color: #fff;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.profile-dropdown a:hover,
+.logout-button:hover {
+  background: #ff9800;
+}
+
+/* 🔵 AUTH BUTTONS */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.login-btn, .signup-btn {
+  background: none;
+  border: 1px solid #ff9800;
+  color: #ff9800;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
-  display: block;
-  margin: 12px auto;
-  width: 80%;
+  transition: 0.2s;
+}
+
+.login-btn:hover, .signup-btn:hover {
+  background: #ff9800;
+  color: #fff;
+}
+
+
+/* 🎥 Live Streams Section */
+.live-streams {
+  padding: 20px;
   text-align: center;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.clear-filter-btn:hover {
-  background: #383c4a; /* Slightly lighter on hover */
-  color: #ffffff;
-  transform: scale(1.02); /* Minimal hover effect */
+/* 🔥 Title */
+.degen-title {
+  font-size: 24px;
+  text-transform: uppercase;
+  color: #ff00ff;
+  text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
 }
 
-/* 🌟 Active Category */
-.sidebar-item.active {
-  background: #ffcc00;
-  color: black;
-  font-weight: bold;
-  border-color: #1b1f27;
-}
 
-/* ❌ Clear Filters Button */
-.clear-filters {
-  width: 100%;
-  padding: 10px;
-  background: #ff0077;
+/* 🔴 Live Badge */
+.live-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: red;
   color: white;
   font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+
+
+
+/* 🎥 "Go Live" Button */
+.go-live-btn {
+  background: linear-gradient(45deg, #ff00ff, #ffcc00);
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: #0d0d0d;
   font-weight: bold;
-  border: 2px solid #ffcc00;
-  border-radius: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.go-live-btn:hover {
+  box-shadow: 0 0 15px #ff00ff;
+}
+
+/* 🔥 "Show All" Button */
+.show-all-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.show-all-btn {
+  background: #00ff99;
+  color: #0d0d0d;
+  font-size: 14px;
+  padding: 12px 18px;
+  border-radius: 5px;
+  font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  text-align: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
 }
 
-.clear-filters:hover {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.05);
+.show-all-btn:hover {
+  background: #ff00ff;
+  color: white;
+  box-shadow: 0 0 15px #ff00ff;
 }
 
 
@@ -440,7 +615,7 @@ button {
 /* 🔥 Trading Room Form - Retro Futuristic Aesthetic */
 .trading-room-form-page {
   max-width: 500px;
-  margin: 40px auto;
+  margin: 100px auto;
   padding: 20px;
   background: #1e1e1e;
   border-radius: 12px;
@@ -616,653 +791,202 @@ button {
 
 
 
-/* 📌 Footer Text */
+/* 🌍 FOOTER STYLES */
 .footer {
-  width: 100%;
-  background: #1b1f27;
-  padding: 20px;
+  background: #101217;
+  color: #fff;
   text-align: center;
-  color: white;
-  font-size: 14px;
-  margin-top: 40px;
-  border-top: 4px solid #ffcc00;
-  box-shadow: 0px -4px 15px rgba(255, 204, 0, 0.3);
-  font-family: "Press Start 2P", sans-serif;
+  padding: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-top: 2px solid #ff00ff;
+  box-shadow: 0px -2px 10px rgba(255, 0, 255, 0.3);
 }
 
-.footer p {
-  margin: 5px 0;
-  color: #ffcc00;
-  font-size: 12px;
-}
-
-/* 🔗 Footer Links */
+/* 📝 FOOTER LINKS */
 .footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
   margin-top: 10px;
 }
 
 .footer-links a {
-  color: #00ff99;
+  color: #ffcc00;
   text-decoration: none;
-  font-size: 12px;
-  transition: color 0.3s ease-in-out, text-shadow 0.3s;
+  font-weight: bold;
+  margin: 0 10px;
+  transition: color 0.3s ease-in-out, text-shadow 0.3s ease-in-out;
 }
 
-/* 🎯 Hover Effect */
 .footer-links a:hover {
-  color: #ff0077;
-  text-shadow: 0px 0px 10px rgba(255, 0, 119, 0.6);
+  color: #fff;
+  text-shadow: 0px 0px 8px #ffcc00;
 }
 
-/* 🌟 Retro Futuristic Header */
+/* 🔹 Header Base Styling */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  justify-content: space-between;
   padding: 15px 30px;
-  background: linear-gradient(90deg, #ff0077, #ffcc00);
-  border-bottom: 4px solid #00ff99;
-  box-shadow: 0px 4px 20px rgba(0, 255, 247, 0.3);
-  text-transform: uppercase;
-  font-family: "Press Start 2P", sans-serif;
+  background: #0d0d0d; /* Dark professional background */
+  border-bottom: 2px solid #222;
+  color: white;
+  font-family: "Inter", sans-serif;
 }
 
-/* 🎮 Logo */
+/* 🔹 Logo */
 .logo {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
-  color: #1b1f27;
-  text-shadow: 3px 3px #ff0077;
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: 0.3s;
 }
 
 .logo:hover {
-  transform: scale(1.1);
+  opacity: 0.8;
 }
 
-/* 🏆 Navigation */
+/* 🔹 Navigation Links */
 .nav-links {
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
 .nav-button {
   background: none;
-  border: 2px solid #ffcc00;
-  color: white;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 14px;
-  padding: 10px 15px;
-  transition: all 0.3s;
-  text-transform: uppercase;
+  color: white;
+  transition: 0.3s;
+}
+
+.nav-button.active {
+  color: #fdbc40; /* Highlight active tab */
+  font-weight: bold;
 }
 
 .nav-button:hover {
-  color: #ffcc00;
-  background: rgba(255, 204, 0, 0.2);
-  transform: scale(1.1);
+  opacity: 0.7;
 }
 
-/* 🔥 Active Tab */
-.nav-button.active {
-  background: #ffcc00;
-  color: black;
-  font-weight: bold;
-  border-color: #1b1f27;
-}
-
-/* 🔍 Search Bar */
+/* 🔹 Search Bar */
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 5px;
+  background: #222;
+  border-radius: 8px;
+  padding: 5px 12px;
 }
 
 .search-bar input {
-  padding: 10px;
-  border-radius: 5px;
-  border: 2px solid #ffcc00;
-  background: #121826;
+  background: none;
+  border: none;
   color: white;
   font-size: 14px;
+  padding: 5px;
   outline: none;
 }
 
-.search-bar button {
-  background: #ff0077;
-  color: white;
-  border: 2px solid #ffcc00;
-  padding: 10px 15px;
+.search-btn {
+  background: none;
+  border: none;
   cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.3s;
+  color: white;
+  font-size: 16px;
 }
 
-.search-bar button:hover {
-  background: #ffcc00;
+/* 🔹 User Profile */
+.user-profile {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-pic {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fdbc40;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 🔻 Profile Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #222;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  min-width: 150px;
+  z-index: 100;
+}
+
+.view-profile,
+.logout-button {
+  display: block;
+  text-align: left;
+  padding: 8px;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.3s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.view-profile:hover,
+.logout-button:hover {
+  background: #fdbc40;
   color: black;
+  border-radius: 4px;
 }
 
-/* 🚀 Authentication Buttons */
+/* 🔹 Auth Buttons */
 .auth-buttons {
   display: flex;
   gap: 10px;
 }
 
-.auth-buttons button {
-  background: #ff0077;
-  color: white;
-  border: 2px solid #ffcc00;
-  padding: 10px 15px;
-  cursor: pointer;
+.login-btn,
+.signup-btn {
+  background: #fdbc40;
+  color: black;
+  border: none;
+  padding: 8px 15px;
   border-radius: 5px;
-  font-size: 14px;
-  transition: background 0.3s;
-}
-
-.auth-buttons button:hover {
-  background: #ffcc00;
-  color: black;
-}
-
-/* 🎥 Live Streams Section */
-.live-streams {
-  text-align: center;
-  padding: 30px;
-  background: #121826;
-  color: white;
-}
-
-/* 🎮 Title */
-.live-streams h2 {
-  font-size: 22px;
-  color: #ffcc00;
-  text-transform: uppercase;
   font-weight: bold;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px #ff0077;
-  font-family: "Press Start 2P", sans-serif;
-}
-
-/* 🔥 Streams Grid - Now Side by Side */
-.streams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-  gap: 20px;
-  justify-content: center;
-  align-items: start;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-  min-height: 300px; /* Ensures the layout holds even if empty */
-}
-
-/* 🚀 No Streams Available */
-.no-streams {
-  grid-column: 1 / -1; /* Full width */
-  text-align: center;
-  font-size: 18px;
-  color: #ffcc00;
-  background: rgba(255, 0, 128, 0.1);
-  padding: 20px;
-  border: 2px dashed #ffcc00;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-/* 🎬 Stream Card */
-.stream-card {
-  background: linear-gradient(145deg, #1b1f27, #292929);
-  padding: 15px;
-  border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: none;
-  box-shadow: 0 0 15px rgba(255, 0, 119, 0.5);
-  overflow: hidden;
-  max-width: 400px; 
-  text-align: center;
+  transition: 0.3s;
 }
 
-/* 🔥 Stream Card Hover */
-.stream-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(255, 0, 119, 0.8);
+.signup-btn {
+  background: #ff6bcb;
 }
 
-/* 🎥 Stream Video */
-.stream-video {
-  width: 100%;
-  height: 200px;
-  border-radius: 6px;
-  border: none;
-}
-
-/* ℹ️ Stream Info */
-.stream-info {
-  padding: 10px 0;
-}
-
-.stream-info h3 {
-  font-size: 16px;
-  color: #ffcc00;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-
-.stream-info p {
-  font-size: 14px;
-  color: white;
-  margin-bottom: 3px;
-}
-
-/* 🎛️ Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  background: #ff0077;
-  color: white;
-  border: 2px solid #ffcc00;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: background 0.3s, transform 0.3s;
-  font-weight: bold;
-}
-
-.pagination button:disabled {
-  background: #333;
-  cursor: not-allowed;
-  border: 2px solid #777;
-}
-
-.pagination button:hover:not(:disabled) {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.1);
-}
-
-.pagination span {
-  color: #ffcc00;
-  font-size: 14px;
-}
-
-/* 🚀 Trending Streams Section */
-.trending-streams {
-  text-align: center;
-  padding: 30px;
-  background: #121826;
-  color: white;
-}
-
-/* 🔥 Title */
-.trending-streams h2 {
-  font-size: 22px;
-  color: #ffcc00;
-  text-transform: uppercase;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px #ff0077;
-  font-family: "Press Start 2P", sans-serif;
-}
-
-/* 🎬 Streams Grid - Ensures Side-by-Side Layout */
-.streams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  justify-items: center;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-  min-height: 300px; /* Ensures the layout holds even if empty */
-}
-
-/* 🎥 Go Live Button */
-.go-live-btn {
-  display: inline-block;
-  background: linear-gradient(90deg, #ff0077, #ffcc00);
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  text-transform: uppercase;
-  box-shadow: 0 0 12px rgba(255, 0, 119, 0.6);
-  transition: all 0.3s ease-in-out;
-  margin-top: 20px;
-}
-
-.go-live-btn:hover {
-  background: linear-gradient(90deg, #ffcc00, #ff0077);
-  transform: scale(1.05);
-  box-shadow: 0 0 18px rgba(255, 204, 0, 0.9);
+.login-btn:hover,
+.signup-btn:hover {
+  opacity: 0.8;
 }
 
 
-/* 🚀 No Trending Streams Available */
-.no-trending-streams {
-  grid-column: 1 / -1; /* Full width */
-  text-align: center;
-  font-size: 18px;
-  color: #ffcc00;
-  background: rgba(255, 0, 128, 0.1);
-  padding: 20px;
-  border: none;
-  font-weight: bold;
-}
 
-/* 🚀 Trending Stream Card */
-.stream-card.trending {
-  background: linear-gradient(145deg, #1b1f27, #292929);
-  padding: 15px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: none;
-  box-shadow: 0 0 15px rgba(0, 255, 153, 0.5);
-  overflow: hidden;
-  max-width: 400px;
-  text-align: center;
-}
-
-/* 🚀 Hover Effect */
-.stream-card.trending:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
-}
-
-/* 📸 Stream Thumbnail */
-.stream-thumbnail {
-  width: 100%;
-  height: 200px;
-  border-radius: 6px;
-  border: 2px solid #ffcc00;
-}
-
-/* ℹ️ Stream Info */
-.stream-info {
-  padding: 10px 0;
-}
-
-.stream-info h3 {
-  font-size: 16px;
-  color: #ffcc00;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-
-.stream-info p {
-  font-size: 14px;
-  color: white;
-  margin-bottom: 3px;
-}
-
-/* 🎛️ Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  background: #00ff99;
-  color: black;
-  border: 2px solid #ffcc00;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: background 0.3s, transform 0.3s;
-  font-weight: bold;
-}
-
-.pagination button:disabled {
-  background: #333;
-  cursor: not-allowed;
-  border: 2px solid #777;
-}
-
-.pagination button:hover:not(:disabled) {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.1);
-}
-
-.pagination span {
-  color: #ffcc00;
-  font-size: 14px;
-}
-
-/* 🏆 Trading Rooms Section */
-.trading-rooms {
-  text-align: center;
-  padding: 40px 20px;
-  background: #0d0f18;
-  color: white;
-}
-
-/* 🎯 Title */
-.trading-rooms h2 {
-  font-size: 24px;
-  color: #ffcc00;
-  text-transform: uppercase;
-  font-weight: bold;
-  margin-bottom: 30px;
-  text-shadow: 3px 3px #ff0077, 0px 0px 15px rgba(255, 0, 119, 0.8);
-  font-family: "Press Start 2P", sans-serif;
-}
-
-/* 🔥 Rooms Grid */
-.rooms-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
-  justify-items: center;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* 🏆 Room Card (Ensures all cards are the same size) */
-.room-card {
-  background: linear-gradient(145deg, #1b1f27, #252a34);
-  padding: 20px;
-  border-radius: 12px;
-  border: 3px solid #ff0077;
-  box-shadow: 0 0 18px rgba(255, 0, 119, 0.6);
-  overflow: hidden;
-  width: 100%;
-  max-width: 350px;
-  height: 420px; /* Ensures uniform height */
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* 🎮 Room Hover Effect */
-.room-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(255, 0, 119, 0.9);
-}
-
-/* 🖼️ Room Thumbnail */
-.room-thumbnail {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0px 0px 15px rgba(255, 0, 119, 0.7);
-}
-
-/* 📌 Room Details */
-.room-card h3 {
-  font-size: 18px;
-  color: #ffcc00;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-  letter-spacing: 1px;
-}
-
-.room-card p {
-  font-size: 14px;
-  color: #e0e0e0;
-  margin-bottom: 10px;
-}
-
-/* 🚀 Join Room Button */
-.join-room-btn {
-  background: #ff0077;
-  color: white;
-  border: 3px solid #ffcc00;
-  padding: 12px;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: bold;
-  transition: background 0.3s ease, transform 0.3s ease;
-  width: 100%;
-  box-shadow: 0 0 10px rgba(255, 0, 119, 0.6);
-}
-
-.join-room-btn:hover {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.06);
-  box-shadow: 0 0 15px rgba(255, 204, 0, 0.9);
-}
-
-/* 🚪 Leave Room Button */
-.leave-room-btn {
-  background: #ff4444;
-  color: white;
-  border: 3px solid #ffcc00;
-  padding: 12px;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: bold;
-  transition: background 0.3s ease, transform 0.3s ease;
-  width: 100%;
-  margin-top: 10px;
-  box-shadow: 0 0 10px rgba(255, 69, 58, 0.7);
-}
-
-.leave-room-btn:hover {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.06);
-  box-shadow: 0 0 15px rgba(255, 204, 0, 0.9);
-}
-
-/* 🎥 Room Content */
-.room-content {
-  margin-top: 10px;
-  background: #10151f;
-  padding: 15px;
-  border-radius: 8px;
-  border: 2px solid #ff0077;
-  text-align: center;
-  box-shadow: 0 0 12px rgba(255, 0, 119, 0.5);
-}
-
-/* 🏷 Room Privacy Badge */
-.room-privacy {
-  font-size: 14px;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: white;
-  display: inline-block;
-  margin-top: 5px;
-}
-
-.room-privacy.public {
-  background-color: #007bff;
-}
-
-.room-privacy.private {
-  background-color: #ff0077;
-}
-
-/* 🌟 Live Stream Placeholder */
-.stream-placeholder {
-  font-size: 16px;
-  color: #ffcc00;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-/* 🛠️ Pending Approval Button */
-.pending-btn {
-  background: #ffcc00;
-  color: black;
-  border: 3px solid #ff0077;
-  padding: 12px;
-  cursor: not-allowed;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: bold;
-  width: 100%;
-  opacity: 0.7;
-}
-
-/* 👑 Admin Panel */
-.admin-approvals {
-  margin-top: 15px;
-  padding: 10px;
-  background: rgba(255, 0, 119, 0.1);
-  border: 2px solid #ff0077;
-  border-radius: 8px;
-}
-
-.admin-approvals h4 {
-  color: #ffcc00;
-  margin-bottom: 10px;
-}
-
-/* 🖥️ Responsive Grid */
-@media (max-width: 768px) {
-  @media (max-width: 768px) {
-    .rooms-grid {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    .room-card {
-      width: 90%;
-    }
-  
-    .create-room-btn {
-      width: 100%;
-      text-align: center;
-    }
-  }
-}
 
 /* 🎬 Stream Placeholder */
 .stream-placeholder {
@@ -1275,7 +999,7 @@ button {
   border: 2px solid #ffcc00;
 }
 
-/* 🎥 Streamer Profile Section */
+
 /* 🎮 Streamer Profile Styling */
 .streamer-profile {
   max-width: 600px;
@@ -1920,6 +1644,473 @@ button {
   color: #ffdb4d;
 }
 
+/* TRENDING STREAMS */
+.trending-streams {
+  width: calc(100% - 260px); /* Adjusted for sidebar */
+  padding: 20px;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow:none;
+  overflow: hidden;
+  margin-left: 260px; /* Prevents sidebar overlap */
+}
+
+/* TITLE */
+.trending-streams h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ff00ff;
+  text-shadow: 0px 0px 10px #ff00ff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* 📌 FIXED GRID LAYOUT - 3 PER ROW MAX */
+.streams-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(250px, 1fr)); /* Default: 3 per row */
+  gap: 20px;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+}
+
+/* 🔴 STREAM + CHAT CARD STYLES */
+.stream-card {
+  border-radius: 8px;
+  padding: 15px;
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  width: 100%;
+  max-width: 320px; /* Slightly bigger cards */
+  min-height: 280px; /* Keeps everything balanced */
+}
+
+.stream-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.6);
+}
+
+/* 🔥 BOUNCING EFFECTS */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.bounce {
+  animation: bounce 3s infinite ease-in-out;
+}
+
+/* 🖼️ THUMBNAIL IMAGES */
+.stream-thumbnail {
+  width: 100%;
+  height: 150px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+/* 🗨️ CHAT PROFILE ICONS */
+.chat-profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.4);
+}
+
+/* 📜 STREAM INFO */
+.stream-info {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.stream-info h3 {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 0px 0px 10px #ffcc00;
+  font-family: 'Press Start 2P', sans-serif; /* RETRO + READABLE */
+  letter-spacing: 0.8px;
+  text-align: center;
+}
+
+
+.stream-info p {
+  font-size: 0.9rem;
+  color: #ddd;
+  margin: 5px 0;
+}
+
+/* 💬 CHAT MESSAGES */
+.chat-message {
+  font-style: italic;
+  color: #00ffea;
+  font-size: 0.85rem;
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 5px rgba(0, 255, 255, 0.3);
+  margin-top: 8px;
+}
+
+/* 🎭 RANDOM MOVEMENT (Controlled Chaos) */
+@keyframes randomMove {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  25% {
+    transform: translate(3px, -3px);
+  }
+  50% {
+    transform: translate(-3px, 3px);
+  }
+  75% {
+    transform: translate(3px, 3px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+.stream-card.trending {
+  animation: randomMove 3s infinite alternate ease-in-out;
+}
+
+/* TRADING ROOM LIST - CLEAN & RESPONSIVE */
+
+/* 🎭 Overall container */
+.trading-rooms-container {
+  width: 80%;
+  max-width: 1200px;
+  margin: 50px;
+  margin-left:200px;
+  padding: 20px;
+}
+
+/* 🔹 Trading Room Header */
+.trading-room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #555; /* Bottom separator */
+}
+
+.trading-room-header h2 {
+  font-size: 1.8rem;
+  font-family: "Press Start 2P", sans-serif;
+  color: #ffcc00;
+  text-shadow: 0px 0px 8px rgba(255, 204, 0, 0.6);
+}
+
+/* ➕ Create Room Button */
+.create-room-btn {
+  background: linear-gradient(90deg, #ff007f, #ff6600);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.create-room-btn:hover {
+  opacity: 0.85;
+}
+
+/* 📜 Room List Layout */
+.rooms-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+/* 🎭 Room List Item */
+.room-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #1a1d29;
+  padding: 15px;
+  border-radius: 5px;
+  border-bottom: 2px solid #666; /* Bottom divider */
+  transition: background 0.3s ease-in-out;
+}
+
+.room-card:hover {
+  background: #24283a;
+}
+
+/* 🖼️ Room Thumbnail */
+.room-thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+/* 📌 Room Details */
+.room-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.room-details h3 {
+  font-size: 1.2rem;
+  font-family: "Press Start 2P", sans-serif;
+  color: #ffcc00;
+}
+
+.room-details p {
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+/* ✅ Join Button */
+.join-room-btn {
+  background: #00ff99;
+  color: #000;
+  font-weight: bold;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.join-room-btn:hover {
+  background: #00cc77;
+}
+
+/* 📱 RESPONSIVENESS */
+
+/* Tablet - Reduce font sizes and spacing */
+@media (max-width: 1024px) {
+  .room-thumbnail {
+    width: 70px;
+    height: 70px;
+  }
+
+  .room-details h3 {
+    font-size: 1rem;
+  }
+
+  .room-details p {
+    font-size: 0.85rem;
+  }
+
+  .join-room-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile - Single column, full width */
+@media (max-width: 768px) {
+  .room-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .room-thumbnail {
+    width: 100%;
+    height: 120px;
+    border-radius: 4px;
+  }
+
+  .join-room-btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+/* Small Mobile (iPhone SE, etc.) */
+@media (max-width: 600px) {
+  .trading-room-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .room-details h3 {
+    font-size: 1rem;
+  }
+
+  .room-details p {
+    font-size: 0.8rem;
+  }
+
+  .create-room-btn {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trending-streams {
+    width: 100%;
+    margin-left: 0; /* Remove sidebar gap */
+  }
+}
+
+/* 📱 RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .streams-grid {
+    grid-template-columns: repeat(3, minmax(200px, 1fr)); /* 3 per row */
+  }
+}
+
+@media (max-width: 900px) {
+  .streams-grid {
+    grid-template-columns: repeat(2, minmax(200px, 1fr)); /* 2 per row */
+  }
+}
+
+@media (max-width: 600px) {
+  .streams-grid {
+    grid-template-columns: repeat(1, minmax(200px, 1fr)); /* 1 per row */
+  }
+.show-more-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+  padding: 12px 20px;
+  background: linear-gradient(90deg, #ff00ff, #ffcc00);
+  color: #000;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.5);
+  transition: transform 0.2s ease-in-out;
+}
+
+.show-more-btn:hover {
+  transform: scale(1.1);
+}
+}
+
+/* 🖥️ Responsive Grid */
+@media (max-width: 768px) {
+  @media (max-width: 768px) {
+    .trading-room-header {
+      flex-direction: column; /* Stack heading & button */
+      text-align: center;
+      padding: 20px 10px;
+    }
+  
+    .trading-room-header h2 {
+      font-size: 1.2rem; /* Slightly smaller text */
+      margin-bottom: 10px; /* Adds spacing */
+    }
+  
+    .create-room-btn {
+      width: 100%; /* Full-width button */
+      max-width: 280px; /* Prevents it from being too wide */
+      font-size: 0.9rem; /* Smaller text */
+    }
+    .trading-rooms-container{
+      margin-left: 0;
+    }
+    .rooms-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .room-card {
+      width: 90%;
+    }
+  
+    .create-room-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 1024px) {
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  .degen-title {
+    font-size: 20px;
+  }
+
+  .stream-video {
+    height: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .live-streams {
+    padding: 10px;
+  }
+
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .stream-card {
+    padding: 8px;
+  }
+
+  .degen-title {
+    font-size: 18px;
+  }
+
+  .stream-video {
+    height: 140px;
+  }
+
+  .go-live-btn {
+    font-size: 12px;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .degen-title {
+    font-size: 16px;
+  }
+
+  .streams-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+  }
+
+  .stream-video {
+    height: 120px;
+  }
+
+  .go-live-btn {
+    font-size: 10px;
+    padding: 8px 14px;
+  }
+}
+
+
 
 /* 🎯 Responsive Adjustments */
 @media (max-width: 768px) {
@@ -2017,51 +2208,8 @@ button {
   }
 }
 
-/* 📱 Mobile Responsive */
-@media (max-width: 1024px) {
-  .header {
-    flex-direction: column;
-    align-items: center;
-  }
 
-  .nav-links {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-}
 
-@media (max-width: 768px) {
-  .header {
-    padding: 10px;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .search-bar input {
-    width: 120px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    flex-direction: column;
-    padding: 10px;
-    text-align: center;
-  }
-
-  .search-bar {
-    width: 100%;
-  }
-
-  .search-bar input {
-    width: 100%;
-  }
-}
 /* 🎨 Mobile Responsiveness */
 @media screen and (max-width: 768px) {
   /* 🔹 Full-Screen Mobile Profile */
@@ -2176,246 +2324,98 @@ button {
   }
 }
 
-/* 📱 Responsive Design */
-@media (max-width: 1200px) {
-  .rooms-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  }
-}
 
+
+/* 🌍 GENERAL MOBILE STYLES */
 @media (max-width: 768px) {
-  /* Responsive Design */
-@media (max-width: 600px) {
-  .trading-room-form-page {
-    width: 90%;
-  }
-}
-  .rooms-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
-  .join-room-btn {
-    font-size: 12px;
-    padding: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .trading-rooms h2 {
-    font-size: 18px;
-  }
-
-  .room-card {
-    max-width: 100%;
-  }
-}
-
-
-/* 📱 Responsive Design */
-@media (max-width: 1200px) {
-  .streams-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  }
-
-  .stream-thumbnail {
-    height: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .streams-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
-  .pagination button {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
-  .stream-thumbnail {
-    height: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .trending-streams h2 {
-    font-size: 18px;
-  }
-
-  .stream-card {
-    max-width: 100%;
-  }
-
-  .stream-thumbnail {
-    height: 140px;
-  }
-}
-
-
-/* 📱 Responsive Sidebar */
-@media (max-width: 1024px) {
-  .sidebar {
-    width: 100%;
-    min-height: unset;
-    border-right: none;
-    border-bottom: 4px solid #ffcc00;
-    text-align: center;
-    padding: 15px;
-  }
-
-  .sidebar ul {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .sidebar-item {
-    flex: 1 1 auto;
-    padding: 10px;
-    max-width: 200px;
-  }
-}
-
-/* 📱 Mobile Sidebar (Adjust for Small Screens) */
-@media (max-width: 768px) {
-  .sidebar {
-    overflow-x: auto; /* Enables horizontal scrolling if needed */
-    white-space: nowrap;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    padding: 10px;
-    gap: 10px;
-  }
-
-  .sidebar ul {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 5px;
-    scrollbar-width: thin;
-  }
-
-  .sidebar-item {
-    font-size: 12px;
-    padding: 8px;
-    flex: 0 0 auto;
-    min-width: 120px;
-  }
-  .clear-filter-btn {
-    width: 100%;
-    font-size: 13px;
-    padding: 7px 10px;
-  }
-}
-
-/* 📱 Ultra Small Screens (Phones) */
-@media (max-width: 480px) {
-  .sidebar h3 {
-    font-size: 11px;
-  }
-
-  .sidebar ul {
-    gap: 5px;
-  }
-
-  .sidebar-item {
-    font-size: 10px;
-    padding: 6px;
-    min-width: 100px;
-  }
-}
-
-/* 📱 Responsive Design */
-@media (max-width: 1200px) {
-  .streams-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-  }
-
-  .stream-video {
-    height: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .streams-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
-  .pagination button {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
-  .stream-video {
-    height: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .live-streams h2 {
-    font-size: 18px;
-  }
-
-  .stream-card {
-    max-width: 100%;
-  }
-
-  .stream-video {
-    height: 140px;
-  }
-}
-
-
-/* 📱 Responsive Header */
-@media (max-width: 1024px) {
+  /* HEADER */
   .header {
     flex-direction: column;
+    align-items: center;
     text-align: center;
     padding: 10px;
   }
 
   .nav-links {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  .search-bar {
-    width: 100%;
+    display: flex;
+    flex-direction: row;
     justify-content: center;
-    margin-top: 10px;
+    gap: 10px;
   }
 
-  .auth-buttons {
-    margin-top: 10px;
+  /* 📊 SIDEBAR */
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .sidebar h3 {
+    font-size: 1.2rem;
+  }
+
+  .sidebar-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .sidebar-item {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
+  @media (max-width: 768px) {
+      .streams-grid {
+          display: flex;
+          flex-direction: column; /* Stack elements vertically */
+          align-items: center; /* Center items */
+      }
+  
+      .stream-card {
+          width: 90%;
+          max-width: 400px;
+          text-align: center;
+      }
+  
+      .live-streams .streams-grid {
+          flex-direction: column;
+      }
+  }
+
+  /* 👣 FOOTER */
+  .footer {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 5px;
   }
 }
 
-@media (max-width: 768px) {
-  .nav-button {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
-  .search-bar input {
-    font-size: 12px;
-  }
-
-  .auth-buttons button {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-}
-
+/* 📱 FOR SMALLER PHONES */
 @media (max-width: 480px) {
-  .logo {
-    font-size: 18px;
+  .streams-grid {
+    grid-template-columns: 1fr;
   }
 
-  .header {
-    padding: 5px;
+  .stream-card {
+    max-width: 100%;
+  }
+
+  .sidebar {
+    padding: 10px;
+    margin-top: 160px;
+  }
+
+  .sidebar-list {
+    flex-direction: column;
   }
 }
 
@@ -2440,35 +2440,6 @@ button {
     font-size: 12px;
   }
 }
-
-
-/* 📱 Responsive Design */
-@media (max-width: 1024px) {
-  .main-layout {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 4px solid var(--accent-color);
-  }
-}
-
-@media (max-width: 768px) {
-  .streams-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
 
 /* ✅ RESPONSIVE DESIGN */
 @media (max-width: 768px) {
@@ -2513,32 +2484,6 @@ button {
     flex-direction: column; /* Stack sidebar & content */
   }
 
-  /* 📌 Sidebar - Mobile */
-  .sidebar {
-    width: 100%;
-    height: auto;
-    min-height: unset;
-    padding: 15px;
-    border-right: none;
-    border-bottom: 4px solid #ffcc00;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-
-  .sidebar .sidebar-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    width: 100%;
-  }
-
-  .sidebar .sidebar-item {
-    width: 45%;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
   /* 🚀 Main Content - Mobile */
   .content-wrapper {
     min-width: 100%;
@@ -2552,25 +2497,3 @@ button {
   }
 }
 
-/* 🏆 Responsive Footer */
-@media (max-width: 768px) {
-  .footer-links {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .footer {
-    font-size: 12px;
-    padding: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer p {
-    font-size: 10px;
-  }
-
-  .footer-links a {
-    font-size: 10px;
-  }
-}

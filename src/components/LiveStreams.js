@@ -4,13 +4,14 @@ import "../styles/global.css";
 
 const LiveStreams = ({ setSelectedStreamer, filteredCategory }) => {
   const [displayedStreams, setDisplayedStreams] = useState([]);
+  const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Future: Fetch live streams dynamically (e.g., from an API or WebSocket)
     const fetchStreams = async () => {
       // Placeholder for API fetch
-      setDisplayedStreams([]); // No hardcoded streams
+      setDisplayedStreams([]); // No hardcoded streams for now
     };
 
     fetchStreams();
@@ -26,27 +27,21 @@ const LiveStreams = ({ setSelectedStreamer, filteredCategory }) => {
     }
   }, [filteredCategory]);
 
-  const streamsPerPage = 6;
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.max(Math.ceil(displayedStreams.length / streamsPerPage), 1);
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const paginatedStreams = displayedStreams.slice(
-    (currentPage - 1) * streamsPerPage,
-    currentPage * streamsPerPage
-  );
+  // Limit streams initially (only show 6)
+  const initialStreams = displayedStreams.slice(0, 6);
 
   return (
     <section className="live-streams">
-      <h2>🎥 Live Trading Streams</h2>
+      <h2 className="degen-title"> Live Trading Streams</h2>
 
-      {paginatedStreams.length > 0 ? (
+      {displayedStreams.length > 0 ? (
         <div className="streams-grid">
-          {paginatedStreams.map((stream) => (
-            <div key={stream.id} className="stream-card" onClick={() => setSelectedStreamer(stream)}>
+          {(showAll ? displayedStreams : initialStreams).map((stream) => (
+            <div
+              key={stream.id}
+              className="stream-card degen-glow"
+              onClick={() => setSelectedStreamer(stream)}
+            >
               <div className="live-badge">🔴 Live</div>
               <iframe
                 src={stream.videoUrl}
@@ -55,7 +50,7 @@ const LiveStreams = ({ setSelectedStreamer, filteredCategory }) => {
                 allowFullScreen
               ></iframe>
               <div className="stream-info">
-                <h3>{stream.name}</h3>
+                <h3 className="degen-text">{stream.name}</h3>
                 <p>{stream.category}</p>
                 <p>👀 {stream.viewers} viewers</p>
               </div>
@@ -72,14 +67,10 @@ const LiveStreams = ({ setSelectedStreamer, filteredCategory }) => {
         </div>
       )}
 
-      {displayedStreams.length > streamsPerPage && (
-        <div className="pagination">
-          <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
-            ◀ Prev
-          </button>
-          <span>Page {currentPage} of {totalPages}</span>
-          <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>
-            Next ▶
+      {displayedStreams.length > 6 && !showAll && (
+        <div className="show-all-container">
+          <button className="show-all-btn degen-button" onClick={() => setShowAll(true)}>
+             Show All Streams
           </button>
         </div>
       )}
