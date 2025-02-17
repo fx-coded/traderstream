@@ -260,6 +260,9 @@ body {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .trading-rooms-container {
+    margin-top: 100px;
+  }
   .trading-room-header {
       flex-direction: column;
       gap: 10px;
