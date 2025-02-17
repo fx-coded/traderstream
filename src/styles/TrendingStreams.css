@@ -1,0 +1,222 @@
+/* TRENDING STREAMS */
+.trending-streams {
+    width: 100% ; 
+    padding: 20px;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow:none;
+    overflow: hidden;
+  }
+  
+  /* TITLE */
+  .trending-streams h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #ff00ff;
+    text-shadow: 0px 0px 10px #ff00ff;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* 📌 FIXED GRID LAYOUT - 3 PER ROW MAX */
+  .streams-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* Default: 3 per row */
+    gap: 20px;
+    justify-content: center;
+    padding: 10px;
+    position: relative;
+  }
+  
+  /* 🔴 STREAM + CHAT CARD STYLES */
+  .stream-card {
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    width: 100%;
+    max-width: 320px; /* Slightly bigger cards */
+    min-height: 280px; /* Keeps everything balanced */
+  }
+  
+  .stream-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 20px rgba(255, 0, 255, 0.6);
+  }
+  
+  /* 🔥 BOUNCING EFFECTS */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  
+  .bounce {
+    animation: bounce 3s infinite ease-in-out;
+  }
+  
+  /* 🖼️ THUMBNAIL IMAGES */
+  .stream-thumbnail {
+    width: 100%;
+    height: 150px;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  
+  /* 🗨️ CHAT PROFILE ICONS */
+  .chat-profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.4);
+  }
+  
+  /* 📜 STREAM INFO */
+  .stream-info {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .stream-info h3 {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #ffcc00;
+    text-shadow: 0px 0px 10px #ffcc00;
+    font-family: 'Press Start 2P', sans-serif; /* RETRO + READABLE */
+    letter-spacing: 0.8px;
+    text-align: center;
+  }
+  
+  
+  .stream-info p {
+    font-size: 0.9rem;
+    color: #ddd;
+    margin: 5px 0;
+  }
+  
+  /* 💬 CHAT MESSAGES */
+  .chat-message {
+    font-style: italic;
+    color: #00ffea;
+    font-size: 0.85rem;
+    padding: 8px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0px 5px rgba(0, 255, 255, 0.3);
+    margin-top: 8px;
+  }
+  
+  /* 🎭 RANDOM MOVEMENT (Controlled Chaos) */
+  @keyframes randomMove {
+    0% {
+      transform: translate(0px, 0px);
+    }
+    25% {
+      transform: translate(3px, -3px);
+    }
+    50% {
+      transform: translate(-3px, 3px);
+    }
+    75% {
+      transform: translate(3px, 3px);
+    }
+    100% {
+      transform: translate(0px, 0px);
+    }
+  }
+  
+  .stream-card.trending {
+    animation: randomMove 3s infinite alternate ease-in-out;
+  }
+
+  @media (max-width: 768px) {
+    .trending-streams {
+      width: 100%;
+      margin-left: 0; 
+      margin-top: 100px;
+    }
+  }
+  
+  /* 📱 RESPONSIVE DESIGN */
+  @media (max-width: 1200px) {
+    .streams-grid {
+      grid-template-columns: repeat(3, minmax(200px, 1fr)); /* 3 per row */
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .streams-grid {
+      grid-template-columns: repeat(2, minmax(200px, 1fr)); /* 2 per row */
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .streams-grid {
+      grid-template-columns: repeat(1, minmax(200px, 1fr)); /* 1 per row */
+    }
+  .show-more-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    padding: 12px 20px;
+    background: linear-gradient(90deg, #ff00ff, #ffcc00);
+    color: #000;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0px 0px 10px rgba(255, 0, 255, 0.5);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .show-more-btn:hover {
+    transform: scale(1.1);
+  }
+  }
+  
+  /* 📱 Responsive Design */
+  @media (max-width: 1024px) {
+    .streams-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .degen-title {
+      font-size: 20px;
+    }
+  
+    .stream-video {
+      height: 160px;
+    }
+  }
+  
+  /* 🎯 Responsive Design */
+@media (max-width: 768px) {
+    .trading-room-form {
+      max-width: 90%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .trading-room-form {
+      padding: 20px;
+    }
+  
+    .trading-room-form h2 {
+      font-size: 14px;
+    }
+  
+    .trading-room-form button {
+      font-size: 12px;
+    }
+  }

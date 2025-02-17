@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { db, storage } from "../firebaseConfig";
 import { doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import "../styles/global.css";
+import "../styles/StreamerProfile.css";
 
 const StreamerProfile = ({ user }) => {
   const { streamerId } = useParams();
@@ -134,7 +134,7 @@ const StreamerProfile = ({ user }) => {
           {editing ? (
             <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="editable-input" />
           ) : (
-            <h2>{username}</h2>
+            <h2 className="profile-username">{username}</h2>
           )}
 
           {editing ? (
@@ -155,7 +155,7 @@ const StreamerProfile = ({ user }) => {
           {user?.uid === streamerId && <p className="followers-count">👥 {followers.length} Followers</p>}
 
           {user && user.uid !== streamerId && (
-            <button className="follow-btn" onClick={handleFollow}>
+            <button className={`follow-btn ${isFollowing ? "following" : ""}`} onClick={handleFollow}>
               {isFollowing ? "✅ Following" : "➕ Follow"}
             </button>
           )}

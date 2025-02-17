@@ -1,402 +1,105 @@
-/* Retro Cyberpunk Global Styles
-body {
-  background-color: #1a1a2e;
-  color: #f5f5f5;
-  font-family: "Press Start 2P", cursive;
-  margin: 0;
+/* 🌐 Global Styles for the Retro Trading Streaming Website */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+  --primary-color: #ff0077;
+  --secondary-color: #ffcc00;
+  --background-color: #1b1f27;
+  --text-color: #f5f5f5;
+  --accent-color: #00ff99;
+}
+
+/* 🌌 Global Reset */
+* {
   padding: 0;
+  box-sizing: border-box;
 }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  overflow: hidden;
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: "Roboto", sans-serif; /* ✅ More legible font for body text */
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%; /* ✅ Prevents iOS text zoom */
 }
 
+/* 🎯 Headings (Keep Press Start 2P for a retro feel) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Press Start 2P", sans-serif; 
+  color: var(--secondary-color);
+}
+
+/* 📝 Paragraphs & General Text (Legible Font) */
+p, span, a, li, button, input, textarea {
+  font-family: "Roboto", sans-serif; /* ✅ Improved readability */
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+/* 🎯 Emphasized Text */
+strong, b {
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+/* 🌍 Main Layout */
 .main-layout {
   display: flex;
+  align-items: flex-start;  /* Ensure it aligns to the top */
   width: 100%;
   max-width: 1400px;
 }
 
+/* ✅ Fix: Prevent iOS input zoom */
+input, textarea, select, button {
+  font-size: 16px !important;
+  -webkit-appearance: none; /* Removes native styling on iOS */
+}
+
+/* ✅ Prevent iOS zooming in when tapping inputs */
+input:focus, textarea:focus {
+  font-size: 16px !important;
+}
+
+/* ✅ Prevent accidental text zooming */
+html {
+  touch-action: manipulation; /* Prevents accidental zooming on double tap */
+}
+
+/* ✅ Prevent buttons from triggering zoom */
+button {
+  font-size: 16px !important;
+}
+
+
+/* 🚀 Main Content */
 .content-wrapper {
   flex-grow: 1;
   padding: 20px;
-}
-
-/* Header Styles */
-.header {
-  overflow: hidden;
+  min-width: calc(100% - 250px); /* Prevent layout shifting */
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 15px 30px;
-  background: linear-gradient(90deg, #ff0080, #8000ff);
-  border-bottom: 4px solid #ffcc00;
-  box-shadow: 0px 4px 10px rgba(255, 204, 0, 0.5);
-  text-transform: uppercase;
-}
-
-.logo {
-  font-size: 26px;
-  font-weight: bold;
-  color: #ffcc00;
-  text-shadow: 3px 3px #ff0080;
-}
-
-.nav-links button {
-  background: none;
-  border: 2px solid #ffcc00;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 10px 15px;
-  transition: all 0.3s;
-  text-transform: uppercase;
-}
-
-.nav-links button:hover {
-  color: #ffcc00;
-  background: rgba(255, 204, 0, 0.2);
-  transform: scale(1.1);
-}
-
-.search-bar input {
-  padding: 12px;
-  border-radius: 5px;
-  border: 2px solid #ffcc00;
-  background: #222;
-  color: white;
-}
-
-/* Sidebar Styles */
-.sidebar {
-  width: 280px;
-  background: #0f0f1a;
-  padding: 25px;
-  border-right: 4px solid #ffcc00;
-  color: #ffcc00;
-}
-
-.sidebar-item {
-  padding: 12px;
-  cursor: pointer;
-  list-style: none;
-  border: 2px solid #ffcc00;
-  transition: background 0.3s, transform 0.2s;
-  border-radius: 6px;
-  text-transform: uppercase;
-}
-
-.sidebar-item:hover {
-  background: #ff0080;
-  transform: scale(1.05);
-}
-
-/* Live & Trending Streams */
-.streams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 25px;
-}
-
-.stream-card {
-  background: linear-gradient(145deg, #0f0f1a, #292929);
-  padding: 18px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: 2px solid #ffcc00;
-  box-shadow: 0 0 10px rgba(255, 165, 0, 0.6);
-}
-
-.stream-card:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
-}
-
-.stream-thumbnail {
-  width: 100%;
-  border-radius: 8px;
-  border: 3px solid #ffcc00;
-}
-
-/* Pagination Styles */
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.pagination button {
-  background: #ff0080;
-  color: white;
-  border: 2px solid #ffcc00;
-  padding: 10px 15px;
-  margin: 0 5px;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.3s, transform 0.3s;
-  text-transform: uppercase;
-}
-
-.pagination button:disabled {
-  background: #333;
-  cursor: not-allowed;
-  border: 2px solid #777;
-}
-
-.pagination button:hover:not(:disabled) {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.1);
-}
-
-/* Top Trading Countries */
-.top-countries {
-  margin-top: 30px;
-}
-
-.country-list {
-  list-style: none;
-  padding: 0;
-}
-
-.country-card {
-  display: flex;
-  justify-content: space-between;
-  background: linear-gradient(145deg, #0f0f1a, #292929);
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  transition: transform 0.3s, box-shadow 0.3s;
-  border: 2px solid #ffcc00;
-  box-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
-}
-
-.country-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
-}
-
-.rank {
-  font-weight: bold;
-  color: #ffcc00;
-}
-
-.name {
-  flex-grow: 1;
-  text-align: left;
-  padding-left: 10px;
-  font-size: 16px;
-}
-
-.volume {
-  font-weight: bold;
-  color: #ff0080;
-}
-
-
-/* Trading Room Form */
-.trading-room-form {
-  max-width: 500px;
-  background: #0f0f1a;
-  padding: 20px;
-  border-radius: 10px;
-  border: 3px solid #ffcc00;
-  box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
-  margin: 20px auto;
-  text-align: center;
-}
-
-.trading-room-form h2 {
-  color: #ffcc00;
-  text-transform: uppercase;
-}
-
-.trading-room-form label {
-  display: block;
-  margin-top: 10px;
-  color: #ffcc00;
-}
-
-.trading-room-form input,
-.trading-room-form select,
-.trading-room-form textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  background: #222;
-  border: 2px solid #ffcc00;
-  color: white;
-  border-radius: 5px;
-}
-
-.trading-room-form button {
-  background: #ff0080;
-  color: white;
-  border: 2px solid #ffcc00;
-  padding: 12px;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.3s, transform 0.3s;
-  margin-top: 15px;
-  width: 100%;
-}
-
-.trading-room-form button:hover {
-  background: #ffcc00;
-  color: black;
-  transform: scale(1.1);
-}
-
-/* Retro Cyberpunk Global Styles */
-body {
-  background-color: #1a1a2e;
-  color: #f5f5f5;
-  font-family: "Press Start 2P", cursive;
-  margin: 0;
-  padding: 0;
+  flex-direction: column;
 }
 
 .app-container {
   display: flex;
+  margin-top: 70px;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  min-height: 100vh;
-  justify-content: space-between;
-}
-
-.main-layout {
-  display: flex;
   width: 100%;
-  max-width: 1400px;
-  flex-grow: 1;
 }
 
-.content-wrapper {
-  flex-grow: 1;
-  padding: 20px;
-}
-
-/* Header Styles */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 15px 30px;
-  background: linear-gradient(90deg, #ff0080, #8000ff);
-  border-bottom: 4px solid #ffcc00;
-  box-shadow: 0px 4px 10px rgba(255, 204, 0, 0.5);
-  text-transform: uppercase;
-}
-
-.logo {
-  font-size: 26px;
-  font-weight: bold;
-  color: #ffcc00;
-  text-shadow: 3px 3px #ff0080;
-}
-
-.nav-links button {
-  background: none;
-  border: 2px solid #ffcc00;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 10px 15px;
-  transition: all 0.3s;
-  text-transform: uppercase;
-}
-
-.nav-links button:hover {
-  color: #ffcc00;
-  background: rgba(255, 204, 0, 0.2);
-  transform: scale(1.1);
-}
-
-.search-bar input {
-  padding: 12px;
-  border-radius: 5px;
-  border: 2px solid #ffcc00;
-  background: #222;
-  color: white;
-}
-
-/* Footer Styles */
-.footer {
-  width: 100%;
-  background: linear-gradient(90deg, #8000ff, #ff0080);
-  padding: 20px;
-  text-align: center;
-  color: #ffcc00;
-  margin-top: 50px;
-  border-top: 4px solid #ffcc00;
-  box-shadow: 0px -4px 10px rgba(255, 204, 0, 0.5);
-  font-size: 14px;
-  text-transform: uppercase;
-}
-
-.footer a {
-  color: #ffcc00;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.footer a:hover {
-  color: #ffffff;
-} */
-
-/* Responsive Design */
+/* 📱 Mobile Responsive Fixes */
 @media (max-width: 768px) {
-  .trading-room-form {
-      max-width: 90%;
-  }
-
-  .footer {
-      font-size: 12px;
-      padding: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .trading-room-form {
-      padding: 15px;
-  }
-  .footer {
-      font-size: 10px;
-  }
-}
-
-
-/* Responsive Design */
-@media (max-width: 1024px) {
   .main-layout {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: column; 
   }
 
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 4px solid #ffcc00;
+  /* 🚀 Main Content - Mobile */
+  .content-wrapper {
+    min-width: 100%;
+    padding: 15px;
   }
-}
 
-@media (max-width: 768px) {
-  .streams-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    flex-direction: column;
-    text-align: center;
-  }
 }

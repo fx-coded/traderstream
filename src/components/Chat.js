@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { db, storage } from "../firebaseConfig";
 import { doc, updateDoc, arrayUnion, onSnapshot, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import "../styles/global.css";
+import "../styles/Chat.css";
 
 const bannedWords = ["racistword1", "racistword2", "badword1", "badword2"];
 
@@ -80,7 +80,7 @@ const Chat = ({ roomId, user, isAdmin, onExit, onLeaveRoom }) => {
       user: username,
       text: newMessage,
       imageUrl,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date().toISOString(),
       reactions: [],
     };
 
@@ -155,7 +155,7 @@ const Chat = ({ roomId, user, isAdmin, onExit, onLeaveRoom }) => {
           >
             <strong className="username">{msg.user}:</strong> {msg.text}
             {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded" className="chat-image" />}
-            <span className="message-time">{msg.timestamp}</span>
+            <span className="message-time">{new Date(msg.timestamp).toLocaleTimeString()}</span>
 
             {/* ✅ Reactions Menu */}
             {activeReactions === msg.id && (
@@ -166,6 +166,15 @@ const Chat = ({ roomId, user, isAdmin, onExit, onLeaveRoom }) => {
                   </button>
                 ))}
                 {msg.userId === user.uid && <button className="delete-btn" onClick={() => deleteMessage(msg.id)}>🗑</button>}
+              </div>
+            )}
+
+            {/* ✅ Display Active Reactions */}
+            {msg.reactions && msg.reactions.length > 0 && (
+              <div className="active-reactions">
+                {msg.reactions.map((r, i) => (
+                  <span key={i}>{r}</span>
+                ))}
               </div>
             )}
           </div>

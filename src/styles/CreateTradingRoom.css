@@ -1,0 +1,192 @@
+
+/* 🔥 Trading Room Form - Retro Futuristic Aesthetic */
+.trading-room-form-page {
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 12px;
+    box-shadow: 0px 0px 12px rgba(255, 105, 180, 0.5);
+    text-align: center;
+    color: white;
+  }
+  
+  .trading-room-form-page h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fdbc40;
+    margin-bottom: 15px;
+  }
+  
+  .trading-room-form-page form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .trading-room-form-page label {
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: #ff6bcb;
+  }
+  
+  /* Ensure text inputs, select, and textarea are styled properly */
+  .trading-room-form-page input:not([type="radio"]),
+  .trading-room-form-page select,
+  .trading-room-form-page textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #333;
+    border: 2px solid #fdbc40;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+  }
+  
+  .trading-room-form-page input::placeholder,
+  .trading-room-form-page textarea::placeholder {
+    color: #aaa;
+  }
+  
+  .trading-room-form-page textarea {
+    resize: none;
+    height: 80px;
+  }
+  
+  /* ✅ Fixing the radio buttons */
+  .trading-room-form-page .privacy-options {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    gap: 10px;
+  }
+  
+  .trading-room-form-page .privacy-options label {
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background: #333;
+    padding: 8px;
+    border-radius: 8px;
+    border: 2px solid #fdbc40;
+    width: 100%;
+    justify-content: center;
+    color: #fdbc40;
+    transition: 0.3s;
+  }
+  
+  .trading-room-form-page .privacy-options label:hover {
+    background: #444;
+  }
+  
+  .trading-room-form-page input[type="radio"] {
+    margin-right: 8px;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fdbc40;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .trading-room-form-page input[type="radio"]:checked {
+    background: #fdbc40;
+    box-shadow: 0px 0px 5px rgba(253, 187, 45, 0.7);
+  }
+  
+  /* Button Styling */
+  .trading-room-form-page button {
+    background: linear-gradient(90deg, #ff6bcb, #fdbc40);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s;
+  }
+  
+  .trading-room-form-page button:hover {
+    background: linear-gradient(90deg, #fdbc40, #ff6bcb);
+    transform: scale(1.05);
+  }
+  
+  /* Error & Success Messages */
+  .trading-room-form-page .error-message {
+    background: #ff4c4c;
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .trading-room-form-page .success-message {
+    background: #4caf50;
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* File Upload Styling */
+  .trading-room-form-page input[type="file"] {
+    border: none;
+    background: transparent;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #fdbc40;
+  }
+  
+  .create-room-btn {
+    display: block;
+    width: 100%;
+    max-width: 250px;
+    margin: 20px auto;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(90deg, #ff6bcb, #fdbc40);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 0px 8px rgba(255, 105, 180, 0.5);
+  }
+  
+  .create-room-btn:hover {
+    background: linear-gradient(90deg, #fdbc40, #ff6bcb);
+    transform: scale(1.05);
+    box-shadow: 0px 0px 12px rgba(255, 105, 180, 0.7);
+  }
+  
+  .create-room-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0px 0px 6px rgba(255, 105, 180, 0.4);
+  }
+  
+/* 🎯 Responsive Adjustments */
+@media (max-width: 768px) {
+    .create-room-button {
+      font-size: 14px;
+      padding: 10px 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .create-room-button {
+      font-size: 13px;
+      padding: 8px 14px;
+    }
+  }  

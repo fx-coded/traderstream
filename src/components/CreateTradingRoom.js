@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { db, storage } from "../firebaseConfig";
 import { collection, addDoc, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import "../styles/global.css";
+import "../styles/CreateTradingRoom.css";
 
 const CreateTradingRoom = ({ user }) => {
   const navigate = useNavigate(); // 🔄 React Router Navigation

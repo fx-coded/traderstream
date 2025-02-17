@@ -177,7 +177,7 @@ const AuthModal = ({ type, setShowAuthModal, setUser }) => {
               onChange={(e) => setResetEmail(e.target.value)}
               required
             />
-            <button className="auth-btn" onClick={handleForgotPassword}>
+            <button className="auth-btn-modal" onClick={handleForgotPassword}>
               📩 Send Reset Link
             </button>
             {resetEmailSent && <p className="success-message">✅ Check your email for the reset link.</p>}
@@ -260,7 +260,7 @@ const AuthModal = ({ type, setShowAuthModal, setUser }) => {
 
             <p className="forgot-password" onClick={() => setShowForgotPassword(true)}>❓ Forgot Password?</p>
 
-            <button type="submit" className="auth-btn" disabled={loading}>
+            <button type="submit" className="auth-btn-modal" disabled={loading}>
               {loading ? "⏳ Processing..." : type === "login" ? "🚀 Login" : "🆕 Sign Up"}
             </button>
           </form>

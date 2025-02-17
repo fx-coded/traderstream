@@ -1,0 +1,48 @@
+
+/* ===== Top Navigation Bar Styles ===== */
+.top-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    background-color: #121212; /* Dark background */
+    padding: 10px 0;
+    border-bottom: 2px solid #333; /* Slight border for separation */
+  }
+  
+  .top-nav button {
+    background: linear-gradient(90deg, #ffcc00, #ff6600); /* Gradient effect */
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .top-nav button:hover {
+    background: linear-gradient(90deg, #ff6600, #ffcc00);
+    transform: scale(1.05);
+  }
+  
+  .top-nav button.active {
+    background: #ff6600; /* Highlight the active category */
+    transform: scale(1.1);
+  }
+  
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .top-nav {
+      flex-wrap: wrap;
+      padding: 8px;
+    }
+  
+    .top-nav button {
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+  }
+  

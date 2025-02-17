@@ -1,0 +1,280 @@
+/* Global Styles */
+body {
+  background-color: #0f0f0f;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container */
+.trading-rooms-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Header */
+.trading-room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 2px solid #ff9900;
+}
+
+.trading-room-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffcc00;
+  text-transform: uppercase;
+  font-family: 'Press Start 2P', cursive;
+}
+
+.create-room-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.create-room-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Rooms Grid */
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Room Card */
+.room-card {
+  background-color: #1a1a1a;
+  border: 2px solid #ff9900;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.room-card:hover {
+  transform: scale(1.05);
+  border-color: #ffcc00;
+}
+
+/* Room Title */
+.room-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffcc00;
+  margin-bottom: 10px;
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* Room Metadata */
+.room-meta p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.room-meta strong {
+  color: #ffcc00;
+}
+
+/* Room Actions */
+.room-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.room-actions button {
+  background-color: #333;
+  color: #ffcc00;
+  border: 1px solid #ffcc00;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.room-actions button:hover {
+  background-color: #ffcc00;
+  color: #000;
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  background-color: #ff9900;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.pagination button:disabled {
+  background-color: #444;
+  cursor: not-allowed;
+}
+
+/* Chat Room */
+.chat-room-container {
+  width: 100%;
+  height: 100vh;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Setup Section */
+.setup-container {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.setup-card {
+  background-color: #222;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ff9900;
+}
+
+.setup-card h4 {
+  font-size: 18px;
+  color: #ffcc00;
+}
+
+.setup-card p {
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* Setup Image */
+.setup-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Setup Actions */
+.setup-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.setup-actions button {
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.setup-actions button:hover {
+  background-color: #ff9900;
+}
+
+/* Add Setup Button */
+.add-setup-btn {
+  background-color: #ff9900;
+  color: black;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.add-setup-btn:hover {
+  background-color: #ffcc00;
+}
+
+/* Setup Form */
+.setup-form-container {
+  background-color: #111;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: auto;
+  text-align: center;
+}
+
+.setup-form-container input,
+.setup-form-container textarea {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  background-color: #222;
+  border: 1px solid #ff9900;
+  color: white;
+  border-radius: 5px;
+}
+
+.setup-form-container button {
+  background-color: #ff9900;
+  color: black;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.setup-form-container button:hover {
+  background-color: #ffcc00;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .trading-room-header {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+  }
+
+  .rooms-grid {
+      grid-template-columns: 1fr;
+  }
+
+  .setup-form-container {
+      width: 90%;
+  }
+
+  .room-actions {
+      flex-direction: column;
+  }
+}

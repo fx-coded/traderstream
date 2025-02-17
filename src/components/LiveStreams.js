@@ -1,80 +1,76 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/global.css";
+import io from "socket.io-client";
+import "../styles/LiveStreams.css";
 
-const LiveStreams = ({ setSelectedStreamer, filteredCategory }) => {
-  const [displayedStreams, setDisplayedStreams] = useState([]);
-  const [showAll, setShowAll] = useState(false);
+const socket = io("http://localhost:4000");
+
+const LiveStreams = ({ liveStreams, user, setShowAuthModal = () => {} }) => {
   const navigate = useNavigate();
+  const [viewerCounts, setViewerCounts] = useState({});
 
   useEffect(() => {
-    // Future: Fetch live streams dynamically (e.g., from an API or WebSocket)
-    const fetchStreams = async () => {
-      // Placeholder for API fetch
-      setDisplayedStreams([]); // No hardcoded streams for now
-    };
+    socket.on("viewer-count", ({ streamerId, count }) => {
+      setViewerCounts((prevCounts) => ({
+        ...prevCounts,
+        [streamerId]: count,
+      }));
+    });
 
-    fetchStreams();
+    return () => {
+      socket.off("viewer-count");
+    };
   }, []);
 
-  useEffect(() => {
-    if (!filteredCategory) {
-      setDisplayedStreams((prevStreams) => prevStreams);
+  const handleGoLive = () => {
+    if (!user) {
+      setShowAuthModal("login"); // 🔐 Require login before streaming
     } else {
-      setDisplayedStreams((prevStreams) =>
-        prevStreams.filter((stream) => stream.category === filteredCategory)
-      );
+      navigate("/go-live"); // 🚀 Redirect to Streamer Dashboard
     }
-  }, [filteredCategory]);
-
-  // Limit streams initially (only show 6)
-  const initialStreams = displayedStreams.slice(0, 6);
+  };
 
   return (
-    <section className="live-streams">
-      <h2 className="degen-title"> Live Trading Streams</h2>
+    <div className="live-streams-container">
+      <h2 className="live-streams-title">🎥 Live Streams</h2>
 
-      {displayedStreams.length > 0 ? (
-        <div className="streams-grid">
-          {(showAll ? displayedStreams : initialStreams).map((stream) => (
+      <button className="go-live-btn" onClick={handleGoLive}>
+        🚀 Go Live
+      </button>
+
+      {liveStreams.length === 0 ? (
+        <p className="no-streams">🚨 No live streams available.</p>
+      ) : (
+        <div className="live-stream-grid">
+          {liveStreams.map((stream) => (
             <div
               key={stream.id}
-              className="stream-card degen-glow"
-              onClick={() => setSelectedStreamer(stream)}
+              className="live-stream-card"
+              onClick={() => navigate(`/viewer/${stream.id}`)}
             >
-              <div className="live-badge">🔴 Live</div>
-              <iframe
-                src={stream.videoUrl}
-                title={stream.name}
-                className="stream-video"
-                allowFullScreen
-              ></iframe>
-              <div className="stream-info">
-                <h3 className="degen-text">{stream.name}</h3>
-                <p>{stream.category}</p>
-                <p>👀 {stream.viewers} viewers</p>
+              <img
+                src={stream.thumbnail || "https://via.placeholder.com/320x180.png?text=Live+Stream"}
+                alt="Stream Thumbnail"
+                className="live-stream-thumbnail"
+              />
+              <div className="live-stream-info">
+                <h3 className="live-stream-title">{stream.title}</h3>
+                <p className="live-stream-category">📌 {stream.category}</p>
+                <p className="live-stream-viewers">
+                  👀 {viewerCounts[stream.id] ?? stream.viewers ?? 0} viewers
+                </p>
+                <p className="live-stream-user">🎤 {stream.username}</p>
+                <p className="live-stream-hashtags">
+                  {stream.hashtags?.map((tag, index) => (
+                    <span key={index} className="hashtag">#{tag} </span>
+                  ))}
+                </p>
               </div>
             </div>
           ))}
         </div>
-      ) : (
-        <div className="no-streams">
-          🚀 No live streams available right now.
-          <br />
-          <button className="go-live-btn" onClick={() => navigate("/go-live")}>
-            🎥 Go Live
-          </button>
-        </div>
       )}
-
-      {displayedStreams.length > 6 && !showAll && (
-        <div className="show-all-container">
-          <button className="show-all-btn degen-button" onClick={() => setShowAll(true)}>
-             Show All Streams
-          </button>
-        </div>
-      )}
-    </section>
+    </div>
   );
 };
 

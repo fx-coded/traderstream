@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import "../styles/global.css"; // Updated CSS file for styling
+import "../styles/Header.css"; // Updated CSS file for styling
 
 const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
