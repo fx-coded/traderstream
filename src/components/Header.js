@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebaseConfig"; // Ensure Firebase auth is imported
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import "../styles/Header.css"; // Ensure CSS is updated for styling
+import "../styles/Header.css";
 
-const Header = ({ user, logout }) => {
+const Header = ({ user, setUser }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [profilePic, setProfilePic] = useState("/default-profile.png");
   const [username, setUsername] = useState("Trader");
-  const [menuOpen, setMenuOpen] = useState(false); // ✅ Mobile menu state
+  const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
 
   // Fetch user profile in real-time
@@ -28,18 +31,43 @@ const Header = ({ user, logout }) => {
     }
   }, [user]);
 
-  // Close dropdown when clicking outside
+  // ✅ Close dropdown & menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        menuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        !event.target.classList.contains("menu-toggle")
+      ) {
+        setMenuOpen(false);
+      }
+
+      if (
+        showDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
         setShowDropdown(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [menuOpen, showDropdown]);
+
+  // ✅ Logout Function
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Clears Firebase authentication session
+      setUser(null); // Reset user state
+      navigate("/login"); // Redirect to login
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <header className="header">
@@ -54,7 +82,7 @@ const Header = ({ user, logout }) => {
       </button>
 
       {/* 🔹 Navigation */}
-      <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
+      <nav ref={menuRef} className={`nav-links ${menuOpen ? "open" : ""}`}>
         <Link to="/live-streams" className="nav-button" onClick={() => setMenuOpen(false)}>
           Live Streams
         </Link>
@@ -77,7 +105,7 @@ const Header = ({ user, logout }) => {
             <Link to={`/profile/${user.uid}`} className="nav-button" onClick={() => setMenuOpen(false)}>
               View Profile
             </Link>
-            <button className="nav-button logout-button" onClick={logout}>
+            <button className="nav-button logout-button" onClick={handleLogout}>
               Logout
             </button>
           </>
@@ -90,7 +118,7 @@ const Header = ({ user, logout }) => {
         <button className="search-btn">🔍</button>
       </div>
 
-      {/* 🔹 Desktop Profile (Hidden on Mobile) */}
+      {/* 🔹 Desktop Profile & Logout (Hidden on Mobile) */}
       {user && (
         <div className="user-profile" ref={dropdownRef}>
           <div className="profile-info" onClick={() => setShowDropdown(!showDropdown)}>
@@ -104,7 +132,7 @@ const Header = ({ user, logout }) => {
               <Link to={`/profile/${user.uid}`} className="view-profile" onClick={() => setShowDropdown(false)}>
                 View Profile
               </Link>
-              <button onClick={logout} className="logout-button">
+              <button onClick={handleLogout} className="logout-button">
                 Logout
               </button>
             </div>
