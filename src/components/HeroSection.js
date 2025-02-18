@@ -3,76 +3,51 @@ import { motion } from "framer-motion";
 import Button from "./Button";
 import "../styles/HeroSection.css";
 
-const traderMessages = [
-  "🚀 TP HIT!!",
-  "📈 Market Pumping!",
-  "🔥 FOMO buyers incoming!",
-  "🤯 This is insane!",
-  "💰 Let's print money!",
-  "💎 Diamond hands!",
-  "😂 Someone just got liquidated!",
-  "🔮 Next target: $20K?",
+const stockTickers = [
+  "BTC/USD: $52,304.50 ▲",
+  "ETH/USD: $3,478.30 ▲",
+  "SPX500: 4,975.12 ▲",
+  "TSLA: $202.89 ▼",
+  "AAPL: $178.25 ▲",
+  "SOL/USD: $110.45 ▲",
 ];
 
 const HeroSection = ({ setShowAuthModal }) => {
-  const [chatBubbles, setChatBubbles] = useState([]);
-  const [price, setPrice] = useState(9500); // Simulate a market move
+  const [price, setPrice] = useState(9500);
+  const [tickerIndex, setTickerIndex] = useState(0);
 
   // 📈 Simulate price movement
   useEffect(() => {
     const interval = setInterval(() => {
       setPrice((prevPrice) => prevPrice + Math.random() * 50);
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
-  // 💬 Generate random floating chat bubbles
+  // 📊 Scrolling stock ticker
   useEffect(() => {
-    const chatInterval = setInterval(() => {
-      const randomMessage =
-        traderMessages[Math.floor(Math.random() * traderMessages.length)];
-      setChatBubbles((prev) => [
-        ...prev,
-        { id: Date.now(), text: randomMessage, x: Math.random() * 80 + 10 },
-      ]);
-
-      // Remove old messages
-      setTimeout(() => {
-        setChatBubbles((prev) => prev.slice(1));
-      }, 4000);
+    const tickerInterval = setInterval(() => {
+      setTickerIndex((prevIndex) => (prevIndex + 1) % stockTickers.length);
     }, 2000);
-
-    return () => clearInterval(chatInterval);
+    return () => clearInterval(tickerInterval);
   }, []);
 
   return (
     <section className="hero-section">
-      {/* 📊 Floating Chat Bubbles */}
-      <div className="floating-chat-container">
-        {chatBubbles.map((bubble) => (
-          <motion.div
-            key={bubble.id}
-            className="chat-bubble"
-            style={{ left: `${bubble.x}%` }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: -80 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 3 }}
-          >
-            {bubble.text}
-          </motion.div>
-        ))}
+      {/* 📊 Scrolling Stock Ticker */}
+      <div className="stock-ticker">
+        <motion.div
+          key={tickerIndex}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 1 }}
+        >
+          {stockTickers[tickerIndex]}
+        </motion.div>
       </div>
 
-      {/* 📉 Animated Candlestick Chart */}
-      <div className="chart-container">
-        {[...Array(15)].map((_, index) => (
-          <div key={index} className="candlestick" />
-        ))}
-      </div>
-
-      {/* 🔥 Animated Profit Number */}
+      {/* 🔥 Animated Profit Display */}
       <motion.div
         className="profit-display"
         animate={{ scale: [1, 1.2, 1] }}
@@ -81,6 +56,7 @@ const HeroSection = ({ setShowAuthModal }) => {
         +${price.toFixed(2)}
       </motion.div>
 
+      {/* 🔥 Glowing Title Effect */}
       <motion.h1
         className="hero-title"
         initial={{ opacity: 0, y: -20 }}

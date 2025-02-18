@@ -11,61 +11,24 @@
     background-color: black;
     color: white;
     padding: 0 1.5rem;
-  }
-  
-  /* 📈 Candlestick Chart Simulation */
-  .chart-container {
+}
+
+/* 📊 Stock Ticker Animation */
+.stock-ticker {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  
-  .candlestick {
-    position: absolute;
-    bottom: 0;
-    width: 6px;
-    background: #00ff00;
-    border-radius: 3px;
-    animation: moveCandlestick 3s infinite alternate ease-in-out, flicker 1.5s infinite;
-    opacity: 0.8;
-  }
-  
-  /* 📉 Candlestick TP Effect */
-  .tp-hit {
-    background: gold !important;
-    box-shadow: 0 0 20px gold;
-  }
-  
-  /* 📉 Randomize Candlestick Placement */
-  .candlestick:nth-child(1) { left: 5%; }
-  .candlestick:nth-child(2) { left: 15%; }
-  .candlestick:nth-child(3) { left: 25%; }
-  .candlestick:nth-child(4) { left: 35%; }
-  .candlestick:nth-child(5) { left: 45%; }
-  .candlestick:nth-child(6) { left: 55%; }
-  .candlestick:nth-child(7) { left: 65%; }
-  .candlestick:nth-child(8) { left: 75%; }
-  .candlestick:nth-child(9) { left: 85%; }
-  .candlestick:nth-child(10) { left: 95%; }
-  
-  /* 📈 Candlestick Movement */
-  @keyframes moveCandlestick {
-    0% { transform: translateY(30px); }
-    100% { transform: translateY(-30px); }
-  }
-  
-  /* 🔥 Flickering Effect */
-  @keyframes flicker {
-    0%, 100% { height: 20px; background: #00ff00; }
-    50% { height: 50px; background: #ff0000; }
-  }
-  
-  /* 💰 Profit Number */
-  .profit-display {
+    top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    animation: ticker-glow 1s infinite alternate;
+}
+
+/* 🔥 Profit Number */
+.profit-display {
     position: absolute;
     top: 50px;
     font-size: 2rem;
@@ -73,83 +36,96 @@
     color: #00ff00;
     text-shadow: 0px 0px 10px rgba(0, 255, 0, 0.7);
     transition: all 0.3s ease-in-out;
-  }
-  
-  /* 💸 TP HIT Celebration Effect */
-  .profit-hit {
+}
+
+/* 💸 TP HIT Celebration Effect */
+.profit-hit {
     color: gold !important;
     text-shadow: 0px 0px 20px rgba(255, 215, 0, 1);
     animation: glow 0.5s infinite alternate;
-  }
-  
-  @keyframes glow {
+}
+
+@keyframes glow {
     0% { text-shadow: 0px 0px 10px rgba(255, 215, 0, 1); }
     100% { text-shadow: 0px 0px 20px rgba(255, 215, 0, 1); }
-  }
-  
-  /* 🔥 Title Styling */
-  .hero-title {
+}
+
+/* 🔥 Title Styling */
+.hero-title {
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
     z-index: 10;
-  }
-  
-  @media (min-width: 768px) {
-    .hero-title {
-      font-size: 3rem;
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .hero-title {
-      font-size: 3.5rem;
-    }
-  }
-  
-  /* 🔥 Subtitle Styling */
-  .hero-subtitle {
+    text-shadow: 0px 0px 20px rgba(255, 255, 0, 0.5);
+}
+
+/* 🔥 Subtitle Styling */
+.hero-subtitle {
     font-size: 1rem;
     color: #d1d5db;
     max-width: 40rem;
     margin-bottom: 1.5rem;
     z-index: 10;
-  }
-  
-  /* 🔥 Button Container */
-  .hero-buttons {
+}
+
+/* 🔥 Button Container */
+.hero-buttons {
     display: flex;
     gap: 1rem;
     z-index: 10;
-  }
-  
-  /* 🔥 Button Styling */
-  .hero-button {
+}
+
+/* 🔥 Button Styling */
+.hero-button {
     padding: 0.75rem 1.5rem;
     font-size: 1.125rem;
     font-weight: 600;
     border-radius: 0.5rem;
     transition: background 0.3s, transform 0.3s;
     cursor: pointer;
-  }
-  
-  .join-now {
+}
+
+.join-now {
     background-color: #facc15;
     color: black;
-  }
-  
-  .join-now:hover {
+}
+
+.join-now:hover {
     background-color: #fbbf24;
     transform: scale(1.05);
-  }
-  
-  .login {
+}
+
+.login {
     background-color: #374151;
     color: white;
-  }
-  
-  .login:hover {
+}
+
+.login:hover {
     background-color: #1f2937;
     transform: scale(1.05);
-  }
-  
+}
+
+/* 📱 Mobile Responsiveness */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+    .profit-display {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    .hero-subtitle {
+        font-size: 0.85rem;
+    }
+    .profit-display {
+        font-size: 1.3rem;
+    }
+}
