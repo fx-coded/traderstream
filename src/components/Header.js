@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import "../styles/Header.css"; // Updated CSS file for styling
+import "../styles/Header.css"; // Ensure CSS is updated for styling
 
-const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => {
+const Header = ({ user, logout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [profilePic, setProfilePic] = useState("/default-profile.png");
   const [username, setUsername] = useState("Trader");
+  const [menuOpen, setMenuOpen] = useState(false); // ✅ Mobile menu state
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -47,30 +48,50 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
         TraderStream
       </div>
 
+      {/* 🔹 Mobile Menu Toggle Button */}
+      <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+        ☰
+      </button>
+
       {/* 🔹 Navigation */}
-      <nav className="nav-links">
-        <button 
-          className={`nav-button ${activeTab === "live" ? "active" : ""}`} 
-          onClick={() => setActiveTab("live")}
-        >
+      <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
+        <Link to="/live-streams" className="nav-button" onClick={() => setMenuOpen(false)}>
           Live Streams
-        </button>
-        <button 
-          className={`nav-button ${activeTab === "rooms" ? "active" : ""}`} 
-          onClick={() => setActiveTab("rooms")}
-        >
-          Trading Rooms
-        </button>
+        </Link>
+        <Link to="/chatrooms" className="nav-button" onClick={() => setMenuOpen(false)}>
+          Chatrooms
+        </Link>
+        <Link to="/brokers" className="nav-button" onClick={() => setMenuOpen(false)}>
+          Brokers
+        </Link>
+        <Link to="/prop-firms" className="nav-button" onClick={() => setMenuOpen(false)}>
+          Prop Firms
+        </Link>
+        <Link to="/crypto-exchanges" className="nav-button" onClick={() => setMenuOpen(false)}>
+          Crypto Exchanges
+        </Link>
+
+        {/* 🔹 Profile & Logout inside Mobile Menu */}
+        {user && menuOpen && (
+          <>
+            <Link to={`/profile/${user.uid}`} className="nav-button" onClick={() => setMenuOpen(false)}>
+              View Profile
+            </Link>
+            <button className="nav-button logout-button" onClick={logout}>
+              Logout
+            </button>
+          </>
+        )}
       </nav>
 
-      {/* 🔹 Search Bar */}
+      {/* 🔹 Desktop Search Bar (Hidden on Mobile) */}
       <div className="search-bar">
         <input type="text" placeholder="Search traders, streams..." />
         <button className="search-btn">🔍</button>
       </div>
 
-      {/* 🔹 User Profile or Auth Options */}
-      {user ? (
+      {/* 🔹 Desktop Profile (Hidden on Mobile) */}
+      {user && (
         <div className="user-profile" ref={dropdownRef}>
           <div className="profile-info" onClick={() => setShowDropdown(!showDropdown)}>
             <img src={profilePic} alt="User" className="profile-pic" />
@@ -80,23 +101,14 @@ const Header = ({ setActiveTab, activeTab, setShowAuthModal, user, logout }) => 
           {/* 🔻 Dropdown Menu */}
           {showDropdown && (
             <div className="profile-dropdown">
-              <Link 
-                to={`/profile/${user.uid}`} 
-                className="view-profile" 
-                onClick={() => setShowDropdown(false)}
-              >
+              <Link to={`/profile/${user.uid}`} className="view-profile" onClick={() => setShowDropdown(false)}>
                 View Profile
               </Link>
               <button onClick={logout} className="logout-button">
-                Sign Out
+                Logout
               </button>
             </div>
           )}
-        </div>
-      ) : (
-        <div className="auth-buttons">
-          <button onClick={() => setShowAuthModal("login")} className="login-btn">Login</button>
-          <button onClick={() => setShowAuthModal("signup")} className="signup-btn">Sign Up</button>
         </div>
       )}
     </header>

@@ -84,7 +84,7 @@ button {
 
 .app-container {
   display: flex;
-  margin-top: 70px;
+  margin: 70px auto;
   flex-direction: column;
   align-items: center;
   width: 100%;
@@ -94,6 +94,9 @@ button {
 @media (max-width: 768px) {
   .main-layout {
     flex-direction: column; 
+  }
+  .app-container {
+    margin-top: 20px;
   }
 
   /* 🚀 Main Content - Mobile */

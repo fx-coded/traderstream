@@ -1,0 +1,136 @@
+/* 🔹 Container */
+.crypto-exchanges-container {
+    padding: 40px 20px;
+}
+
+/* 🔹 Title */
+.crypto-exchanges-title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* 🔹 Table */
+.crypto-exchanges-table-container {
+    overflow-x: auto;
+}
+
+.crypto-exchanges-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+.crypto-exchanges-table thead {
+    background: #252525;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.crypto-exchanges-table th,
+.crypto-exchanges-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 🔹 Table Rows */
+.crypto-exchanges-table tbody tr {
+    transition: background 0.3s;
+}
+
+.crypto-exchanges-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* 🔹 Exchange Name & Icon */
+.exchange-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.exchange-logo {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    border-radius: 5px;
+    background: white;
+    padding: 5px;
+}
+
+/* 🔹 Visit Exchange Button */
+.open-account-btn {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.open-account-btn:hover {
+    background: #0056b3;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 1024px) {
+    .crypto-exchanges-title {
+        font-size: 1.8rem;
+    }
+
+    .crypto-exchanges-table th,
+    .crypto-exchanges-table td {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .crypto-exchanges-table thead {
+        display: none;
+    }
+
+    .crypto-exchanges-table,
+    .crypto-exchanges-table tbody,
+    .crypto-exchanges-table tr,
+    .crypto-exchanges-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .crypto-exchanges-table tr {
+        margin-bottom: 15px;
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    }
+
+    .crypto-exchanges-table td {
+        padding: 10px;
+        text-align: right;
+        position: relative;
+    }
+
+    .crypto-exchanges-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .open-account-btn {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+}

@@ -16,16 +16,19 @@ import AuthModal from "./Profile/AuthModal";
 import AuthAction from "./Profile/AuthAction";
 import StreamerDashboard from "./components/StreamerDashboard";
 import Viewer from "./components/Viewer";
+import PropFirms from "./components/TopPropFirms";
+import TopCryptoExchanges from "./components/TopCrypto";
 import "./App.css";
+import TopBrokers from "./components/TopBrokers";
 
 const socket = io("http://localhost:4000"); // ✅ Connect to signaling server
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("live");
-  const [tradingRooms, setTradingRooms] = useState([]);
+  const [tradingRooms, setTradingRooms] = useState([]); 
   const [showAuthModal, setShowAuthModal] = useState(null);
   const [user, setUser] = useState(null);
-  const [liveStreams, setLiveStreams] = useState([]); // ✅ Tracks Active Live Streams
+  const [liveStreams, setLiveStreams] = useState([]); // ✅ Ensured liveStreams is always an array
 
   // 🔥 Detect Firebase Auth Changes
   useEffect(() => {
@@ -39,7 +42,7 @@ const App = () => {
   // ✅ Listen for Live Streams Updates in Real-Time
   useEffect(() => {
     socket.on("update-streams", (streams) => {
-      setLiveStreams(streams);
+      setLiveStreams(streams || []); // ✅ Ensuring it never becomes undefined
     });
 
     return () => {
@@ -64,29 +67,19 @@ const App = () => {
     });
   };
 
-  // ✅ Handle "Go Live" Button Click
-  const handleGoLiveClick = () => {
-    if (!user) {
-      setShowAuthModal("login"); // 🔐 Open login modal if user is not authenticated
-    } else {
-      window.location.href = "/go-live"; // 🚀 Redirect to Streamer Dashboard
-    }
-  };
-
   return (
     <Router>
       {!user ? (
-        <HeroSection setShowAuthModal={setShowAuthModal} /> // ✅ Pass `setShowAuthModal`
+        <HeroSection setShowAuthModal={setShowAuthModal} /> // ✅ Pass setShowAuthModal
       ) : (
         <div className="app-container">
-          <Header
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            setShowAuthModal={setShowAuthModal}
-            user={user}
-            logout={logout}
+          <Header 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            user={user} 
+            logout={logout} 
           />
-          
+
           <div className="main-layout">
             <div className="content-wrapper">
               <Routes>
@@ -99,22 +92,22 @@ const App = () => {
                     ) : (
                       <>
                         <TrendingStreams />
-                        <LiveStreams
-                          liveStreams={liveStreams}
-                          user={user}
-                          setShowAuthModal={setShowAuthModal}
-                          handleGoLiveClick={handleGoLiveClick} // ✅ Pass Go-Live Handler
-                        />
+                        <LiveStreams liveStreams={liveStreams} />
                         <Footer />
                       </>
                     )
                   }
                 />
 
-                {/* ✅ Route for Creating a Trading Room */}
-                <Route path="/create-room" element={<CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />} />
+                {/* ✅ Updated Navigation Routes */}
+                <Route path="/live-streams" element={<LiveStreams liveStreams={liveStreams} />} />
+                <Route path="/chatrooms" element={<TradingRoomsList />} />
+                <Route path="/brokers" element={<TopBrokers />} />
+                <Route path="/prop-firms" element={<PropFirms />} />
+                <Route path="/crypto-exchanges" element={<TopCryptoExchanges />} />
 
-                {/* ✅ Chat Room Route */}
+                {/* ✅ Trading Room Features */}
+                <Route path="/create-room" element={<CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />} />
                 <Route path="/chat/:roomId" element={<Chat user={user} />} />
 
                 {/* ✅ Full-Page Profile Route */}
@@ -124,13 +117,13 @@ const App = () => {
                 <Route path="/auth-action" element={<AuthAction />} />
 
                 {/* ✅ Protected Live Streaming Route */}
-                <Route
-                  path="/go-live"
-                  element={user ? <StreamerDashboard user={user} /> : <Navigate to="/" />}
-                />
+                <Route path="/go-live" element={user ? <StreamerDashboard user={user} /> : <Navigate to="/" />} />
 
                 {/* ✅ Route for Viewers to Watch Streams */}
                 <Route path="/viewer/:streamId" element={<Viewer />} />
+
+                {/* 🔥 Catch-All Route - Redirects Unknown Pages to Home */}
+                <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
           </div>
@@ -146,3 +139,4 @@ const App = () => {
 };
 
 export default App;
+
