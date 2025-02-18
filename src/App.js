@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
-import io from "socket.io-client"; // ✅ Socket.io for real-time updates
+import io from "socket.io-client"; // ✅ Real-time updates
+import HeroSection from "./components/HeroSection"; // ✅ Landing Page
 import Header from "./components/Header";
 import LiveStreams from "./components/LiveStreams";
 import TrendingStreams from "./components/TrendingStreams";
@@ -29,13 +30,7 @@ const App = () => {
   // 🔥 Detect Firebase Auth Changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        console.log("✅ User is logged in:", currentUser);
-        setUser(currentUser);
-      } else {
-        console.log("❌ No user logged in");
-        setUser(null);
-      }
+      setUser(currentUser);
     });
 
     return () => unsubscribe();
@@ -69,11 +64,6 @@ const App = () => {
     });
   };
 
-  // ✅ Add Stream to Live List when Starting
-  const handleStartStreaming = (streamData) => {
-    socket.emit("start-stream", streamData); // ✅ Let the server handle it
-  };
-
   // ✅ Handle "Go Live" Button Click
   const handleGoLiveClick = () => {
     if (!user) {
@@ -85,68 +75,72 @@ const App = () => {
 
   return (
     <Router>
-      <div className="app-container">
-        <Header 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          setShowAuthModal={setShowAuthModal} 
-          user={user}
-          logout={logout}
-        />
-        
-        <div className="main-layout">
-          <div className="content-wrapper">
-            <Routes>
-              {/* ✅ Default Homepage */}
-              <Route 
-                path="/" 
-                element={
-                  activeTab === "rooms" ? (
-                    <TradingRoomsList tradingRooms={tradingRooms} user={user}/>
-                  ) : (
-                    <>
-                      <TrendingStreams />
-                      <LiveStreams 
-                        liveStreams={liveStreams} 
-                        user={user} 
-                        setShowAuthModal={setShowAuthModal}
-                        handleGoLiveClick={handleGoLiveClick} // ✅ Pass Go-Live Handler
-                      />
-                      <Footer />
-                    </>
-                  )
-                } 
-              />
+      {!user ? (
+        <HeroSection setShowAuthModal={setShowAuthModal} /> // ✅ Pass `setShowAuthModal`
+      ) : (
+        <div className="app-container">
+          <Header
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            setShowAuthModal={setShowAuthModal}
+            user={user}
+            logout={logout}
+          />
+          
+          <div className="main-layout">
+            <div className="content-wrapper">
+              <Routes>
+                {/* ✅ Default Homepage */}
+                <Route
+                  path="/"
+                  element={
+                    activeTab === "rooms" ? (
+                      <TradingRoomsList tradingRooms={tradingRooms} user={user} />
+                    ) : (
+                      <>
+                        <TrendingStreams />
+                        <LiveStreams
+                          liveStreams={liveStreams}
+                          user={user}
+                          setShowAuthModal={setShowAuthModal}
+                          handleGoLiveClick={handleGoLiveClick} // ✅ Pass Go-Live Handler
+                        />
+                        <Footer />
+                      </>
+                    )
+                  }
+                />
 
-              {/* ✅ Route for Creating a Trading Room */}
-              <Route path="/create-room" element={<CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />} />
+                {/* ✅ Route for Creating a Trading Room */}
+                <Route path="/create-room" element={<CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />} />
 
-              {/* ✅ Chat Room Route */}
-              <Route path="/chat/:roomId" element={<Chat user={user} />} />
+                {/* ✅ Chat Room Route */}
+                <Route path="/chat/:roomId" element={<Chat user={user} />} />
 
-              {/* ✅ Full-Page Profile Route */}
-              <Route path="/profile/:streamerId" element={<StreamerProfile user={user} />} />
+                {/* ✅ Full-Page Profile Route */}
+                <Route path="/profile/:streamerId" element={<StreamerProfile user={user} />} />
 
-              {/* ✅ Route for Email Verification & Password Reset */}
-              <Route path="/auth-action" element={<AuthAction />} />
+                {/* ✅ Route for Email Verification & Password Reset */}
+                <Route path="/auth-action" element={<AuthAction />} />
 
-              {/* ✅ Protected Live Streaming Route */}
-              <Route 
-                path="/go-live" 
-                element={user ? <StreamerDashboard onStartStreaming={handleStartStreaming} user={user} /> : <Navigate to="/" />} 
-              />
+                {/* ✅ Protected Live Streaming Route */}
+                <Route
+                  path="/go-live"
+                  element={user ? <StreamerDashboard user={user} /> : <Navigate to="/" />}
+                />
 
-              {/* ✅ Route for Viewers to Watch Streams */}
-              <Route path="/viewer/:streamId" element={<Viewer />} />
-            </Routes>
+                {/* ✅ Route for Viewers to Watch Streams */}
+                <Route path="/viewer/:streamId" element={<Viewer />} />
+              </Routes>
+            </div>
           </div>
-        </div>
 
-        {/* ✅ Authentication Modal */}
-        {showAuthModal && (
-          <AuthModal type={showAuthModal} setShowAuthModal={setShowAuthModal} setUser={setUser} />
-        )}
-      </div>
+          <Footer />
+        </div>
+      )}
+
+      {/* ✅ Authentication Modal */}
+      {showAuthModal && <AuthModal type={showAuthModal} setShowAuthModal={setShowAuthModal} setUser={setUser} />}
     </Router>
   );
 };
