@@ -1,10 +1,11 @@
 import React from "react";
 import "../styles/TopBrokers.css";
+import ICMarkets from "./images/ic_markets.png";
 
 const brokers = [
   { 
     name: "IC Markets", 
-    logo: "/images/ic-markets.png", 
+    logo: {ICMarkets}, 
     leverage: "1:500", 
     minDeposit: "$200", 
     rating: "4.9", 
