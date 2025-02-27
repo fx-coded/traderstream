@@ -15,6 +15,7 @@ const Header = ({ user, setUser }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
   // Refs
   const dropdownRef = useRef(null);
@@ -24,6 +25,15 @@ const Header = ({ user, setUser }) => {
   // Hooks
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Handle window resize to detect mobile view
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Close menu when route changes
   useEffect(() => {
@@ -269,15 +279,17 @@ const Header = ({ user, setUser }) => {
             aria-expanded={showDropdown}
             aria-haspopup="true"
           >
-            <img 
-              src={profilePic} 
-              alt="" 
-              className="profile-pic"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/default-profile.png";
-              }}
-            />
+            {!isMobile && (
+              <img 
+                src={profilePic} 
+                alt="" 
+                className="profile-pic"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/default-profile.png";
+                }}
+              />
+            )}
             <span className="username">
               {username}
               <span className="dropdown-arrow">{showDropdown ? '▲' : '▼'}</span>
