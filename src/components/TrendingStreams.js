@@ -3,96 +3,133 @@ import "../styles/TrendingStreams.css";
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
 import img3 from "./images/img3.png";
-import img4 from "./images/img4.png";
-import img5 from "./images/img5.png";
-import img6 from "./images/img6.png";
-import img7 from "./images/img7.png";
-import img8 from "./images/img8.png";
-import img9 from "./images/img9.png";
-import img10 from "./images/img10.png";
 import img11 from "./images/img11.png";
-import img12 from "./images/img12.png";
 import img13 from "./images/img13.png";
 import img14 from "./images/img14.png";
-import img15 from "./images/img15.png";
-import img16 from "./images/img16.png";
-import img17 from "./images/img17.png";
-import img18 from "./images/img18.png";
-import img19 from "./images/img19.png";
-import img20 from "./images/img20.png";
+import trive from "./images/trive.jpg";
 
+// Mock Data: Empty Streams (placeholder thumbnails for UI layout)
+const placeholderStreams = [
+  { id: 1, type: "stream", name: "My 2025 watchlist", category: "Crypto Trading", viewers: 0, thumbnail: img1, creator: "Money Speaks" },
+  { id: 2, type: "stream", name: "My 2025 watchlist", category: "Gold, Oil & Indices", viewers: 0, thumbnail: img2, creator: "FxGuru" },
+  { id: 3, type: "stream", name: "My 2025 watchlist", category: "Crypto Trading", viewers: 0, thumbnail: img3, creator: "Diamond Hands" },
+];
 
-// Mock Data: 10 Streams + 10 Chat Rooms
-const placeholderTrending = [
-  { id: 1, type: "stream", name: "Crypto Whale Watching", category: "Crypto Trading", viewers: 1200, thumbnail: img1 },
-  { id: 2, type: "stream", name: "Scalping Gold Live", category: "Gold, Oil & Indices", viewers: 800, thumbnail: img2 },
-  { id: 3, type: "stream", name: "BTC Going Parabolic 🚀", category: "Crypto Trading", viewers: 3000, thumbnail: img3 },
-  { id: 4, type: "stream", name: "AI Trading Bots", category: "Tech & AI Trading", viewers: 900, thumbnail: img4 },
-  { id: 5, type: "stream", name: "Forex Scalping Masterclass", category: "Forex Trading", viewers: 500, thumbnail: img5 },
-  { id: 6, type: "stream", name: "Memecoin Hunt 🔥", category: "Meme Coin Degens", viewers: 1500, thumbnail: img6 },
-  { id: 7, type: "stream", name: "Swing Trading Strategies", category: "Futures & Commodities", viewers: 1100, thumbnail: img7 },
-  { id: 8, type: "stream", name: "Prop Firm Challenge 🏆", category: "Forex Trading", viewers: 700, thumbnail: img8 },
-  { id: 9, type: "stream", name: "Ethereum ETF Incoming?", category: "Crypto Trading", viewers: 950, thumbnail: img9 },
-  { id: 10, type: "stream", name: "Gold vs Bitcoin 2025", category: "Gold, Oil & Indices", viewers: 650, thumbnail: img10 },
-  { id: 11, type: "chat", name: "🚀 Bitcoin 100x 🚀", category: "Crypto Trading", members: 250, profilePic: img11, message: "Bitcoin breakout incoming, sending it to the moon! 🌕" },
-  { id: 12, type: "chat", name: "🔥 Meme Coins to 1000x", category: "Meme Coin Degens", members: 380, profilePic: img12, message: "This new meme coin is a goldmine! $PEPE to the moon! 🚀" },
-  { id: 13, type: "chat", name: "Solana Degen Calls", category: "Crypto Trading", members: 200, profilePic: img13, message: "Solana $500 EOD?? Don’t fade the degen pump! 🤯" },
-  { id: 14, type: "chat", name: "Gold Scalpers 🔥", category: "Gold, Oil & Indices", members: 180, profilePic: img14, message: "XAU/USD just broke resistance, get in before the next run! 🚀" },
-  { id: 15, type: "chat", name: "Prop Firm Traders", category: "Forex Trading", members: 340, profilePic: img15, message: "Just passed my FTMO Challenge in 3 days! 🔥" },
-  { id: 16, type: "chat", name: "🛑 Shorting the Market?", category: "Futures & Commodities", members: 120, profilePic: img16, message: "Bear market confirmed? Going full short on indices! 🐻" },
-  { id: 17, type: "chat", name: "Best Trading Bots 🤖", category: "Tech & AI Trading", members: 280, profilePic: img17, message: "What’s the best trading bot for scalping right now? AI > Humans?" },
-  { id: 18, type: "chat", name: "Forex vs Crypto Debate", category: "Forex Trading", members: 210, profilePic: img18, message: "Forex maxis and crypto maxis, fight it out here! 🥊" },
-  { id: 19, type: "chat", name: "🔥 New Rug Pull Alert", category: "Meme Coin Degens", members: 390, profilePic: img19, message: "Another one bites the dust! Do Kwon style exit 😭" },
-  { id: 20, type: "chat", name: "ETH Gas Fees Insane!", category: "Crypto Trading", members: 240, profilePic: img20, message: "Why is gas $300 to send a $5 NFT?! Wtf ETH!" },
+// Mock Data: Chat Rooms/Discussions
+const placeholderDiscussions = [
+  { id: 11, type: "chat", name: "🚀 Bitcoin 100x 🚀", category: "Crypto Trading", members: 250, profilePic: img11, message: "Bitcoin breakout incoming, sending it to the moon! 🌕", creator: "Money Speaks" },
+  { id: 13, type: "chat", name: "Solana Degen Calls", category: "Crypto Trading", members: 200, profilePic: img13, message: "Solana $500 EOD?? Don't fade the degen pump! 🤯", creator: "Diamond Hands" },
+  { id: 14, type: "chat", name: "Gold Scalpers 🔥", category: "Gold, Oil & Indices", members: 180, profilePic: img14, message: "XAU/USD just broke resistance, get in before the next run! 🚀", creator: "FxGuru" },
 ];
 
 const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
-  const [trending, setTrending] = useState(placeholderTrending);
+  // Always use placeholder streams for now (empty streams section as requested)
+  const [trendingStreams, setTrendingStreams] = useState(placeholderStreams);
+  // Use the already created chats data directly without slicing initially
+  const [trendingDiscussions, setTrendingDiscussions] = useState([]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTrending((prev) => {
-        const shuffled = [...prev].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 10); // Show only 10 at a time
-      });
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if ((realStreams && realStreams.length > 0) || (realChats && realChats.length > 0)) {
-      setTrending([
-        ...realStreams,
-        ...realChats,
-        ...placeholderTrending,
-      ].slice(0, 10));
+    // Only display real chats if they exist, otherwise show placeholders
+    if (realChats && realChats.length > 0) {
+      // Only show real chats (created by users), limit to 3 for display
+      setTrendingDiscussions(realChats.slice(0, 3));
+    } else {
+      // If no real chats, use first 3 placeholders
+      setTrendingDiscussions(placeholderDiscussions.slice(0, 3));
     }
-  }, [realStreams, realChats]);
+  }, [realChats]);
 
   return (
-    <section className="trending-streams">
-      <h2> Trending Streams & Chats</h2>
-
-      <div className="streams-grid">
-        {trending.map((item) => (
-          <div key={item.id} className={`stream-card trending bounce ${item.type === "chat" ? "chat-card" : ""}`} onClick={() => setSelectedStreamer(item)}>
-            {item.type === "chat" ? (
-              <img src={item.profilePic} alt={item.name} className="chat-profile-pic" />
-            ) : (
-              <img src={item.thumbnail} alt={item.name} className="stream-thumbnail" />
-            )}
-
-            <div className="stream-info">
-              <h3>{item.name}</h3>
-              <p>{item.category}</p>
-              <p>👥 {item.type === "chat" ? `${item.members} members` : `${item.viewers} viewers`}</p>
-              {item.type === "chat" && <p className="chat-message">💬 {item.message}</p>}
+    <div className="trending-container">
+      {/* Trive Advertisement Banner */}
+      <div className="ad-banner">
+        <div className="ad-content">
+          <div className="ad-text">
+            <h2 className="ad-title">TRADE WITH TRIVE<br/>- THE PREMIER<br/>GLOBAL BROKER</h2>
+            <p className="ad-subtext">Access 10,000+ markets with<br/>competitive spreads</p>
+          </div>
+          <div className="ad-media">
+            <div className="ad-video-container">
+              <iframe 
+                className="youtube-video" 
+                src="https://www.youtube.com/embed/P0E0rZCfo3A?autoplay=1&mute=1&loop=1&playlist=P0E0rZCfo3A" 
+                title="Trive International" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
-        ))}
+          <div className="ad-info">
+            <div className="ad-info-container">
+              <div className="ad-info-icon">
+                <img src={trive} alt="Trive icon" className="trive-icon" />
+              </div>
+              <div className="ad-info-text">
+                <h3 className="ad-info-title">What is Trive Social?</h3>
+                <p className="ad-info-description">
+                  Trive Social is a trading platform that seamlessly integrates with technology. It simplifies the trading journey through copy trading, where users can follow and replicate the trades of top-performing traders. This feature is ideal for beginners learning the ropes and for experienced traders looking to diversify by leveraging expert strategies.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+      
+      {/* Trending Streams Section */}
+      <section className="trending-section">
+        <h3 className="section-title">Trending Streams</h3>
+        
+        <div className="content-grid">
+          {trendingStreams.map(stream => (
+            <div 
+              key={stream.id} 
+              className="content-card" 
+              onClick={() => setSelectedStreamer(stream)}
+            >
+              <div className="card-thumbnail">
+                <img 
+                  src={stream.thumbnail} 
+                  alt={stream.name} 
+                  className="thumbnail-img"
+                />
+              </div>
+              <div className="card-info">
+                <p className="creator-name">{stream.creator}</p>
+                <p className="stream-name">{stream.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      
+      {/* Trending Discussions Section */}
+      <section className="trending-section">
+        <h3 className="section-title">Trending Discussions</h3>
+        
+        <div className="content-grid">
+          {trendingDiscussions.map(discussion => (
+            <div 
+              key={discussion.id} 
+              className="content-card" 
+              onClick={() => setSelectedStreamer(discussion)}
+            >
+              <div className="card-thumbnail">
+                <img 
+                  src={discussion.profilePic} 
+                  alt={discussion.name} 
+                  className="thumbnail-img"
+                />
+              </div>
+              <div className="card-info">
+                <p className="creator-name">{discussion.creator}</p>
+                <p className="stream-name">{discussion.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 };
 
