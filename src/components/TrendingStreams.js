@@ -43,6 +43,7 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
     <div className="trending-container">
       {/* Trive Advertisement Banner */}
       <div className="ad-banner">
+        <div className="ad-label">Ad</div>
         <div className="ad-content">
           <div className="ad-text">
             <h2 className="ad-title">TRADE WITH TRIVE<br/>- THE PREMIER<br/>GLOBAL BROKER</h2>
@@ -78,7 +79,7 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
       
       {/* Trending Streams Section */}
       <section className="trending-section">
-        <h3 className="section-title">Trending Streams</h3>
+        <h3 className="section-title">TRENDING STREAMS</h3>
         
         <div className="content-grid">
           {trendingStreams.map(stream => (
@@ -105,7 +106,7 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
       
       {/* Trending Discussions Section */}
       <section className="trending-section">
-        <h3 className="section-title">Trending Discussions</h3>
+        <h3 className="section-title">TRENDING DISCUSSIONS</h3>
         
         <div className="content-grid">
           {trendingDiscussions.map(discussion => (
