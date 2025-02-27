@@ -11,7 +11,7 @@
   }
   
   .top-nav button {
-    background: linear-gradient(90deg, #ffcc00, #ff6600); /* Gradient effect */
+    background: linear-gradient(90deg, #06a3dd, #ff6600); /* Gradient effect */
     color: #fff;
     font-size: 14px;
     font-weight: bold;
@@ -23,7 +23,7 @@
   }
   
   .top-nav button:hover {
-    background: linear-gradient(90deg, #ff6600, #ffcc00);
+    background: linear-gradient(90deg, #ff6600, #06a3dd);
     transform: scale(1.05);
   }
   

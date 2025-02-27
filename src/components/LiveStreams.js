@@ -5,9 +5,10 @@ import "../styles/LiveStreams.css";
 
 const socket = io("http://localhost:4000");
 
-const LiveStreams = ({ liveStreams, user, setShowAuthModal = () => {} }) => {
+const LiveStreams = ({ liveStreams, user, setShowAuthModal }) => {
   const navigate = useNavigate();
   const [viewerCounts, setViewerCounts] = useState({});
+  const [permissionError, setPermissionError] = useState(null);
 
   useEffect(() => {
     socket.on("viewer-count", ({ streamerId, count }) => {
@@ -22,10 +23,43 @@ const LiveStreams = ({ liveStreams, user, setShowAuthModal = () => {} }) => {
     };
   }, []);
 
-  const handleGoLive = () => {
+  // ✅ Ensure camera/mic permissions before allowing the user to go live
+  const requestPermissions = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const hasCamera = devices.some((device) => device.kind === "videoinput");
+      const hasMic = devices.some((device) => device.kind === "audioinput");
+
+      if (!hasCamera || !hasMic) {
+        throw new Error("No camera or microphone detected.");
+      }
+
+      // Request permission
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+      // Release media after permission check
+      stream.getTracks().forEach((track) => track.stop());
+      return true;
+    } catch (error) {
+      console.error("❌ Permission error:", error);
+      setPermissionError("❌ Failed to access camera/microphone. Please enable permissions in browser.");
+      return false;
+    }
+  };
+
+  const handleGoLive = async () => {
+    console.log("User:", user); // ✅ Debug user authentication
     if (!user) {
-      setShowAuthModal("login"); // 🔐 Require login before streaming
-    } else {
+      if (typeof setShowAuthModal === "function") {
+        setShowAuthModal("login"); // 🔐 Require login before streaming
+      } else {
+        console.error("❌ setShowAuthModal is not a function");
+      }
+      return;
+    }
+
+    const hasPermissions = await requestPermissions();
+    if (hasPermissions) {
       navigate("/go-live"); // 🚀 Redirect to Streamer Dashboard
     }
   };
@@ -33,6 +67,8 @@ const LiveStreams = ({ liveStreams, user, setShowAuthModal = () => {} }) => {
   return (
     <div className="live-streams-container">
       <h2 className="live-streams-title">🎥 Live Streams</h2>
+
+      {permissionError && <p className="error-message">{permissionError}</p>}
 
       <button className="go-live-btn" onClick={handleGoLive}>
         🚀 Go Live

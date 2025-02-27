@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Chat from "./Chat"; // ✅ Import Chat Component
-import { db } from "../firebaseConfig";
+import { db, auth } from "../firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   doc,
@@ -13,7 +14,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/TrendingRoom.css";
 
-const TradingRoomsList = ({ user, filteredCategory }) => {
+const TradingRoomsList = ({ filteredCategory }) => {
   const [tradingRooms, setTradingRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -23,8 +24,21 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
   const [trade, setTrade] = useState({ asset: "", entry: "", stopLoss: "", takeProfit: "", analysis: "" });
   const [image, setImage] = useState(null);
   const [isSetupFormVisible, setIsSetupFormVisible] = useState(false);
+  const [user, setUser] = useState(null); // ✅ Ensure user state is properly managed
   const storage = getStorage();
   const navigate = useNavigate();
+
+  // ✅ Check user authentication state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "rooms"), (snapshot) => {
@@ -45,7 +59,11 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
   }, [filteredCategory, tradingRooms]);
 
   const joinRoom = async (roomId, type) => {
-    if (!user) return alert("Please log in to join a room!");
+    if (!user) {
+      alert("Please log in to join a room!");
+      navigate("/login"); // ✅ Redirect user to login
+      return;
+    }
 
     const roomRef = doc(db, "rooms", roomId);
     const roomSnapshot = await getDoc(roomRef);
@@ -80,7 +98,11 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
   };
 
   const submitTradeSetup = async () => {
-    if (!user) return alert("Please log in to submit a trade setup!");
+    if (!user) {
+      alert("Please log in to submit a trade setup!");
+      navigate("/login"); // ✅ Redirect user to login
+      return;
+    }
 
     let imageUrl = "";
     if (image) {
@@ -181,7 +203,6 @@ const TradingRoomsList = ({ user, filteredCategory }) => {
               <input type="text" placeholder="Stop Loss" value={trade.stopLoss} onChange={(e) => setTrade({ ...trade, stopLoss: e.target.value })} />
               <input type="text" placeholder="Take Profit" value={trade.takeProfit} onChange={(e) => setTrade({ ...trade, takeProfit: e.target.value })} />
               <textarea placeholder="Analysis" value={trade.analysis} onChange={(e) => setTrade({ ...trade, analysis: e.target.value })}></textarea>
-              <input type="file" onChange={(e) => setImage(e.target.files[0])} />
               <button onClick={submitTradeSetup}>✅ Submit Setup</button>
             </div>
           )}

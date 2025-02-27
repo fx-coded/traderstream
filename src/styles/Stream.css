@@ -1,50 +1,104 @@
-/* Main Container */
+/* 🎥 Streamer Dashboard - Styles */
 .streamerdash-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 1200px;
+  min-height: 100vh;
+  background-color: #121212;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  padding: 20px;
 }
 
-/* Stream Setup (Before Going Live) */
+/* 🎬 Stream Setup UI */
 .stream-setup {
   background: #1e1e1e;
-  padding: 30px;
+  padding: 20px;
   border-radius: 10px;
-  width: 420px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
   text-align: center;
-  border: 1px solid #444;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+  max-width: 500px;
+  width: 100%;
 }
 
 .stream-setup h2 {
-  font-size: 26px;
-  color: #fdbb2d;
-  margin-bottom: 20px;
-  font-family: 'Press Start 2P', cursive;
+  font-size: 24px;
+  margin-bottom: 15px;
+  font-family: "Press Start 2P", sans-serif; /* Retro pixel font */
+  color: #ffeb3b;
+  text-shadow: 2px 2px 5px rgba(255, 235, 59, 0.5);
 }
 
-/* Input Fields */
+/* 📋 Input Fields */
 .stream-setup input,
 .stream-setup select {
   width: 100%;
   padding: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   border: 1px solid #444;
   border-radius: 5px;
-  background: #292929;
-  color: white;
-  font-size: 14px;
-  outline: none;
+  background: #262626;
+  color: #fff;
+  font-size: 16px;
 }
 
 .stream-setup input::placeholder {
-  color: #999;
+  color: #aaa;
 }
 
 .stream-setup select {
   cursor: pointer;
+}
+
+/* 🎬 Start Streaming Button */
+.stream-setup button {
+  background: #00c853;
+  color: white;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.stream-setup button:hover {
+  background: #00e676;
+}
+
+.stream-setup button:disabled {
+  background: #444;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* ✅ Hashtag Container */
+.hashtag-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hashtag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.hashtag {
+  background: #0091ea;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
 }
 
 /* Terms & Conditions Checkbox */
@@ -95,163 +149,98 @@
   opacity: 1; /* Make sure it's not transparent */
 }
 
-/* Start Streaming Button */
-.stream-setup button {
-  background-color: #28a745;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
 
-.stream-setup button:hover {
-  background-color: #218838;
-}
-
-/* Stop Streaming Button */
-.streamerdash-stop-btn {
-  background-color: red;
-  color: white;
-}
-
-.streamerdash-stop-btn:hover {
-  background-color: darkred;
-}
-
-/* Live Stream Header */
-.streamerdash-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.streamerdash-header h1 {
-  font-size: 26px;
-  font-weight: bold;
-  color: #fdbb2d;
-}
-
-.streamerdash-header p {
-  font-size: 16px;
-  color: #bbb;
-}
-
-.streamerdash-header a {
-  color: #00c6ff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.streamerdash-header a:hover {
-  text-decoration: underline;
-}
-
-/* Live Stream Layout */
-.streamerdash-main {
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-  justify-content: center;
-}
-
-/* Video Stream */
-.streamerdash-stream video {
-  width: 720px;
-  height: 405px;
-  background: black;
+/* 📹 Streaming UI */
+.streamerdash-video {
+  width: 100%;
+  max-width: 800px;
   border-radius: 10px;
-  border: 2px solid #00c6ff;
+  margin-top: 15px;
+  border: 2px solid #00c853;
 }
 
-/* Live Chat */
+/* 🎤 Live Chat */
 .streamerdash-chat {
-  width: 350px;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
   background: #1e1e1e;
   padding: 15px;
   border-radius: 10px;
-  border: 1px solid #333;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+  margin-top: 15px;
 }
 
 .streamerdash-chat h3 {
-  text-align: center;
-  color: #fdbb2d;
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 10px;
 }
 
 .streamerdash-chat-messages {
-  height: 300px;
-  overflow-y: scroll;
-  border: 1px solid #444;
+  max-height: 250px;
+  overflow-y: auto;
   padding: 10px;
-  background: #292929;
+  background: #262626;
   border-radius: 5px;
-  font-size: 14px;
-  color: #ddd;
 }
 
 .streamerdash-chat-messages p {
-  margin: 5px 0;
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
 
-.streamerdash-chat-messages strong {
-  color: #00c6ff;
-}
-
-/* Chat Input */
 .streamerdash-chat input {
+  width: 80%;
   padding: 10px;
-  margin-top: 10px;
   border: 1px solid #444;
   border-radius: 5px;
-  background: #292929;
+  background: #262626;
   color: white;
-  font-size: 14px;
-}
-
-.streamerdash-chat input::placeholder {
-  color: #bbb;
 }
 
 .streamerdash-chat button {
-  background-color: #007bff;
+  background: #00c853;
   color: white;
   padding: 10px;
-  margin-top: 5px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 .streamerdash-chat button:hover {
-  background-color: #0056b3;
+  background: #00e676;
 }
 
-/* Viewer Count */
-.viewer-count {
-  font-size: 16px;
-  font-weight: bold;
-  color: #00c6ff;
-  text-align: center;
-  margin-top: 10px;
+/* 🛑 Stop Streaming Button */
+.streamerdash-stop-btn {
+  background: #d50000;
+  color: white;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 15px;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 900px) {
-  .streamerdash-main {
-    flex-direction: column;
-    align-items: center;
+.streamerdash-stop-btn:hover {
+  background: #ff1744;
+}
+
+/* 🖥 Responsive Design */
+@media (max-width: 768px) {
+  .streamerdash-container {
+    padding: 10px;
   }
 
-  .streamerdash-stream video {
-    width: 100%;
-    height: auto;
+  .stream-setup {
+    max-width: 100%;
   }
 
   .streamerdash-chat {
-    width: 100%;
+    max-width: 100%;
   }
 }
-

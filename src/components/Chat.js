@@ -1,196 +1,146 @@
 import React, { useState, useEffect, useRef } from "react";
-import { db, storage } from "../firebaseConfig";
-import { doc, updateDoc, arrayUnion, onSnapshot, getDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import "../styles/Chat.css";
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, getDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import TraderSidebar from "./TraderSidebar";
+import "../styles/Chat.css"; 
 
-const bannedWords = ["racistword1", "racistword2", "badword1", "badword2"];
-
-const isValidMessage = (message) => {
-  if (!message.trim() || message.length < 2) return false;
-  return !bannedWords.some((word) => message.toLowerCase().includes(word));
-};
-
-const reactions = ["👍", "😂", "🔥", "❤️", "💎", "🚀", "🤑"];
-
-const Chat = ({ roomId, user, isAdmin, onExit, onLeaveRoom }) => {
+const Chat = ({ groupId, user }) => {
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [imageUpload, setImageUpload] = useState(null);
-  const [roomData, setRoomData] = useState(null);
-  const [roomOwner, setRoomOwner] = useState(null);
-  const [username, setUsername] = useState(user?.displayName || "Trader");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [activeReactions, setActiveReactions] = useState(null);
-  const chatEndRef = useRef(null);
+  const [message, setMessage] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState([]); // ✅ Track online users
+  const chatRef = useRef(null);
 
-  // ✅ Fetch username from Firestore
+  // ✅ Mark user as online when they enter the chat
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user || !groupId) return;
 
-    const fetchUsername = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          setUsername(userDoc.data().username || user.displayName || "Trader");
-        }
-      } catch (error) {
-        console.error("🔥 Error fetching username:", error);
-      }
+    const userRef = doc(db, "users", user.uid);
+    updateDoc(userRef, { isOnline: true });
+
+    return () => {
+      updateDoc(userRef, { isOnline: false }); // ✅ Mark user as offline when they leave
     };
+  }, [user, groupId]);
 
-    fetchUsername();
-  }, [user?.uid, user.displayName]);
-
-  // ✅ Listen for messages in the chat room
+  // ✅ Fetch messages in real-time
   useEffect(() => {
-    const roomRef = doc(db, "rooms", roomId);
-    const unsubscribe = onSnapshot(roomRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setMessages(docSnap.data().messages || []);
-        setRoomData(docSnap.data());
-        setRoomOwner(docSnap.data().adminId);
+    if (!groupId) return;
+
+    const messagesRef = collection(db, "groups", groupId, "messages");
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+
+    return () => unsubscribe();
+  }, [groupId]);
+
+  // ✅ Fetch online users in real-time
+  useEffect(() => {
+    if (!groupId) return;
+
+    const groupRef = doc(db, "groups", groupId);
+    
+    const unsubscribe = onSnapshot(groupRef, async (groupSnapshot) => {
+      if (groupSnapshot.exists()) {
+        const members = groupSnapshot.data().members || [];
+        const onlineUsersList = [];
+
+        for (const memberId of members) {
+          const userDoc = await getDoc(doc(db, "users", memberId));
+          if (userDoc.exists() && userDoc.data().isOnline) {
+            onlineUsersList.push(userDoc.data());
+          }
+        }
+
+        setOnlineUsers(onlineUsersList);
       }
     });
 
     return () => unsubscribe();
-  }, [roomId]);
+  }, [groupId]);
 
-  // ✅ Scroll to the latest message
+  // ✅ Auto-scroll to latest message
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
   }, [messages]);
 
-  // ✅ Send a message
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    if (!user) return alert("❌ You must be logged in to chat!");
-    if (!isValidMessage(newMessage)) return alert("❌ Message contains prohibited words!");
-
-    let imageUrl = "";
-    if (imageUpload) {
-      const imageRef = ref(storage, `chat_images/${user.uid}_${Date.now()}`);
-      await uploadBytes(imageRef, imageUpload);
-      imageUrl = await getDownloadURL(imageRef);
+  // ✅ Send message
+  const sendMessage = async () => {
+    if (!user) {
+      alert("You must be logged in to send messages!");
+      return;
     }
 
-    const messageData = {
-      id: Date.now(),
-      userId: user.uid,
-      user: username,
-      text: newMessage,
-      imageUrl,
-      timestamp: new Date().toISOString(),
-      reactions: [],
-    };
+    if (!groupId) {
+      alert("Error: Group ID is missing! Please rejoin the chat.");
+      return;
+    }
 
-    await updateDoc(doc(db, "rooms", roomId), { messages: arrayUnion(messageData) });
-    setNewMessage("");
-    setImageUpload(null);
-  };
+    if (!message.trim()) {
+      return;
+    }
 
-  // ✅ Toggle reactions menu on right-click or hold
-  const toggleReactionMenu = (messageId) => {
-    setActiveReactions(activeReactions === messageId ? null : messageId);
-  };
+    try {
+      await addDoc(collection(db, "groups", String(groupId), "messages"), {
+        text: message,
+        senderId: user.uid,
+        senderName: user.displayName || "Trader",
+        timestamp: serverTimestamp(),
+      });
 
-  // ✅ Add reactions to a message
-  const addReaction = async (messageId, reaction) => {
-    const roomRef = doc(db, "rooms", roomId);
-    const updatedMessages = messages.map((msg) => {
-      if (msg.id === messageId) {
-        if (!msg.reactions) msg.reactions = [];
-        if (!msg.reactions.includes(reaction)) {
-          msg.reactions.push(reaction);
-        }
-      }
-      return msg;
-    });
-
-    await updateDoc(roomRef, { messages: updatedMessages });
-    setActiveReactions(null);
-  };
-
-  // ✅ Delete a message
-  const deleteMessage = async (messageId) => {
-    if (!user) return;
-    const roomRef = doc(db, "rooms", roomId);
-    const updatedMessages = messages.filter((msg) => msg.id !== messageId);
-    await updateDoc(roomRef, { messages: updatedMessages });
+      setMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   return (
     <div className="chat-container">
-      {/* ✅ Chat Header */}
-      <div className="chat-header">
-        <h2>{roomData?.roomName}</h2>
-        <p className="member-count">👥 {roomData?.members?.length || 0} Members</p>
+      {/* Left Sidebar */}
+      <TraderSidebar groupId={groupId} />
 
-        <div className="chat-options">
-          <button className="menu-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>☰</button>
-          {dropdownOpen && (
-            <div className="dropdown-menu">
-              <button onClick={onExit}>🍔 Exit Room</button>
-              <button onClick={onLeaveRoom}>🚪 Leave Group</button>
-              {user.uid === roomOwner && (
-                <button onClick={() => updateDoc(doc(db, "rooms", roomId), { messages: [] })}>
-                  🗑 Delete Chat
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ✅ Chat Messages */}
-      <div className="chat-messages">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`chat-message ${msg.userId === user.uid ? "sent" : "received"}`}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              toggleReactionMenu(msg.id);
-            }}
-          >
-            <strong className="username">{msg.user}:</strong> {msg.text}
-            {msg.imageUrl && <img src={msg.imageUrl} alt="Uploaded" className="chat-image" />}
-            <span className="message-time">{new Date(msg.timestamp).toLocaleTimeString()}</span>
-
-            {/* ✅ Reactions Menu */}
-            {activeReactions === msg.id && (
-              <div className="reaction-container">
-                {reactions.map((emoji) => (
-                  <button key={emoji} className="reaction-btn" onClick={() => addReaction(msg.id, emoji)}>
-                    {emoji}
-                  </button>
-                ))}
-                {msg.userId === user.uid && <button className="delete-btn" onClick={() => deleteMessage(msg.id)}>🗑</button>}
-              </div>
-            )}
-
-            {/* ✅ Display Active Reactions */}
-            {msg.reactions && msg.reactions.length > 0 && (
-              <div className="active-reactions">
-                {msg.reactions.map((r, i) => (
-                  <span key={i}>{r}</span>
-                ))}
-              </div>
+      {/* Chat Window */}
+      <div className="chat-window">
+        {/* Chat Header */}
+        <div className="chat-header">
+          <h2>Traders Chat Room</h2>
+          <div className="online-users">
+            <strong>🟢 Online:</strong>
+            {onlineUsers.length === 0 ? (
+              <span> No one is online</span>
+            ) : (
+              onlineUsers.map((user) => <span key={user.uid}>{user.displayName || "Trader"}, </span>)
             )}
           </div>
-        ))}
-        <div ref={chatEndRef}></div>
-      </div>
+        </div>
 
-      {/* ✅ Chat Input */}
-      <form className="chat-input" onSubmit={sendMessage}>
-        <input type="text" placeholder="Type your message..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
-        <label className="upload-icon">
-          📎
-          <input type="file" accept="image/*" onChange={(e) => setImageUpload(e.target.files[0])} style={{ display: "none" }} />
-        </label>
-        <button type="submit">🚀 Send</button>
-      </form>
+        {/* Messages Container */}
+        <div ref={chatRef} className="chat-messages">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`message ${msg.senderId === user?.uid ? "sent" : "received"}`}>
+              <div className="message-info">
+                <span className="sender-name">{msg.senderName}</span>
+                <span className="message-text">{msg.text}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Chat Input */}
+        <div className="chat-input">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button onClick={sendMessage}>Send</button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -25,7 +25,7 @@ const socket = io("http://localhost:4000"); // ✅ Connect to signaling server
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("live");
-  const [tradingRooms, setTradingRooms] = useState([]); 
+  const [tradingRooms, setTradingRooms] = useState([]);
   const [showAuthModal, setShowAuthModal] = useState(null);
   const [user, setUser] = useState(null);
   const [liveStreams, setLiveStreams] = useState([]); // ✅ Ensured liveStreams is always an array
@@ -92,15 +92,14 @@ const App = () => {
                     ) : (
                       <>
                         <TrendingStreams />
-                        <LiveStreams liveStreams={liveStreams} />
-                        <Footer />
+                        <LiveStreams liveStreams={liveStreams} user={user} setShowAuthModal={setShowAuthModal} />
                       </>
                     )
                   }
                 />
 
                 {/* ✅ Updated Navigation Routes */}
-                <Route path="/live-streams" element={<LiveStreams liveStreams={liveStreams} />} />
+                <Route path="/live-streams" element={<LiveStreams liveStreams={liveStreams} user={user} setShowAuthModal={setShowAuthModal} />} />
                 <Route path="/chatrooms" element={<TradingRoomsList />} />
                 <Route path="/brokers" element={<TopBrokers />} />
                 <Route path="/prop-firms" element={<PropFirms />} />

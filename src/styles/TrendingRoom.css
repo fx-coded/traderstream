@@ -28,7 +28,7 @@ body {
 .trading-room-header h2 {
   font-size: 24px;
   font-weight: bold;
-  color: #ffcc00;
+  color: #06a3dd;
   text-transform: uppercase;
   font-family: 'Press Start 2P', cursive;
 }
@@ -68,14 +68,14 @@ body {
 
 .room-card:hover {
   transform: scale(1.05);
-  border-color: #ffcc00;
+  border-color: #06a3dd;
 }
 
 /* Room Title */
 .room-title {
   font-size: 20px;
   font-weight: bold;
-  color: #ffcc00;
+  color: #06a3dd;
   margin-bottom: 10px;
   font-family: 'Press Start 2P', cursive;
 }
@@ -88,7 +88,7 @@ body {
 }
 
 .room-meta strong {
-  color: #ffcc00;
+  color: #06a3dd;
 }
 
 /* Room Actions */
@@ -101,8 +101,8 @@ body {
 
 .room-actions button {
   background-color: #333;
-  color: #ffcc00;
-  border: 1px solid #ffcc00;
+  color: #06a3dd;
+  border: 1px solid #06a3dd;
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 5px;
@@ -111,7 +111,7 @@ body {
 }
 
 .room-actions button:hover {
-  background-color: #ffcc00;
+  background-color: #06a3dd;
   color: #000;
 }
 
@@ -170,7 +170,7 @@ body {
 
 .setup-card h4 {
   font-size: 18px;
-  color: #ffcc00;
+  color: #06a3dd;
 }
 
 .setup-card p {
@@ -219,7 +219,7 @@ body {
 }
 
 .add-setup-btn:hover {
-  background-color: #ffcc00;
+  background-color: #06a3dd;
 }
 
 /* Setup Form */
@@ -255,7 +255,7 @@ body {
 }
 
 .setup-form-container button:hover {
-  background-color: #ffcc00;
+  background-color: #06a3dd;
 }
 
 /* Mobile Responsive */

@@ -4,9 +4,10 @@ import { db, storage } from "../firebaseConfig";
 import { collection, addDoc, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/CreateTradingRoom.css";
+import { v4 as uuidv4 } from "uuid";
 
 const CreateTradingRoom = ({ user }) => {
-  const navigate = useNavigate(); // 🔄 React Router Navigation
+  const navigate = useNavigate();
   const [roomName, setRoomName] = useState("");
   const [category, setCategory] = useState("Forex Trading");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -82,6 +83,12 @@ const CreateTradingRoom = ({ user }) => {
         }
       }
 
+      // ✅ Get user's display name or fallback to email
+      const adminName = user.displayName || user.email.split("@")[0]; 
+
+      // ✅ Generate a unique chat ID
+      const chatId = uuidv4();
+
       console.log("📝 Creating room in Firestore...");
       const roomRef = await addDoc(collection(db, "rooms"), {
         roomName: roomName.trim(),
@@ -90,8 +97,10 @@ const CreateTradingRoom = ({ user }) => {
         description: description.trim(),
         thumbnail: imageUrl,
         adminId: user.uid,
+        adminName: adminName, // ✅ Store creator's name
+        chatId: chatId, // ✅ Unique chat ID assigned
         members: [user.uid],
-        pendingUsers: [],
+        pendingUsers: isPrivate ? [] : null,
         messages: [],
         createdAt: new Date(),
       });
@@ -104,7 +113,7 @@ const CreateTradingRoom = ({ user }) => {
           messages: [
             {
               sender: "System",
-              text: "🔔 This is a private room. Members must request access, and the admin will approve/reject requests.",
+              text: `🔔 This is a private room. Members must request access, and ${adminName} (Admin) will approve/reject requests.`,
               timestamp: new Date(),
             },
           ],
@@ -114,9 +123,9 @@ const CreateTradingRoom = ({ user }) => {
       setSuccess("✅ Room created successfully!");
       setUploading(false);
 
-      // 🔄 Redirect to the new room's chat after success
+      // 🔄 Redirect to the new room's chat
       setTimeout(() => {
-        navigate(`/chat/${roomRef.id}`);
+        navigate(`/chat/${chatId}`);
       }, 1000);
     } catch (err) {
       console.error("🔥 Error creating room:", err);

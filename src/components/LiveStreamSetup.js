@@ -1,11 +1,9 @@
-// LiveStreamSetup.js
 import React, { useState } from "react";
 
 const LiveStreamSetup = () => {
   const [streamKey, setStreamKey] = useState("");
-  
+
   const generateStreamKey = () => {
-    // TODO: Fetch from backend API
     setStreamKey("rtmp://yourserver/live/yourstreamkey");
   };
 
