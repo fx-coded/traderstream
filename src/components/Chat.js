@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { 
   collection, 
   addDoc, 
@@ -17,6 +17,8 @@ import { db } from "../firebaseConfig";
 import TraderSidebar from "./TraderSidebar";
 import "../styles/Chat.css"; 
 
+const MESSAGES_PER_PAGE = 25;
+
 const Chat = ({ roomId, user, onExit }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
@@ -28,13 +30,11 @@ const Chat = ({ roomId, user, onExit }) => {
   const chatRef = useRef(null);
   const lastMessageRef = useRef(null);
   const observerRef = useRef(null);
-  const MESSAGES_PER_PAGE = 25;
 
-  // Fix parameter handling - use roomId instead of groupId
+  // Fetch room details
   useEffect(() => {
     if (!user || !roomId) return;
 
-    // Fetch room details
     const fetchRoomDetails = async () => {
       try {
         const roomDoc = await getDoc(doc(db, "rooms", roomId));
@@ -55,6 +55,8 @@ const Chat = ({ roomId, user, onExit }) => {
         isOnline: true,
         lastActiveRoom: roomId,
         lastActive: serverTimestamp()
+      }).catch(error => {
+        console.error("Error updating online status:", error);
       });
     }
 
@@ -65,42 +67,15 @@ const Chat = ({ roomId, user, onExit }) => {
         updateDoc(userRef, { 
           isOnline: false,
           lastActive: serverTimestamp()
+        }).catch(error => {
+          console.error("Error updating offline status:", error);
         });
       }
     };
   }, [user, roomId]);
 
-  // Fetch initial messages batch
-  useEffect(() => {
-    if (!roomId) return;
-    
-    setIsLoading(true);
-    
-    const messagesRef = collection(db, "rooms", roomId, "messages");
-    const q = query(messagesRef, orderBy("timestamp", "desc"), limit(MESSAGES_PER_PAGE));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedMessages = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .reverse();
-        
-      setMessages(fetchedMessages);
-      setIsLoading(false);
-      setHasMore(snapshot.docs.length === MESSAGES_PER_PAGE);
-      
-      // Scroll to bottom after initial load
-      setTimeout(() => {
-        if (chatRef.current) {
-          chatRef.current.scrollTop = chatRef.current.scrollHeight;
-        }
-      }, 100);
-    });
-    
-    return () => unsubscribe();
-  }, [roomId]);
-
-  // Load more messages when scrolling up
-  const loadMoreMessages = async () => {
+  // Load more messages when scrolling up - useCallback to fix the dependency issue
+  const loadMoreMessages = useCallback(async () => {
     if (!roomId || !hasMore || loadingMore || messages.length === 0) return;
     
     setLoadingMore(true);
@@ -125,10 +100,10 @@ const Chat = ({ roomId, user, onExit }) => {
         setHasMore(snapshot.docs.length === MESSAGES_PER_PAGE);
         
         // Maintain scroll position
-        const currentHeight = chatRef.current.scrollHeight;
+        const currentHeight = chatRef.current?.scrollHeight;
         
         setTimeout(() => {
-          if (chatRef.current) {
+          if (chatRef.current && currentHeight) {
             const newHeight = chatRef.current.scrollHeight;
             chatRef.current.scrollTop = newHeight - currentHeight;
           }
@@ -141,7 +116,40 @@ const Chat = ({ roomId, user, onExit }) => {
     } finally {
       setLoadingMore(false);
     }
-  };
+  }, [roomId, hasMore, loadingMore, messages]);
+
+  // Fetch initial messages batch
+  useEffect(() => {
+    if (!roomId) return;
+    
+    setIsLoading(true);
+    setMessages([]);
+    
+    const messagesRef = collection(db, "rooms", roomId, "messages");
+    const q = query(messagesRef, orderBy("timestamp", "desc"), limit(MESSAGES_PER_PAGE));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedMessages = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .reverse();
+        
+      setMessages(fetchedMessages);
+      setIsLoading(false);
+      setHasMore(snapshot.docs.length === MESSAGES_PER_PAGE);
+      
+      // Scroll to bottom after initial load
+      setTimeout(() => {
+        if (chatRef.current) {
+          chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }
+      }, 100);
+    }, (error) => {
+      console.error("Error fetching messages:", error);
+      setIsLoading(false);
+    });
+    
+    return () => unsubscribe();
+  }, [roomId]);
 
   // Set up intersection observer for infinite scrolling
   useEffect(() => {
@@ -168,7 +176,7 @@ const Chat = ({ roomId, user, onExit }) => {
     return () => {
       if (observerRef.current) observerRef.current.disconnect();
     };
-  }, [hasMore, isLoading, loadingMore, messages]);
+  }, [hasMore, isLoading, loadingMore, messages, loadMoreMessages]);
 
   // Fetch online users in real-time
   useEffect(() => {
@@ -184,7 +192,10 @@ const Chat = ({ roomId, user, onExit }) => {
           getDoc(doc(db, "users", memberId))
             .then(userDoc => {
               if (userDoc.exists() && userDoc.data().isOnline) {
-                return userDoc.data();
+                return {
+                  uid: memberId,
+                  ...userDoc.data()
+                };
               }
               return null;
             })
@@ -197,6 +208,8 @@ const Chat = ({ roomId, user, onExit }) => {
         const results = await Promise.all(promises);
         setOnlineUsers(results.filter(Boolean));
       }
+    }, (error) => {
+      console.error("Error fetching room data:", error);
     });
 
     return () => unsubscribe();
@@ -215,16 +228,8 @@ const Chat = ({ roomId, user, onExit }) => {
     }
   }, [messages]);
 
-  // Handle key press (Enter to send)
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   // Send message
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
     if (!user) {
       alert("You must be logged in to send messages!");
       return;
@@ -259,14 +264,75 @@ const Chat = ({ roomId, user, onExit }) => {
       console.error("Error sending message:", error);
       alert("Failed to send message. Please try again.");
     }
-  };
+  }, [message, roomId, user]);
+
+  // Handle key press (Enter to send)
+  const handleKeyPress = useCallback((e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }, [sendMessage]);
 
   // Format timestamp
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return "";
     
-    const date = timestamp.toDate();
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+      const date = timestamp.toDate();
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (error) {
+      console.error("Error formatting timestamp:", error);
+      return "";
+    }
+  };
+
+  const renderMessagesList = () => {
+    if (isLoading) {
+      return <div className="loading-messages">Loading messages...</div>;
+    }
+    
+    if (messages.length === 0) {
+      return (
+        <div className="no-messages">
+          No messages yet. Be the first to send a message!
+        </div>
+      );
+    }
+    
+    return (
+      <>
+        {hasMore && (
+          <div className="load-more-container">
+            <button 
+              className="load-more-button" 
+              onClick={loadMoreMessages}
+              disabled={loadingMore}
+            >
+              {loadingMore ? "Loading..." : "Load more messages"}
+            </button>
+          </div>
+        )}
+        
+        {messages.map((msg, index) => (
+          <div 
+            key={msg.id} 
+            className={`message ${msg.senderId === user?.uid ? "sent" : "received"}`}
+            ref={index === 0 ? lastMessageRef : null}
+          >
+            <div className="message-info">
+              <span className="sender-name">
+                {msg.senderId === user?.uid ? "You" : msg.senderName}
+              </span>
+              <span className="message-timestamp">
+                {formatTimestamp(msg.timestamp)}
+              </span>
+            </div>
+            <div className="message-text">{msg.text}</div>
+          </div>
+        ))}
+      </>
+    );
   };
 
   return (
@@ -303,47 +369,7 @@ const Chat = ({ roomId, user, onExit }) => {
 
         {/* Messages Container */}
         <div ref={chatRef} className="chat-messages">
-          {isLoading ? (
-            <div className="loading-messages">Loading messages...</div>
-          ) : (
-            <>
-              {hasMore && (
-                <div className="load-more-container">
-                  <button 
-                    className="load-more-button" 
-                    onClick={loadMoreMessages}
-                    disabled={loadingMore}
-                  >
-                    {loadingMore ? "Loading..." : "Load more messages"}
-                  </button>
-                </div>
-              )}
-              
-              {messages.map((msg, index) => (
-                <div 
-                  key={msg.id} 
-                  className={`message ${msg.senderId === user?.uid ? "sent" : "received"}`}
-                  ref={index === 0 ? lastMessageRef : null}
-                >
-                  <div className="message-info">
-                    <span className="sender-name">
-                      {msg.senderId === user?.uid ? "You" : msg.senderName}
-                    </span>
-                    <span className="message-timestamp">
-                      {formatTimestamp(msg.timestamp)}
-                    </span>
-                  </div>
-                  <div className="message-text">{msg.text}</div>
-                </div>
-              ))}
-              
-              {messages.length === 0 && !isLoading && (
-                <div className="no-messages">
-                  No messages yet. Be the first to send a message!
-                </div>
-              )}
-            </>
-          )}
+          {renderMessagesList()}
         </div>
 
         {/* Chat Input */}
@@ -354,8 +380,12 @@ const Chat = ({ roomId, user, onExit }) => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyPress}
             rows={1}
+            disabled={!user || !roomId}
           />
-          <button onClick={sendMessage} disabled={!message.trim()}>
+          <button 
+            onClick={sendMessage} 
+            disabled={!message.trim() || !user || !roomId}
+          >
             Send
           </button>
         </div>

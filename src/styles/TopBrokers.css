@@ -1,410 +1,565 @@
-/* TopBrokers.css */
-:root {
-    --primary-color: #1da1f2;
-    --primary-hover: #0c8de4;
-    --primary-light: #e8f5fd;
-    --text-color: #333;
-    --text-secondary: #666;
-    --border-color: #e1e8ed;
-    --bg-white: #fff;
-    --bg-light: #f5f8fa;
-    --success-color: #4caf50;
-    --warning-color: #ff9800;
-    --danger-color: #f44336;
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
+/* TopBrokers.css - Responsive styling */
+
+/* Main container */
+.brokers-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #333;
+}
+
+/* Header section */
+.brokers-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.brokers-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.brokers-subtitle {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+/* Search and filters section */
+.brokers-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.search-container {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.broker-search {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.broker-search:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.clear-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #95a5a6;
+  cursor: pointer;
+}
+
+.clear-search:hover {
+  color: #e74c3c;
+}
+
+.filter-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.filter-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.no-results p {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.reset-filters {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reset-filters:hover {
+  background-color: #2980b9;
+}
+
+/* Table styling */
+.brokers-table-container {
+  overflow-x: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.brokers-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.brokers-table thead {
+  background-color: #f8f9fa;
+}
+
+.brokers-table th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.brokers-table th:not(.rank-col):hover {
+  color: #3498db;
+}
+
+.brokers-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+/* Column widths */
+.rank-col {
+  width: 40px;
+  text-align: center;
+}
+
+.broker-col {
+  min-width: 200px;
+}
+
+.leverage-col, .deposit-col {
+  min-width: 120px;
+}
+
+.rating-col {
+  min-width: 150px;
+}
+
+.action-col {
+  min-width: 150px;
+  text-align: center;
+}
+
+/* Broker rows */
+.broker-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.broker-row:hover {
+  background-color: #f5f7fa;
+}
+
+.broker-row.expanded {
+  background-color: #ebf5fb;
+}
+
+.broker-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.broker-logo {
+  width: 80px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Star Rating */
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+}
+
+.star {
+  color: #ddd;
+  font-size: 18px;
+  position: relative;
+}
+
+.star.full {
+  color: #f1c40f;
+}
+
+.star.half {
+  position: relative;
+}
+
+.star.half::after {
+  content: '★';
+  color: #f1c40f;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  overflow: hidden;
+}
+
+.rating-number {
+  margin-left: 5px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Action buttons */
+.open-account-btn {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.open-account-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Expanded broker details */
+.broker-details-row td {
+  padding: 0;
+}
+
+.broker-details {
+  background-color: #f8f9fa;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.broker-details-section h4,
+.broker-features h4 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 8px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.broker-features p {
+  line-height: 1.6;
+  color: #2c3e50;
+}
+
+.broker-cta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-column: 1 / -1;
+  padding-top: 15px;
+}
+
+.visit-website-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #2ecc71;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.visit-website-btn:hover {
+  background-color: #27ae60;
+}
+
+/* Disclaimer */
+.brokers-disclaimer {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.brokers-disclaimer p {
+  font-size: 14px;
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .broker-details {
+    grid-template-columns: 1fr 1fr;
   }
-  
-  .brokers-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  /* Header section */
-  .brokers-header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  
+}
+
+@media (max-width: 992px) {
   .brokers-title {
     font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-color);
   }
   
   .brokers-subtitle {
-    color: var(--text-secondary);
     font-size: 16px;
   }
   
-  /* Search and filters */
+  .broker-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
   .brokers-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
   }
   
   .search-container {
-    position: relative;
-    flex-grow: 1;
-    max-width: 300px;
-  }
-  
-  .broker-search {
+    max-width: 100%;
     width: 100%;
-    padding: 10px 36px 10px 12px;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
-    font-size: 14px;
-  }
-  
-  .broker-search:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.1);
-  }
-  
-  .clear-search {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: var(--text-secondary);
-  }
-  
-  .clear-search:hover {
-    color: var(--danger-color);
   }
   
   .filter-container {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
   }
   
   .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .filter-group label {
-    font-size: 14px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-  
-  .filter-group select {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
-    font-size: 14px;
-    background-color: var(--bg-white);
-  }
-  
-  .filter-group select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-  }
-  
-  /* No results message */
-  .no-results {
-    text-align: center;
-    padding: 40px;
-    background-color: var(--bg-light);
-    border-radius: 8px;
-    margin-bottom: 24px;
-  }
-  
-  .no-results p {
-    margin-bottom: 16px;
-    color: var(--text-secondary);
-    font-size: 16px;
-  }
-  
-  .reset-filters {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  .reset-filters:hover {
-    background-color: var(--primary-hover);
-  }
-  
-  /* Brokers table */
-  .brokers-table-container {
-    overflow-x: auto;
-    margin-bottom: 24px;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-  }
-  
-  .brokers-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--bg-white);
-  }
-  
-  .brokers-table th {
-    background-color: var(--bg-light);
-    padding: 16px;
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-color);
-    border-bottom: 2px solid var(--border-color);
-    white-space: nowrap;
-    cursor: pointer;
-    user-select: none;
-  }
-  
-  .brokers-table th:hover {
-    background-color: #edf2f7;
-  }
-  
-  .rank-col {
-    width: 50px;
-    text-align: center !important;
-  }
-  
-  .broker-col {
-    min-width: 200px;
-  }
-  
-  .leverage-col, .deposit-col {
-    width: 120px;
-  }
-  
-  .rating-col {
-    width: 140px;
-  }
-  
-  .action-col {
-    width: 140px;
-    text-align: center !important;
-    cursor: default !important;
-  }
-  
-  .brokers-table td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-  }
-  
-  /* Broker row styling */
-  .broker-row {
-    transition: var(--transition);
-    cursor: pointer;
-  }
-  
-  .broker-row:hover {
-    background-color: var(--primary-light);
-  }
-  
-  .broker-row.expanded {
-    background-color: var(--primary-light);
-  }
-  
-  .broker-name {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    flex: 1;
+    min-width: 30%;
   }
   
   .broker-logo {
-    width: 100px;
-    height: auto;
-    max-height: 40px;
-    object-fit: contain;
+    width: 60px;
+    height: 30px;
   }
   
-  /* Star rating system */
-  .star-rating {
-    display: flex;
-    align-items: center;
+  .brokers-title {
+    font-size: 24px;
+  }
+  
+  .open-account-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  /* Make the table more responsive on tablets */
+  .brokers-table th,
+  .brokers-table td {
+    padding: 12px 8px;
   }
   
   .star {
     font-size: 16px;
-    margin-right: 2px;
+  }
+}
+
+@media (max-width: 576px) {
+  .brokers-container {
+    padding: 15px;
   }
   
-  .star.full {
-    color: #ffc107;
-  }
-  
-  .star.half {
-    position: relative;
-    color: #e0e0e0;
-  }
-  
-  .star.half::before {
-    content: "★";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    overflow: hidden;
-    color: #ffc107;
-  }
-  
-  .star.empty {
-    color: #e0e0e0;
-  }
-  
-  .rating-number {
-    margin-left: 6px;
-    font-weight: 600;
-    color: var(--text-color);
-  }
-  
-  /* Open account button */
-  .open-account-btn {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: var(--transition);
-    white-space: nowrap;
-  }
-  
-  .open-account-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-  }
-  
-  /* Broker details row */
-  .broker-details-row {
-    background-color: var(--primary-light);
-  }
-  
-  .broker-details {
-    padding: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 20px;
-  }
-  
-  .broker-details h4 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 16px;
-    color: var(--text-color);
-  }
-  
-  .details-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .detail-item {
-    display: flex;
+  /* Optimize for mobile viewing */
+  .filter-container {
     flex-direction: column;
   }
   
-  .detail-label {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
+  .filter-group {
+    width: 100%;
   }
   
-  .detail-value {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-color);
+  /* Adjust the table for mobile */
+  .brokers-table thead {
+    display: none; /* Hide header on very small screens */
   }
   
-  .broker-features p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
+  .brokers-table, 
+  .brokers-table tbody, 
+  .brokers-table tr, 
+  .brokers-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
   }
   
-  .visit-website-btn {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
-    text-align: center;
-    white-space: nowrap;
-  }
-  
-  .visit-website-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(29, 161, 242, 0.2);
-  }
-  
-  /* Disclaimer */
-  .brokers-disclaimer {
-    padding: 16px;
-    background-color: var(--bg-light);
+  .brokers-table tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--text-secondary);
+    overflow: hidden;
   }
   
-  .brokers-disclaimer p {
-    margin: 0;
+  .broker-row td {
+    text-align: right;
+    padding: 10px 15px;
+    position: relative;
+    padding-left: 50%;
   }
   
-  /* Responsive styles */
-  @media (max-width: 992px) {
-    .broker-details {
-      grid-template-columns: 1fr 1fr;
-    }
-    
-    .broker-cta {
-      grid-column: span 2;
-      display: flex;
-      justify-content: center;
-    }
+  .broker-row td:before {
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: 600;
+    text-align: left;
   }
   
-  @media (max-width: 768px) {
-    .brokers-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .search-container {
-      max-width: none;
-    }
-    
-    .filter-container {
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    .filter-group {
-      justify-content: space-between;
-    }
-    
-    .filter-group select {
-      flex-grow: 1;
-    }
+  /* Add labels for each cell */
+  .broker-row .rank-col:before {
+    content: "Rank:";
+  }
+  
+  .broker-row .broker-name:before {
+    content: "Broker:";
+  }
+  
+  .broker-row .leverage-col:before {
+    content: "Leverage:";
+  }
+  
+  .broker-row .deposit-col:before {
+    content: "Min Deposit:";
+  }
+  
+  .broker-row .rating-col:before {
+    content: "Rating:";
+  }
+  
+  .broker-row .action-col:before {
+    content: "";
+  }
+  
+  /* Special formatting for broker name cell */
+  .broker-row .broker-name {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+  
+  .broker-logo {
+    margin-bottom: 5px;
+  }
+  
+  /* Make sure the action button is centered */
+  .broker-row .action-col {
+    text-align: center;
+    padding-left: 15px;
+  }
+  
+  .open-account-btn {
+    width: 100%;
+    padding: 10px;
+  }
+  
+  /* Fix the expanded details view */
+  .broker-details-row td {
+    padding: 15px !important;
+    text-align: left;
+  }
+  
+  .broker-details-row td:before {
+    display: none;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-item {
+    margin-bottom: 10px;
+  }
+}
+
+/* Ensure expanded rows don't try to follow the mobile pattern */
+.broker-details-row td {
+  padding-left: 15px !important;
+  text-align: left !important;
 }

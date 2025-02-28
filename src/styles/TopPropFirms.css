@@ -2,442 +2,552 @@
 
 /* Main container */
 .prop-firms-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-  }
-  
-  /* Header section */
-  .prop-firms-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
-  .prop-firms-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #2c3e50;
-  }
-  
-  .prop-firms-subtitle {
-    font-size: 18px;
-    color: #7f8c8d;
-    margin-bottom: 20px;
-  }
-  
-  /* Search and filters section */
-  .prop-firms-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  
-  .search-container {
-    position: relative;
-    flex: 1;
-    min-width: 250px;
-    max-width: 400px;
-  }
-  
-  .prop-firm-search {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    transition: border-color 0.3s;
-  }
-  
-  .prop-firm-search:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-  }
-  
-  .clear-search {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    font-size: 22px;
-    color: #95a5a6;
-    cursor: pointer;
-  }
-  
-  .clear-search:hover {
-    color: #e74c3c;
-  }
-  
-  .filter-container {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  
-  .filter-group {
-    display: flex;
-    flex-direction: column;
-    min-width: 150px;
-  }
-  
-  .filter-group label {
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #7f8c8d;
-    font-weight: 600;
-  }
-  
-  .filter-group select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 15px;
-    background-color: white;
-    cursor: pointer;
-  }
-  
-  .filter-group select:focus {
-    outline: none;
-    border-color: #3498db;
-  }
-  
-  /* No results message */
-  .no-results {
-    text-align: center;
-    padding: 30px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    margin: 20px 0;
-  }
-  
-  .no-results p {
-    font-size: 18px;
-    color: #7f8c8d;
-    margin-bottom: 15px;
-  }
-  
-  .reset-filters {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .reset-filters:hover {
-    background-color: #2980b9;
-  }
-  
-  /* Table styling */
-  .prop-firms-table-container {
-    overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    margin-bottom: 30px;
-  }
-  
-  .prop-firms-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-  }
-  
-  .prop-firms-table thead {
-    background-color: #f8f9fa;
-  }
-  
-  .prop-firms-table th {
-    padding: 15px 12px;
-    text-align: left;
-    font-weight: 600;
-    color: #2c3e50;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
-  }
-  
-  .prop-firms-table th.sortable {
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .prop-firms-table th.sortable:hover {
-    color: #3498db;
-  }
-  
-  .prop-firms-table td {
-    padding: 15px 12px;
-    border-bottom: 1px solid #e9ecef;
-    vertical-align: middle;
-  }
-  
-  /* Firm rows */
-  .firm-row {
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .firm-row:hover {
-    background-color: #f5f7fa;
-  }
-  
-  .firm-row.expanded {
-    background-color: #ebf5fb;
-  }
-  
-  .firm-name {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 600;
-  }
-  
-  .firm-logo {
-    width: 80px;
-    height: 40px;
-    object-fit: contain;
-  }
-  
-  /* Star Rating */
-  .star-rating {
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  .star {
-    color: #ddd;
-    font-size: 18px;
-    position: relative;
-  }
-  
-  .star.full {
-    color: #f1c40f;
-  }
-  
-  .star.half::after {
-    content: '★';
-    color: #f1c40f;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 50%;
-    overflow: hidden;
-  }
-  
-  .rating-number {
-    margin-left: 5px;
-    font-weight: 600;
-    color: #2c3e50;
-  }
-  
-  /* Action buttons */
-  .open-account-btn {
-    display: inline-block;
-    padding: 8px 15px;
-    background-color: #2ecc71;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: background-color 0.3s;
-    text-align: center;
-    white-space: nowrap;
-  }
-  
-  .open-account-btn:hover {
-    background-color: #27ae60;
-  }
-  
-  /* Expanded firm details */
-  .firm-details-row td {
-    padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #333;
+}
+
+/* Header section */
+.prop-firms-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.prop-firms-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.prop-firms-subtitle {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+/* Search and filters section */
+.prop-firms-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.search-container {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.prop-firm-search {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.prop-firm-search:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.clear-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #95a5a6;
+  cursor: pointer;
+}
+
+.clear-search:hover {
+  color: #e74c3c;
+}
+
+.filter-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.filter-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.no-results p {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.reset-filters {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reset-filters:hover {
+  background-color: #2980b9;
+}
+
+/* Table styling */
+.prop-firms-table-container {
+  overflow-x: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.prop-firms-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.prop-firms-table thead {
+  background-color: #f8f9fa;
+}
+
+.prop-firms-table th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.prop-firms-table th.sortable {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.prop-firms-table th.sortable:hover {
+  color: #3498db;
+}
+
+.prop-firms-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+/* Firm rows */
+.firm-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.firm-row:hover {
+  background-color: #f5f7fa;
+}
+
+.firm-row.expanded {
+  background-color: #ebf5fb;
+}
+
+.firm-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.firm-logo {
+  width: 80px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Star Rating */
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+}
+
+.star {
+  color: #ddd;
+  font-size: 18px;
+  position: relative;
+}
+
+.star.full {
+  color: #f1c40f;
+}
+
+.star.half {
+  position: relative;
+}
+
+.star.half::after {
+  content: '★';
+  color: #f1c40f;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  overflow: hidden;
+}
+
+.rating-number {
+  margin-left: 5px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Action buttons */
+.open-account-btn {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #2ecc71;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.open-account-btn:hover {
+  background-color: #27ae60;
+}
+
+/* Expanded firm details */
+.firm-details-row td {
+  padding: 0;
+}
+
+.firm-details {
+  background-color: #f8f9fa;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.firm-details-section {
+  margin-bottom: 15px;
+}
+
+.firm-details-section h4 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 8px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.firm-cta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-column: 1 / -1;
+  padding-top: 15px;
+}
+
+.visit-website-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.visit-website-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Disclaimer */
+.prop-firms-disclaimer {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.prop-firms-disclaimer p {
+  font-size: 14px;
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .prop-firms-container {
+    padding: 15px;
   }
   
   .firm-details {
-    background-color: #f8f9fa;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-    border-bottom: 1px solid #e9ecef;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .prop-firms-title {
+    font-size: 28px;
   }
   
-  .firm-details-section {
-    margin-bottom: 15px;
+  .prop-firms-subtitle {
+    font-size: 16px;
   }
   
-  .firm-details-section h4 {
-    font-size: 18px;
-    color: #2c3e50;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 8px;
+  .firm-details {
+    grid-template-columns: 1fr;
   }
   
   .details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-  
-  .detail-item {
-    display: flex;
+}
+
+@media (max-width: 768px) {
+  .prop-firms-actions {
     flex-direction: column;
   }
   
-  .detail-item.full-width {
-    grid-column: 1 / -1;
+  .search-container {
+    max-width: 100%;
+    width: 100%;
   }
   
-  .detail-label {
-    font-size: 14px;
-    color: #7f8c8d;
-    margin-bottom: 5px;
+  .filter-container {
+    width: 100%;
+    justify-content: space-between;
   }
   
-  .detail-value {
-    font-weight: 600;
-    color: #2c3e50;
+  .filter-group {
+    min-width: 45%;
   }
   
-  .firm-cta {
+  .firm-logo {
+    width: 60px;
+    height: 30px;
+  }
+  
+  .prop-firms-title {
+    font-size: 24px;
+  }
+  
+  .open-account-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .prop-firms-table th,
+  .prop-firms-table td {
+    padding: 12px 8px;
+  }
+  
+  .star {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .prop-firms-container {
+    padding: 10px;
+  }
+  
+  /* Convert table to cards for mobile */
+  .prop-firms-table thead {
+    display: none; /* Hide table headers on mobile */
+  }
+  
+  .prop-firms-table,
+  .prop-firms-table tbody,
+  .prop-firms-table tr {
+    display: block;
+    width: 100%;
+  }
+  
+  .firm-row {
+    margin-bottom: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  
+  .firm-row td {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    grid-column: 1 / -1;
-    padding-top: 15px;
+    padding: 12px 15px;
+    text-align: right;
+    border-bottom: 1px solid #f1f1f1;
   }
   
-  .visit-website-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
+  .firm-row td:before {
+    content: attr(data-label);
     font-weight: 600;
-    transition: background-color 0.3s;
-    text-align: center;
+    color: #7f8c8d;
+    text-align: left;
+    padding-right: 10px;
   }
   
-  .visit-website-btn:hover {
-    background-color: #2980b9;
+  /* Special case for first cell (rank) - hide it on mobile */
+  .firm-row td:first-child {
+    display: none;
+  }
+  
+  /* Override for the firm name cell */
+  .firm-row .firm-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    justify-content: center;
+    padding-right: 0;
+  }
+  
+  .firm-row .firm-name:before {
+    content: "Prop Firm";
+  }
+  
+  .firm-logo {
+    width: 100px;
+    height: 50px;
+  }
+  
+  /* Style the action button cell */
+  .firm-row td:last-child {
+    justify-content: center;
+    padding: 15px;
+  }
+  
+  .firm-row td:last-child:before {
+    display: none;
+  }
+  
+  .open-account-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  /* Expanded details styling for mobile */
+  .firm-details-row td {
+    display: block;
+    padding: 0 !important;
+  }
+  
+  .firm-details {
+    padding: 15px;
+  }
+  
+  .firm-details-section h4 {
+    font-size: 16px;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-item {
+    margin-bottom: 10px;
   }
   
   /* Disclaimer */
-  .prop-firms-disclaimer {
-    margin-top: 30px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-  }
-  
   .prop-firms-disclaimer p {
-    font-size: 14px;
-    color: #7f8c8d;
-    line-height: 1.5;
+    font-size: 12px;
   }
   
-  /* Responsive styles */
-  @media (max-width: 992px) {
-    .prop-firms-title {
-      font-size: 28px;
-    }
-    
-    .prop-firms-subtitle {
-      font-size: 16px;
-    }
-    
-    .firm-details {
-      grid-template-columns: 1fr;
-    }
+  /* Filter adjust for mobile */
+  .filter-container {
+    flex-direction: column;
   }
   
-  @media (max-width: 768px) {
-    .prop-firms-actions {
-      flex-direction: column;
-    }
-    
-    .search-container {
-      max-width: 100%;
-    }
-    
-    .filter-container {
-      width: 100%;
-      justify-content: space-between;
-    }
-    
-    .filter-group {
-      min-width: 45%;
-    }
-    
-    .firm-logo {
-      width: 60px;
-      height: 30px;
-    }
-    
-    .prop-firms-title {
-      font-size: 24px;
-    }
-    
-    .open-account-btn {
-      padding: 6px 12px;
-      font-size: 13px;
-    }
+  .filter-group {
+    width: 100%;
+    min-width: 100%;
   }
-  
-  @media (max-width: 576px) {
-    .prop-firms-container {
-      padding: 15px;
-    }
-    
-    .prop-firms-table th,
-    .prop-firms-table td {
-      padding: 10px 8px;
-      font-size: 14px;
-    }
-    
-    .firm-name {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 5px;
-    }
-    
-    .star {
-      font-size: 16px;
-    }
-    
-    .detail-item {
-      min-width: 100%;
-    }
-    
-    .filter-group {
-      min-width: 100%;
-    }
-    
-    .prop-firms-title {
-      font-size: 22px;
-    }
-    
-    .prop-firms-subtitle {
-      font-size: 14px;
-    }
-    
-    .firm-details {
-      padding: 15px;
-    }
-    
-    .firm-details-section h4 {
-      font-size: 16px;
-    }
-  }
+}
+
+/* Add data labels for mobile view */
+@media (max-width: 576px) {
+  .firm-row td:nth-child(3):before { content: "Leverage"; }
+  .firm-row td:nth-child(4):before { content: "Min Account"; }
+  .firm-row td:nth-child(5):before { content: "Profit Split"; }
+  .firm-row td:nth-child(6):before { content: "Rating"; }
+}
