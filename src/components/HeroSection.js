@@ -192,18 +192,6 @@ const HeroSection = ({ setShowAuthModal }) => {
           variants={featureVariants}
           transition={{ duration: 0.6 }}
         >
-          <div className="feature-item">
-            <span className="feature-icon">🔥</span>
-            <span>Live Trading Signals</span>
-          </div>
-          <div className="feature-item">
-            <span className="feature-icon">📊</span>
-            <span>Real-time Analysis</span>
-          </div>
-          <div className="feature-item">
-            <span className="feature-icon">👨‍🏫</span>
-            <span>Expert Mentorship</span>
-          </div>
         </motion.div>
 
         {/* Desktop CTA buttons */}

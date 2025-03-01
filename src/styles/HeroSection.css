@@ -1,4 +1,4 @@
-/* HeroSection.css - Complete Responsive Styling */
+/* HeroSection.css - Fixed Mobile Styling */
 
 /* Base container styling */
 .hero-section {
@@ -8,7 +8,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     padding: 0 2rem;
     background: linear-gradient(135deg, #0a0e17 0%, #141b29 100%);
@@ -73,7 +73,7 @@
     right: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     background-color: rgba(19, 22, 36, 0.7);
     border-radius: 6px;
     margin: 0 auto;
@@ -228,8 +228,8 @@
   
   /* Profit display styling */
   .profit-display {
-    position: absolute;
-    top: 6.5rem;
+    position: relative;
+    top: 5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -241,6 +241,7 @@
     border: 1px solid rgba(0, 207, 138, 0.25);
     min-width: 270px;
     z-index: 5;
+    margin-bottom: 1.5rem;
   }
   
   .profit-label {
@@ -274,6 +275,18 @@
     }
   }
   
+  /* Mobile CTA buttons container */
+  .mobile-cta-container {
+    display: flex;
+    position: relative;
+    top: 6.5rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    justify-content: center;
+    z-index: 20;
+  }
+  
   /* Main content styling */
   .hero-content {
     max-width: 900px;
@@ -282,11 +295,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    /* Move content down to make space for ticker and profit display */
-    margin-top: 4rem;
-    /* Make sure content stays within viewport */
-    max-height: 80vh;
+    justify-content: flex-start;
+    padding-top: 9rem;
+    width: 100%;
   }
   
   .hero-title {
@@ -350,6 +361,7 @@
     display: flex;
     gap: 1.2rem;
     justify-content: center;
+    width: 100%;
   }
   
   .hero-button {
@@ -419,20 +431,6 @@
     animation: float 20s infinite alternate ease-in-out, pulse-glow-orb 8s infinite alternate ease-in-out;
   }
   
-  /* Top CTA buttons for mobile */
-  .mobile-cta-container {
-    display: none;
-    position: absolute;
-    top: 10rem;
-    left: 0;
-    right: 0;
-    width: 100%;
-    justify-content: center;
-    gap: 1rem;
-    z-index: 20;
-    padding: 0 1rem;
-  }
-  
   /* Responsive adjustments */
   @media (max-width: 1200px) {
     .hero-title {
@@ -448,18 +446,9 @@
     .hero-features {
       gap: 2rem;
     }
-    
-    .profit-display {
-      top: 6rem;
-    }
   }
   
   @media (max-width: 768px) {
-    .hero-section {
-      justify-content: flex-start;
-      padding-top: 14rem;
-    }
-    
     .hero-title {
       font-size: 3rem;
     }
@@ -486,40 +475,27 @@
       display: none;
     }
     
-    .profit-display {
-      top: 6rem;
-      width: 90%;
-      max-width: 300px;
-      padding: 0.7rem 1.5rem;
+    .hero-buttons {
+      display: none;
     }
     
     .profit-value {
       font-size: 1.8rem;
     }
     
-    .hero-buttons {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    
-    .hero-button {
-      min-width: 160px;
-    }
-    
-    .hero-content {
-      margin-top: 2rem;
+    .mobile-cta-container {
+      display: flex;
     }
   }
   
   @media (max-width: 576px) {
     .hero-section {
       padding: 0 1rem;
-      padding-top: 12rem;
-      justify-content: flex-start;
     }
     
     .hero-title {
       font-size: 2.5rem;
+      margin-top: 1rem;
     }
     
     .market-ticker {
@@ -536,30 +512,28 @@
     }
     
     .profit-display {
-      top: 5rem;
+      top: 4.5rem;
       padding: 0.5rem 1.5rem;
+      width: 90%;
+      max-width: 280px;
     }
     
     .profit-value {
       font-size: 1.6rem;
     }
     
-    /* Show mobile CTA buttons at top when viewport is small */
     .mobile-cta-container {
-      display: flex;
-    }
-    
-    .hero-buttons {
-      display: none;
+      top: 5.5rem;
     }
     
     .mobile-cta-container .hero-button {
       padding: 0.75rem 1.5rem;
       font-size: 0.9rem;
+      min-width: 140px;
     }
     
     .hero-content {
-      margin-top: 0;
+      padding-top: 8rem;
     }
     
     /* Simplify features to save space */
@@ -592,57 +566,8 @@
     .mobile-cta-container .hero-button {
       width: 90%;
     }
-  }
-  
-  /* Fix for tall mobile screens */
-  @media (max-height: 700px) and (max-width: 576px) {
-    .hero-section {
-      padding-top: 10rem;
-    }
-    
-    .profit-display {
-      top: 4.5rem;
-    }
     
     .hero-content {
-      margin-top: 0;
-    }
-    
-    .hero-features {
-      margin-bottom: 2rem;
-    }
-  }
-  
-  /* Handle very short screens */
-  @media (max-height: 600px) {
-    .hero-section {
-      justify-content: flex-start;
-      padding-top: 8rem;
-      overflow-y: auto; /* Allow scrolling if needed */
-    }
-    
-    .hero-title {
-      font-size: 2.2rem;
-      margin-bottom: 1rem;
-    }
-    
-    .hero-subtitle {
-      margin-bottom: 1.5rem;
-    }
-    
-    .hero-features {
-      margin-bottom: 1.5rem;
-    }
-    
-    .profit-display {
-      position: relative;
-      top: 0;
-      margin-bottom: 1.5rem;
-    }
-    
-    .mobile-cta-container {
-      position: relative;
-      top: 0;
-      margin-bottom: 1rem;
+      padding-top: 7rem;
     }
   }
