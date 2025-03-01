@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db, storage } from "../firebaseConfig";
-import { collection, addDoc, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/CreateTradingRoom.css";
 import { v4 as uuidv4 } from "uuid";
@@ -16,6 +24,13 @@ const CreateTradingRoom = ({ user }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [uploading, setUploading] = useState(false);
+
+  // Ensure we have the current user data
+  useEffect(() => {
+    if (!user) {
+      setError("❌ You need to log in to create a room!");
+    }
+  }, [user]);
 
   // 📌 Handle File Upload
   const handleFileChange = (e) => {
@@ -32,6 +47,11 @@ const CreateTradingRoom = ({ user }) => {
       setThumbnail(file);
       setError("");
     }
+  };
+
+  // 📌 Handle Privacy Change
+  const handlePrivacyChange = (value) => {
+    setIsPrivate(value);
   };
 
   // 📌 Handle Form Submission
@@ -83,50 +103,80 @@ const CreateTradingRoom = ({ user }) => {
         }
       }
 
-      // ✅ Get user's display name or fallback to email
-      const adminName = user.displayName || user.email.split("@")[0]; 
+      // ✅ Get user's display name with proper fallback
+      let adminName = "Anonymous";
+      if (user.displayName) {
+        adminName = user.displayName;
+      } else if (user.email) {
+        adminName = user.email.split("@")[0];
+      }
 
-      // ✅ Generate a unique chat ID
+      // ✅ Generate a unique room ID and chat ID
+      const roomId = uuidv4();
       const chatId = uuidv4();
 
       console.log("📝 Creating room in Firestore...");
-      const roomRef = await addDoc(collection(db, "rooms"), {
+      const roomData = {
+        roomId: roomId, // Explicit room ID for reference
         roomName: roomName.trim(),
         category,
-        isPrivate,
+        isPrivate: isPrivate, // Make sure boolean value is stored
         description: description.trim(),
         thumbnail: imageUrl,
         adminId: user.uid,
-        adminName: adminName, // ✅ Store creator's name
-        chatId: chatId, // ✅ Unique chat ID assigned
+        adminName: adminName,
+        chatId: chatId,
         members: [user.uid],
-        pendingUsers: isPrivate ? [] : null,
+        pendingUsers: [],
         messages: [],
         createdAt: new Date(),
-      });
+      };
 
+      const roomRef = await addDoc(collection(db, "rooms"), roomData);
       console.log("📢 Room created:", roomRef.id);
 
+      // Add initial system message for all rooms
+      const initialMessage = {
+        sender: "System",
+        text: isPrivate 
+          ? `🔒 This is a private room. Members must request access, and ${adminName} (Admin) will approve/reject requests.`
+          : `👋 Welcome to ${roomName}! This room was created by ${adminName}.`,
+        timestamp: new Date(),
+      };
+
+      await updateDoc(doc(db, "rooms", roomRef.id), {
+        messages: [initialMessage],
+      });
+      
+      // Add notification about room creation for private rooms
       if (isPrivate) {
-        console.log("🔒 Setting up private room system message...");
-        await updateDoc(doc(db, "rooms", roomRef.id), {
-          messages: [
-            {
-              sender: "System",
-              text: `🔔 This is a private room. Members must request access, and ${adminName} (Admin) will approve/reject requests.`,
-              timestamp: new Date(),
-            },
-          ],
-        });
+        try {
+          // Add a notification for the admin about the new private room
+          const notificationData = {
+            userId: user.uid,
+            type: "room_created",
+            roomId: roomId,
+            roomName: roomName.trim(),
+            chatId: chatId,
+            message: `You created private room "${roomName.trim()}"`,
+            read: false,
+            createdAt: new Date()
+          };
+          
+          await addDoc(collection(db, "notifications"), notificationData);
+          console.log("✅ Notification added for private room creation");
+        } catch (notifError) {
+          console.error("❌ Error creating notification:", notifError);
+        }
       }
 
       setSuccess("✅ Room created successfully!");
       setUploading(false);
 
-      // 🔄 Redirect to the new room's chat
+      // 🔄 Redirect to the new room's chat with proper ID
       setTimeout(() => {
         navigate(`/chat/${chatId}`);
-      }, 1000);
+      }, 1500);
     } catch (err) {
       console.error("🔥 Error creating room:", err);
       setError("⚠️ Something went wrong. Try again.");
@@ -151,16 +201,29 @@ const CreateTradingRoom = ({ user }) => {
           <option>Futures & Commodities</option>
           <option>Meme Coin Degens</option>
           <option>Gold, Oil & Indices</option>
+          <option>Technical Analysis</option>
+          <option>Day Trading</option>
+          <option>Swing Trading</option>
         </select>
 
         <label>Privacy:</label>
         <div className="privacy-options">
           <label>
-            <input type="radio" name="privacy" checked={!isPrivate} onChange={() => setIsPrivate(false)} />
+            <input 
+              type="radio" 
+              name="privacy" 
+              checked={!isPrivate} 
+              onChange={() => handlePrivacyChange(false)} 
+            />
             🔓 Public (Anyone can join)
           </label>
           <label>
-            <input type="radio" name="privacy" checked={isPrivate} onChange={() => setIsPrivate(true)} />
+            <input 
+              type="radio" 
+              name="privacy" 
+              checked={isPrivate} 
+              onChange={() => handlePrivacyChange(true)} 
+            />
             🔒 Private (Admin approval required)
           </label>
         </div>

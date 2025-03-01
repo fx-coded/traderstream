@@ -23,6 +23,7 @@ import TopCryptoExchanges from "./components/TopCrypto";
 import TopBrokers from "./components/TopBrokers";
 import LoadingSpinner from "./components/LoadingSpinner"; // Assuming you have this component
 import ErrorBoundary from "./components/ErrorBoundary"; // Assuming you have this component
+import NotificationsComponent from "./components/NotificationsComponent";
 
 import "./App.css";
 
@@ -254,6 +255,15 @@ const App = () => {
                       element={
                         <ErrorBoundary>
                           <Viewer socket={socket} user={user} />
+                        </ErrorBoundary>
+                      } 
+                    />
+
+<Route 
+                      path="/notifications" 
+                      element={
+                        <ErrorBoundary>
+                          <NotificationsComponent user={user} />
                         </ErrorBoundary>
                       } 
                     />

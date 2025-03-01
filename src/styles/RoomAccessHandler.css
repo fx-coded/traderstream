@@ -1,0 +1,78 @@
+/* RoomAccessHandler.css */
+.room-access-handler {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .room-access-handler p {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+  }
+  
+  .room-access-handler .error-message {
+    color: #e53935;
+    font-weight: 500;
+  }
+  
+  .room-access-handler .success-message {
+    color: #43a047;
+    font-weight: 500;
+  }
+  
+  .access-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .access-buttons button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .approve-btn {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .approve-btn:hover {
+    background-color: #43a047;
+  }
+  
+  .decline-btn {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .decline-btn:hover {
+    background-color: #e53935;
+  }
+  
+  .access-buttons button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 480px) {
+    .access-buttons {
+      flex-direction: column;
+    }
+    
+    .access-buttons button {
+      width: 100%;
+      padding: 10px;
+    }
+  }
