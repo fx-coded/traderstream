@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Chat from "./Chat"; // Import Chat Component
+import { useNavigate, useParams } from "react-router-dom";
+import Chat from "./Chat";
 import { db, auth } from "../firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import {
@@ -10,6 +10,10 @@ import {
   arrayUnion,
   getDoc,
   onSnapshot,
+  query,
+  where,
+  orderBy,
+  getDocs
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "../styles/TrendingRoom.css";
@@ -25,8 +29,10 @@ const TradingRoomsList = ({ filteredCategory }) => {
   const [image, setImage] = useState(null);
   const [isSetupFormVisible, setIsSetupFormVisible] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const storage = getStorage();
   const navigate = useNavigate();
+  const { roomId } = useParams();
 
   // Check user authentication state
   useEffect(() => {
@@ -40,13 +46,61 @@ const TradingRoomsList = ({ filteredCategory }) => {
     return () => unsubscribe();
   }, []);
 
+  // Handle direct URL access
+  useEffect(() => {
+    if (roomId) {
+      loadRoomFromUrl(roomId);
+    }
+  }, [roomId, user]);
+
+  // Load room from URL parameter
+  const loadRoomFromUrl = async (roomId) => {
+    try {
+      // First check if it's a chat ID
+      const roomsQuery = query(
+        collection(db, "rooms"),
+        where("chatId", "==", roomId)
+      );
+      
+      const roomSnapshot = await getDocs(roomsQuery);
+      
+      if (!roomSnapshot.empty) {
+        const roomData = roomSnapshot.docs[0];
+        setSelectedRoom(roomData.id);
+        setIsChatOpen(true);
+        return;
+      }
+      
+      // If not found by chatId, try direct room ID
+      const directRoomRef = doc(db, "rooms", roomId);
+      const directRoomSnap = await getDoc(directRoomRef);
+      
+      if (directRoomSnap.exists()) {
+        setSelectedRoom(roomId);
+        setIsSetupRoom(true);
+        // Fetch trade setups for the selected room
+        fetchTradeSetups(directRoomRef);
+      }
+    } catch (error) {
+      console.error("Error loading room from URL:", error);
+    }
+  };
+
   // Fetch trading rooms
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "rooms"), (snapshot) => {
-      const rooms = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      rooms.sort((a, b) => (b.members?.length || 0) - (a.members?.length || 0));
-      setTradingRooms(rooms);
-    });
+    setLoading(true);
+    const unsubscribe = onSnapshot(
+      query(collection(db, "rooms"), orderBy("createdAt", "desc")), 
+      (snapshot) => {
+        const rooms = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setTradingRooms(rooms);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching rooms:", error);
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
@@ -84,6 +138,21 @@ const TradingRoomsList = ({ filteredCategory }) => {
     
     const roomData = roomSnapshot.data();
 
+    // Check if room is private and user is not a member
+    if (roomData.isPrivate && !roomData.members?.includes(user.uid)) {
+      if (!roomData.pendingUsers?.includes(user.uid)) {
+        // Add user to pending list
+        await updateDoc(roomRef, { 
+          pendingUsers: arrayUnion(user.uid) 
+        });
+        alert("This is a private room. Your request to join has been sent to the admin.");
+      } else {
+        alert("Your request to join this room is pending admin approval.");
+      }
+      return;
+    }
+
+    // Add user to members if not already a member
     if (!roomData.members?.includes(user.uid)) {
       await updateDoc(roomRef, { members: arrayUnion(user.uid) });
     }
@@ -92,13 +161,18 @@ const TradingRoomsList = ({ filteredCategory }) => {
       setSelectedRoom(roomId);
       setIsChatOpen(true);
       setIsSetupRoom(false);
+      
+      // Update URL with chat ID for sharing
+      if (roomData.chatId) {
+        window.history.pushState({}, "", `/chat/${roomData.chatId}`);
+      }
     } else if (type === "setup") {
       setSelectedRoom(roomId);
       setIsChatOpen(false);
       setIsSetupRoom(true);
       
       // Update URL to include room ID for direct access
-      window.history.pushState({}, "", `/chatroom/${roomId}`);
+      window.history.pushState({}, "", `/room/${roomId}`);
       
       // Fetch trade setups for the selected room
       fetchTradeSetups(roomRef);
@@ -251,7 +325,7 @@ const TradingRoomsList = ({ filteredCategory }) => {
     setIsSetupRoom(false);
     setSelectedRoom(null);
     // Reset URL
-    window.history.pushState({}, "", "/");
+    window.history.pushState({}, "", "/rooms");
   };
 
   // Render trade setup form
@@ -259,8 +333,8 @@ const TradingRoomsList = ({ filteredCategory }) => {
     if (!isSetupFormVisible) return null;
     
     return (
-      <div className="setup-form-container">
-        <h4>Add New Trade Setup</h4>
+      <div className="setup-form">
+        <h3>Add New Trade Setup</h3>
         <input 
           type="text" 
           placeholder="Asset (required)" 
@@ -296,103 +370,150 @@ const TradingRoomsList = ({ filteredCategory }) => {
           onChange={handleImageChange} 
         />
         <div className="form-buttons">
-          <button onClick={() => setIsSetupFormVisible(false)}>Cancel</button>
-          <button onClick={submitTradeSetup}>✅ Submit Setup</button>
+          <button onClick={() => setIsSetupFormVisible(false)} className="cancel-btn">Cancel</button>
+          <button onClick={submitTradeSetup} className="submit-btn">✅ Submit Setup</button>
         </div>
       </div>
     );
   };
 
   return (
-    <div className={isChatOpen || isSetupRoom ? "chat-room-container" : "trading-rooms-container"}>
+    <div className={`trading-rooms-container ${isChatOpen || isSetupRoom ? 'room-active' : ''}`}>
       {!isChatOpen && !isSetupRoom && (
         <>
-          <div className="trading-room-header">
-            <h2>🔥 Active Trading Rooms</h2>
+          <div className="trading-rooms-header">
+            <div className="header-title">
+              <span className="fire-icon">🔥</span> ACTIVE TRADING ROOMS
+            </div>
             <button className="create-room-btn" onClick={() => navigate("/create-room")}>
-              ➕ Create Room
+              + Create Room
             </button>
           </div>
 
-          <div className="rooms-grid">
-            {filteredRooms.map((room) => (
-              <div key={room.id} className="room-card">
-                <h3 className="room-title">{room.roomName}</h3>
-                <div className="room-meta">
-                  <p>👤 Created by: <strong>{room.author || "Anonymous"}</strong></p>
-                  <p>👥 Members: <strong>{room.members?.length || 0}</strong></p>
-                  <p>🔒 Privacy: <strong>{room.isPublic ? "Public" : "Private"}</strong></p>
+          {loading ? (
+            <div className="loading-spinner">
+              <div className="spinner"></div>
+              <span>Loading rooms...</span>
+            </div>
+          ) : (
+            <div className="rooms-container">
+              {filteredRooms.map((room) => (
+                <div key={room.id} className="room-item">
+                  <div className="room-name">{room.roomName}</div>
+                  <div className="room-info">
+                    <div className="info-row">
+                      <span className="info-label">
+                        <span className="info-icon">👤</span>Created by:
+                      </span>
+                      <span className="info-value">{room.adminName || "Anonymous"}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">
+                        <span className="info-icon">👥</span>Members:
+                      </span>
+                      <span className="info-value">{room.members?.length || 0}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">
+                        <span className="info-icon">{room.isPrivate ? "🔒" : "🔓"}</span>Privacy:
+                      </span>
+                      <span className={`info-value ${room.isPrivate ? "private" : "public"}`}>
+                        {room.isPrivate ? "Private" : "Public"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="room-actions">
+                    <button className="chat-btn" onClick={() => joinRoom(room.id, "chat")}>
+                      💬 Chat
+                    </button>
+                    <button className="setups-btn" onClick={() => joinRoom(room.id, "setup")}>
+                      📊 Setups
+                    </button>
+                  </div>
                 </div>
-                <div className="room-actions">
-                  <button onClick={() => joinRoom(room.id, "chat")}>💬 Chat</button>
-                  <button onClick={() => joinRoom(room.id, "setup")}>📊 Setups</button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </>
       )}
 
       {isChatOpen && selectedRoom && (
-        <div className="chat-view">
+        <div className="chat-container">
           <button className="back-btn" onClick={goBack}>← Back to Rooms</button>
           <Chat
             roomId={selectedRoom}
             user={user}
-            onExit={() => setIsChatOpen(false)}
+            onExit={goBack}
           />
         </div>
       )}
 
       {isSetupRoom && selectedRoom && (
-        <div className="setup-view">
+        <div className="setups-container">
           <button className="back-btn" onClick={goBack}>← Back to Rooms</button>
-          <h3>🔥 Trade Setups</h3>
-          <div className="setup-container">
-            {tradeSetups.length === 0 ? (
+          <h2>Trade Setups</h2>
+          
+          {tradeSetups.length === 0 ? (
+            <div className="no-setups">
               <p>No trade setups yet. Be the first to share your analysis!</p>
-            ) : (
-              tradeSetups.map((setup) => (
-                <div key={setup.id} className="setup-card">
+              <button onClick={() => setIsSetupFormVisible(true)} className="add-setup-btn">
+                Add First Setup
+              </button>
+            </div>
+          ) : (
+            <div className="setups-list">
+              {tradeSetups.map((setup) => (
+                <div key={setup.id} className="setup-item">
                   <div className="setup-header">
-                    <h4>📊 {setup.asset}</h4>
+                    <h3 className="setup-asset">📊 {setup.asset}</h3>
                     <p className="setup-author">by {setup.user}</p>
-                    <p className="setup-date">{setup.timestamp?.toDate().toLocaleString()}</p>
                   </div>
-                  <p>🎯 Entry: {setup.entry} | 🚫 SL: {setup.stopLoss} | 🏁 TP: {setup.takeProfit}</p>
-                  <p className="setup-analysis">📝 {setup.analysis}</p>
+                  <div className="setup-levels">
+                    {setup.entry && <div className="setup-level entry">🎯 Entry: {setup.entry}</div>}
+                    {setup.stopLoss && <div className="setup-level stoploss">🛑 SL: {setup.stopLoss}</div>}
+                    {setup.takeProfit && <div className="setup-level takeprofit">🏁 TP: {setup.takeProfit}</div>}
+                  </div>
+                  {setup.analysis && <p className="setup-analysis">{setup.analysis}</p>}
                   {setup.imageUrl && (
                     <img 
                       src={setup.imageUrl} 
-                      alt="Trade Setup" 
+                      alt="Trade chart" 
                       className="setup-image" 
                       onClick={() => window.open(setup.imageUrl, '_blank')}
                     />
                   )}
-                  <div className="setup-actions">
-                    <button 
-                      className={setup.likedBy?.includes(user?.uid) ? "active-vote" : ""}
-                      onClick={() => handleVote(setup.id, 'like')}
-                    >
-                      👍 {setup.likes}
-                    </button>
-                    <button 
-                      className={setup.dislikedBy?.includes(user?.uid) ? "active-vote" : ""}
-                      onClick={() => handleVote(setup.id, 'dislike')}
-                    >
-                      👎 {setup.dislikes}
-                    </button>
+                  <div className="setup-footer">
+                    <div className="setup-time">{setup.timestamp?.toDate 
+                      ? setup.timestamp.toDate().toLocaleString() 
+                      : new Date(setup.timestamp).toLocaleString()}</div>
+                    <div className="vote-buttons">
+                      <button 
+                        className={`vote-btn ${setup.likedBy?.includes(user?.uid) ? 'active' : ''}`}
+                        onClick={() => handleVote(setup.id, 'like')}
+                      >
+                        👍 {setup.likes || 0}
+                      </button>
+                      <button 
+                        className={`vote-btn ${setup.dislikedBy?.includes(user?.uid) ? 'active' : ''}`}
+                        onClick={() => handleVote(setup.id, 'dislike')}
+                      >
+                        👎 {setup.dislikes || 0}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-
-          <button className="add-setup-btn" onClick={() => setIsSetupFormVisible(!isSetupFormVisible)}>
-            {isSetupFormVisible ? "✖" : "➕ Add Setup"}
+              ))}
+            </div>
+          )}
+          
+          <button 
+            className={`floating-add-btn ${isSetupFormVisible ? 'hidden' : ''}`}
+            onClick={() => setIsSetupFormVisible(true)}
+          >
+            + Add Setup
           </button>
-
-          {renderSetupForm()}
+          
+          {isSetupFormVisible && renderSetupForm()}
         </div>
       )}
     </div>

@@ -1,37 +1,33 @@
-/* 🌫 Background Blur */
+/* Auth Modal Styles */
 .auth-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(10px);
-  background: rgba(0, 0, 0, 0.8);
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: 20px;
+  backdrop-filter: blur(3px);
 }
 
-/* 🎯 Authentication Modal */
 .auth-modal {
-  background: #f9f9f9;
-  padding: 30px;
+  background-color: #fff;
   border-radius: 12px;
   width: 100%;
-  max-width: 400px;
-  color: #1b1f27;
-  font-family: "Arial", sans-serif;
-  text-align: center;
-  animation: fadeIn 0.3s ease-in-out;
+  max-width: 450px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: modal-appear 0.3s ease-out;
+  overflow: hidden;
 }
 
-/* 🎬 Fade-in Animation */
-@keyframes fadeIn {
+@keyframes modal-appear {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -39,386 +35,231 @@
   }
 }
 
-/* 🚀 Modal Header */
 .auth-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .auth-header h2 {
-  font-size: 18px;
-  color: #06a3dd;
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
 }
 
-/* ❌ Close Button */
 .close-btn {
   background: none;
   border: none;
-  color: #ff0077;
-  font-size: 20px;
+  color: #777;
+  font-size: 1.2rem;
   cursor: pointer;
+  transition: color 0.2s;
 }
 
 .close-btn:hover {
-  color: #06a3dd;
+  color: #333;
 }
 
-/* 📩 Form Inputs */
-.auth-modal label {
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
   display: block;
-  text-align: left;
-  font-size: 14px;
-  color: #06a3dd;
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #555;
 }
 
-.auth-modal input {
+input[type="text"],
+input[type="email"],
+input[type="password"] {
   width: 100%;
-  padding: 12px;
-  background: #252932;
-  border: 1px solid #06a3dd;
-  color: white;
+  padding: 12px 10px;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 14px;
-  outline: none;
-  text-align: center;
-  transition: border 0.3s;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.auth-modal input:focus {
-  border: 1px solid #ff0077;
-}
-
-/* 📅 Date of Birth */
-.dob-container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.dob-container select {
-  flex: 1;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #06a3dd;
-  background:white;
-  color: #06a3dd;
-  font-size: 14px;
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
   outline: none;
 }
 
-.dob-container select:focus {
-  border: 1px solid #ff0077;
+.input-error {
+  border-color: #e74c3c !important;
+  background-color: rgba(231, 76, 60, 0.05);
 }
 
-/* 👀 Password Container */
 .password-container {
-  display: flex;
-  align-items: center;
   position: relative;
+  display: flex;
 }
 
-.password-container input {
-  flex-grow: 1;
-  padding-right: 40px;
-}
-
-/* 👁️ Toggle Password Button */
 .toggle-password {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  font-size: 18px;
   cursor: pointer;
-  color: #06a3dd;
+  color: #777;
+  font-size: 1rem;
+  z-index: 10;
 }
 
-.toggle-password:hover {
-  color: #ff0077;
+.auth-btn-modal {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  border: none;
+  margin-top: 10px;
 }
 
-/* ⚠ Error Message */
+.auth-btn-modal:active {
+  transform: scale(0.98);
+}
+
+.auth-btn-modal.primary {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.auth-btn-modal.primary:hover {
+  background-color: #3a80d2;
+}
+
+.auth-btn-modal.secondary {
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+.auth-btn-modal.secondary:hover {
+  background-color: #e7e7e7;
+}
+
+.auth-btn-modal.google {
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-btn-modal.google:hover {
+  background-color: #f8f8f8;
+}
+
+.auth-btn-modal:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .error-message {
-  color: #ff4444;
-  font-size: 12px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  padding: 8px 12px;
+  background-color: rgba(231, 76, 60, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #e74c3c;
 }
 
-/* 🔄 Forgot Password */
+.field-error {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.success-message {
+  color: #27ae60;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  padding: 8px 12px;
+  background-color: rgba(39, 174, 96, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #27ae60;
+}
+
 .forgot-password {
-  font-size: 12px;
-  color: #06a3dd;
+  color: #4a90e2;
+  font-size: 0.9rem;
   cursor: pointer;
-  margin-bottom: 15px;
-  transition: color 0.3s;
+  margin: 10px 0;
+  text-align: right;
 }
 
 .forgot-password:hover {
   text-decoration: underline;
-  color: #ff0077;
 }
 
-/* 🔥 Login / Sign-Up Button */
-.auth-btn-modal {
-  background: linear-gradient(90deg, #ffcc00, #ff9900);
-  color: black;
-  padding: 14px;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  transition: background 0.3s, transform 0.2s;
-}
-
-.auth-btn-modal:hover {
-  background: linear-gradient(90deg, #ff9900, #ffcc00);
-  transform: scale(1.05);
-}
-
-/* 🔄 Switch between Login and Sign Up */
-.switch-auth {
-  color: #ff0077;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-.switch-auth:hover {
-  text-decoration: underline;
-  color: #06a3dd;
-}
-
-/* 📧 Email / Phone Toggle */
-.toggle-email-phone {
+.divider {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.toggle-email-phone button {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  background: #252932;
-  color: white;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
-
-.toggle-email-phone .active {
-  background: #06a3dd;
-  color: black;
-}
-
-/* 🌍 AuthAction Page - Responsive Styles */
-.auth-action-container {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #0f0f1a;
-  color: #ffffff;
-  flex-direction: column;
   text-align: center;
-  padding: 20px;
+  margin: 20px 0;
 }
 
-.auth-action-box {
-  background: #1a1a2e;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0px 0px 10px rgba(255, 204, 0, 0.3);
-  max-width: 400px;
-  width: 100%;
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.auth-action-box h2 {
-  margin-bottom: 15px;
-  font-size: 22px;
-  color: #06a3dd
+.divider span {
+  padding: 0 10px;
+  color: #666;
+  font-size: 0.9rem;
 }
 
-.auth-action-box p {
-  font-size: 14px;
-  margin-bottom: 15px;
-  color: #bbbbbb;
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.auth-action-box input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  background: #252545;
-  border: 1px solid #06a3dd;
-  color: white;
-  border-radius: 6px;
-  font-size: 16px;
+.switch-auth-type {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #666;
 }
 
-.auth-action-box input::placeholder {
-  color: #cccccc;
-}
-
-.auth-action-box button {
-  width: 100%;
-  padding: 12px;
-  background: #06a3dd;
-  border: none;
-  color: #0f0f1a;
-  font-weight: bold;
+.auth-link {
+  color: #4a90e2;
   cursor: pointer;
-  border-radius: 6px;
-  transition: 0.3s;
-  font-size: 16px;
+  font-weight: 500;
 }
 
-.auth-action-box button:hover {
-  background: #06a3dd;
-}
-
-.auth-action-box .error-message {
-  color: #ff4d4d;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-.auth-action-box .success-message {
-  color: #66ff66;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-.back-to-home {
-  margin-top: 15px;
-  font-size: 14px;
+.auth-link:hover {
   text-decoration: underline;
-  color: #06a3dd;
-  cursor: pointer;
 }
 
-.back-to-home:hover {
-  color: #06a3dd;
-}
-
-
-/* 📱 Responsive Design */
-@media (max-width: 768px) {
-  .auth-action-box {
-    padding: 20px;
-    max-width: 350px;
-  }
-
-  .auth-action-box h2 {
-    font-size: 20px;
-  }
-
-  .auth-action-box p,
-  .auth-action-box .error-message,
-  .auth-action-box .success-message {
-    font-size: 13px;
-  }
-
-  .auth-action-box input,
-  .auth-action-box button {
-    font-size: 14px;
-    padding: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-action-box {
-    padding: 18px;
-    max-width: 90%;
-  }
-
-  .auth-action-box h2 {
-    font-size: 18px;
-  }
-
-  .auth-action-box p,
-  .auth-action-box .error-message,
-  .auth-action-box .success-message {
-    font-size: 12px;
-  }
-
-  .auth-action-box input,
-  .auth-action-box button {
-    font-size: 13px;
-    padding: 8px;
-  }
-
-  .back-to-home {
-    font-size: 12px;
-  }
-}
-
-
-/* 📱 Responsive Design */
+/* Mobile responsiveness */
 @media (max-width: 480px) {
   .auth-modal {
-    width: 95%;
+    width: 90%;
     padding: 20px;
   }
-
+  
   .auth-header h2 {
-    font-size: 16px;
-  }
-
-  .auth-modal input {
-    font-size: 12px;
-  }
-
-  .auth-btn-modal {
-    font-size: 14px;
-  }
-  
-  .dob-container {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .toggle-email-phone {
-    flex-direction: column;
+    font-size: 1.3rem;
   }
 }
-
-  @media (max-width: 768px) {
-      .streams-grid {
-          display: flex;
-          flex-direction: column; /* Stack elements vertically */
-          align-items: center; /* Center items */
-      }
-  
-      .stream-card {
-          width: 90%;
-          max-width: 400px;
-          text-align: center;
-      }
-  
-      .live-streams .streams-grid {
-          flex-direction: column;
-      }
-  }
-
-/* 📱 FOR SMALLER PHONES */
-@media (max-width: 480px) {
-  .streams-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stream-card {
-    max-width: 100%;
-  }
-}
-

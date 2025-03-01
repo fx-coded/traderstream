@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { db } from "../firebaseConfig";
+import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import "../styles/TrendingStreams.css";
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
@@ -7,15 +10,15 @@ import img11 from "./images/img11.png";
 import img13 from "./images/img13.png";
 import img14 from "./images/img14.png";
 import trive from "./images/trive.jpg";
+import { FaUsers, FaFire, FaClock, FaUserPlus, FaCircle } from "react-icons/fa";
 
-// Mock Data: Empty Streams (placeholder thumbnails for UI layout)
+// Placeholder assets in case real data is not available
 const placeholderStreams = [
   { id: 1, type: "stream", name: "My 2025 watchlist", category: "Crypto Trading", viewers: 0, thumbnail: img1, creator: "Money Speaks" },
   { id: 2, type: "stream", name: "My 2025 watchlist", category: "Gold, Oil & Indices", viewers: 0, thumbnail: img2, creator: "FxGuru" },
   { id: 3, type: "stream", name: "My 2025 watchlist", category: "Crypto Trading", viewers: 0, thumbnail: img3, creator: "Diamond Hands" },
 ];
 
-// Mock Data: Chat Rooms/Discussions
 const placeholderDiscussions = [
   { id: 11, type: "chat", name: "🚀 Bitcoin 100x 🚀", category: "Crypto Trading", members: 250, profilePic: img11, message: "Bitcoin breakout incoming, sending it to the moon! 🌕", creator: "Money Speaks" },
   { id: 13, type: "chat", name: "Solana Degen Calls", category: "Crypto Trading", members: 200, profilePic: img13, message: "Solana $500 EOD?? Don't fade the degen pump! 🤯", creator: "Diamond Hands" },
@@ -23,21 +26,230 @@ const placeholderDiscussions = [
 ];
 
 const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
-  // Always use placeholder streams for now (empty streams section as requested)
-  const [trendingStreams, setTrendingStreams] = useState(placeholderStreams);
-  // Use the already created chats data directly without slicing initially
-  const [trendingDiscussions, setTrendingDiscussions] = useState([]);
+  const navigate = useNavigate();
+  // State for different sections
+  const [liveStreams, setLiveStreams] = useState([]);
+  const [newRooms, setNewRooms] = useState([]);
+  const [trendingRooms, setTrendingRooms] = useState([]);
+  const [loading, setLoading] = useState({
+    streams: true,
+    newRooms: true,
+    trendingRooms: true
+  });
 
+  // Fetch live streams, new rooms, and trending rooms from Firestore
   useEffect(() => {
-    // Only display real chats if they exist, otherwise show placeholders
-    if (realChats && realChats.length > 0) {
-      // Only show real chats (created by users), limit to 3 for display
-      setTrendingDiscussions(realChats.slice(0, 3));
-    } else {
-      // If no real chats, use first 3 placeholders
-      setTrendingDiscussions(placeholderDiscussions.slice(0, 3));
+    const fetchData = async () => {
+      try {
+        // 1. Fetch live streams
+        await fetchLiveStreams();
+        
+        // 2. Fetch new chat rooms (most recently created)
+        await fetchNewRooms();
+        
+        // 3. Fetch trending chat rooms (most members/active)
+        await fetchTrendingRooms();
+        
+      } catch (error) {
+        console.error("Error fetching trending data:", error);
+        // Handle errors by using placeholder data
+        fallbackToPlaceholders();
+      }
+    };
+    
+    fetchData();
+  }, [realStreams, realChats]);
+
+  // Function to fetch live streams
+  const fetchLiveStreams = async () => {
+    try {
+      // If we have real streams data from props, use it
+      if (realStreams && realStreams.length > 0) {
+        setLiveStreams(realStreams.slice(0, 3));
+      } else {
+        // Otherwise, fetch from Firestore
+        const streamsQuery = query(
+          collection(db, "streams"), 
+          where("isLive", "==", true),
+          orderBy("viewerCount", "desc"), 
+          limit(3)
+        );
+        
+        const streamsSnapshot = await getDocs(streamsQuery);
+        
+        if (!streamsSnapshot.empty) {
+          const streamsList = streamsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            type: "stream",
+            ...doc.data()
+          }));
+          setLiveStreams(streamsList);
+        } else {
+          // No live streams, use placeholders
+          setLiveStreams(placeholderStreams);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching live streams:", error);
+      setLiveStreams(placeholderStreams);
+    } finally {
+      setLoading(prev => ({ ...prev, streams: false }));
     }
-  }, [realChats]);
+  };
+
+  // Function to fetch new rooms
+  const fetchNewRooms = async () => {
+    try {
+      const roomsQuery = query(
+        collection(db, "rooms"), 
+        orderBy("createdAt", "desc"), 
+        limit(3)
+      );
+      
+      const roomsSnapshot = await getDocs(roomsQuery);
+      
+      if (!roomsSnapshot.empty) {
+        const roomsList = roomsSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            type: "chat",
+            name: data.roomName,
+            category: data.category,
+            members: data.members ? data.members.length : 0,
+            profilePic: data.thumbnail || getPlaceholderImage(data.category),
+            message: data.messages && data.messages.length > 0 ? 
+              data.messages[data.messages.length - 1].text : 
+              `Welcome to ${data.roomName}!`,
+            creator: data.adminName || "Anonymous",
+            isPrivate: data.isPrivate,
+            createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+            chatId: data.chatId
+          };
+        });
+        setNewRooms(roomsList);
+      } else {
+        // No rooms found, use first 3 placeholder discussions
+        setNewRooms(placeholderDiscussions.slice(0, 3));
+      }
+    } catch (error) {
+      console.error("Error fetching new rooms:", error);
+      setNewRooms(placeholderDiscussions.slice(0, 3));
+    } finally {
+      setLoading(prev => ({ ...prev, newRooms: false }));
+    }
+  };
+
+  // Function to fetch trending rooms (by member count)
+  const fetchTrendingRooms = async () => {
+    try {
+      // If we have real chats from props, use those
+      if (realChats && realChats.length > 0) {
+        // Sort by members count to get most popular
+        const sortedChats = [...realChats].sort((a, b) => 
+          (b.members || 0) - (a.members || 0)
+        ).slice(0, 3);
+        
+        setTrendingRooms(sortedChats);
+      } else {
+        // Otherwise fetch from Firestore
+        // We're defining "trending" as rooms with most members
+        const roomsQuery = query(
+          collection(db, "rooms"),
+          // Here we would ideally order by member count, but Firestore can't order by array length
+          // Instead, we'll fetch more rooms and sort them manually
+          limit(20)
+        );
+        
+        const roomsSnapshot = await getDocs(roomsQuery);
+        
+        if (!roomsSnapshot.empty) {
+          let roomsList = roomsSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              type: "chat",
+              name: data.roomName,
+              category: data.category,
+              members: data.members ? data.members.length : 0,
+              profilePic: data.thumbnail || getPlaceholderImage(data.category),
+              message: data.messages && data.messages.length > 0 ? 
+                data.messages[data.messages.length - 1].text : 
+                `Welcome to ${data.roomName}!`,
+              creator: data.adminName || "Anonymous",
+              isPrivate: data.isPrivate,
+              createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+              chatId: data.chatId,
+              // Last activity can be determined by the timestamp of the last message
+              lastActivity: data.messages && data.messages.length > 0 ?
+                data.messages[data.messages.length - 1].timestamp :
+                data.createdAt
+            };
+          });
+          
+          // Sort by member count to get trending rooms
+          roomsList.sort((a, b) => b.members - a.members);
+          setTrendingRooms(roomsList.slice(0, 3));
+        } else {
+          // No rooms found, use placeholder discussions
+          setTrendingRooms(placeholderDiscussions);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching trending rooms:", error);
+      setTrendingRooms(placeholderDiscussions);
+    } finally {
+      setLoading(prev => ({ ...prev, trendingRooms: false }));
+    }
+  };
+
+  // Fallback to placeholders if all fetches fail
+  const fallbackToPlaceholders = () => {
+    setLiveStreams(placeholderStreams);
+    setNewRooms(placeholderDiscussions.slice(0, 3));
+    setTrendingRooms(placeholderDiscussions);
+    setLoading({
+      streams: false,
+      newRooms: false,
+      trendingRooms: false
+    });
+  };
+
+  // Helper function to get placeholder images based on category
+  const getPlaceholderImage = (category) => {
+    switch (category) {
+      case "Crypto Trading":
+        return img11;
+      case "Gold, Oil & Indices":
+        return img14;
+      default:
+        return img13;
+    }
+  };
+
+  // Navigate to chat room when clicked
+  const handleRoomClick = (room) => {
+    if (room.chatId) {
+      navigate(`/chat/${room.chatId}`);
+    } else if (setSelectedStreamer) {
+      setSelectedStreamer(room);
+    }
+  };
+
+  // Format relative time (e.g., "2 hours ago")
+  const getRelativeTime = (date) => {
+    if (!date) return '';
+    
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - new Date(date)) / 1000);
+    
+    if (diffInSeconds < 60) return `${diffInSeconds} sec ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hr ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    
+    return new Date(date).toLocaleDateString();
+  };
 
   return (
     <div className="trending-container">
@@ -77,58 +289,153 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
         </div>
       </div>
       
-      {/* Trending Streams Section */}
+      {/* Live Streams Section */}
       <section className="trending-section">
-        <h3 className="section-title">TRENDING STREAMS</h3>
-        
-        <div className="content-grid">
-          {trendingStreams.map(stream => (
-            <div 
-              key={stream.id} 
-              className="content-card" 
-              onClick={() => setSelectedStreamer(stream)}
-            >
-              <div className="card-thumbnail">
-                <img 
-                  src={stream.thumbnail} 
-                  alt={stream.name} 
-                  className="thumbnail-img"
-                />
-              </div>
-              <div className="card-info">
-                <p className="creator-name">{stream.creator}</p>
-                <p className="stream-name">{stream.name}</p>
-              </div>
-            </div>
-          ))}
+        <div className="section-header">
+          <h3 className="section-title">
+            <FaCircle className="live-icon pulse" /> LIVE STREAMS
+          </h3>
+          <button className="view-all-btn" onClick={() => navigate('/streams')}>
+            View All
+          </button>
         </div>
+        
+        {loading.streams ? (
+          <div className="loader-container">
+            <div className="loader"></div>
+          </div>
+        ) : (
+          <div className="content-grid">
+            {liveStreams.map(stream => (
+              <div 
+                key={stream.id} 
+                className="content-card stream-card" 
+                onClick={() => setSelectedStreamer(stream)}
+              >
+                <div className="card-thumbnail">
+                  <div className="live-tag">LIVE</div>
+                  <div className="viewers-count">
+                    <FaUsers className="icon" /> {stream.viewers || 0}
+                  </div>
+                  <img 
+                    src={stream.thumbnail} 
+                    alt={stream.name} 
+                    className="thumbnail-img"
+                  />
+                </div>
+                <div className="card-info">
+                  <div className="info-row">
+                    <p className="creator-name">{stream.creator}</p>
+                    <span className="category-tag">{stream.category}</span>
+                  </div>
+                  <p className="stream-name">{stream.name}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
       
-      {/* Trending Discussions Section */}
+      {/* New Chat Rooms Section */}
       <section className="trending-section">
-        <h3 className="section-title">TRENDING DISCUSSIONS</h3>
-        
-        <div className="content-grid">
-          {trendingDiscussions.map(discussion => (
-            <div 
-              key={discussion.id} 
-              className="content-card" 
-              onClick={() => setSelectedStreamer(discussion)}
-            >
-              <div className="card-thumbnail">
-                <img 
-                  src={discussion.profilePic} 
-                  alt={discussion.name} 
-                  className="thumbnail-img"
-                />
-              </div>
-              <div className="card-info">
-                <p className="creator-name">{discussion.creator}</p>
-                <p className="stream-name">{discussion.name}</p>
-              </div>
-            </div>
-          ))}
+        <div className="section-header">
+          <h3 className="section-title">
+            <FaUserPlus className="section-icon" /> NEW CHAT ROOMS
+          </h3>
+          <button className="view-all-btn" onClick={() => navigate('/rooms')}>
+            View All
+          </button>
         </div>
+        
+        {loading.newRooms ? (
+          <div className="loader-container">
+            <div className="loader"></div>
+          </div>
+        ) : (
+          <div className="content-grid">
+            {newRooms.map(room => (
+              <div 
+                key={room.id} 
+                className="content-card room-card" 
+                onClick={() => handleRoomClick(room)}
+              >
+                <div className="card-thumbnail">
+                  {room.isPrivate && (
+                    <div className="private-tag">PRIVATE</div>
+                  )}
+                  <div className="members-count">
+                    <FaUsers className="icon" /> {room.members}
+                  </div>
+                  <img 
+                    src={room.profilePic} 
+                    alt={room.name} 
+                    className="thumbnail-img"
+                  />
+                </div>
+                <div className="card-info">
+                  <div className="info-row">
+                    <p className="creator-name">{room.creator}</p>
+                    <div className="time-tag">
+                      <FaClock className="icon" /> {getRelativeTime(room.createdAt)}
+                    </div>
+                  </div>
+                  <p className="stream-name">{room.name}</p>
+                  <span className="category-tag">{room.category}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+      
+      {/* Trending Chat Rooms Section */}
+      <section className="trending-section">
+        <div className="section-header">
+          <h3 className="section-title">
+            <FaFire className="section-icon" /> TRENDING DISCUSSIONS
+          </h3>
+          <button className="view-all-btn" onClick={() => navigate('/rooms')}>
+            View All
+          </button>
+        </div>
+        
+        {loading.trendingRooms ? (
+          <div className="loader-container">
+            <div className="loader"></div>
+          </div>
+        ) : (
+          <div className="content-grid">
+            {trendingRooms.map(room => (
+              <div 
+                key={room.id} 
+                className="content-card room-card" 
+                onClick={() => handleRoomClick(room)}
+              >
+                <div className="card-thumbnail">
+                  {room.isPrivate && (
+                    <div className="private-tag">PRIVATE</div>
+                  )}
+                  <div className="members-count">
+                    <FaUsers className="icon" /> {room.members}
+                  </div>
+                  <img 
+                    src={room.profilePic} 
+                    alt={room.name} 
+                    className="thumbnail-img"
+                  />
+                </div>
+                <div className="card-info">
+                  <div className="info-row">
+                    <p className="creator-name">{room.creator}</p>
+                    <span className="category-tag">{room.category}</span>
+                  </div>
+                  <p className="stream-name">{room.name}</p>
+                  <p className="latest-message">{room.message}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
