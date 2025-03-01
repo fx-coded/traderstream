@@ -397,7 +397,7 @@ const AuthModal = ({ type = "login", setShowAuthModal, setUser }) => {
                 onClick={() => toggleVisibility('showPassword')}
                 aria-label={viewState.showPassword ? "Hide password" : "Show password"}
               >
-                {viewState.showPassword ? "🙈" : "👁️"}
+                {viewState.showPassword ? "👁️" : "🙈"}
               </button>
             </div>
             {formErrors.password && <p className="field-error">{formErrors.password}</p>}
@@ -423,7 +423,7 @@ const AuthModal = ({ type = "login", setShowAuthModal, setUser }) => {
                   onClick={() => toggleVisibility('showConfirmPassword')}
                   aria-label={viewState.showConfirmPassword ? "Hide password" : "Show password"}
                 >
-                  {viewState.showConfirmPassword ? "🙈" : "👁️"}
+                  {viewState.showConfirmPassword ? "👁️" : "🙈"}
                 </button>
               </div>
               {formErrors.confirmPassword && <p className="field-error">{formErrors.confirmPassword}</p>}
