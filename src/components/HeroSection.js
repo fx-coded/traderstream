@@ -1,93 +1,233 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { memo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Button from "./Button";
+import useMarketData from "../services/useMarketData";
 import "../styles/HeroSection.css";
 
-const stockTickers = [
-  "BTC/USD: $52,304.50 ▲",
-  "ETH/USD: $3,478.30 ▲",
-  "SPX500: 4,975.12 ▲",
-  "TSLA: $202.89 ▼",
-  "AAPL: $178.25 ▲",
-  "SOL/USD: $110.45 ▲",
-];
+// Memoized ticker component for better performance
+const MarketTicker = memo(({ symbol, price, change, direction }) => {
+  const isPositive = direction === "up";
+  
+  return (
+    <div className={`ticker-item ${isPositive ? 'positive' : 'negative'}`}>
+      <span className="ticker-symbol">{symbol}:</span>
+      {price && (
+        <span className="ticker-price">
+          {symbol.includes('/USD') ? '$' : ''}{price.toFixed(2)}
+        </span>
+      )}
+      <span className="ticker-change">
+        {isPositive ? "▲" : "▼"} {Math.abs(change).toFixed(2)}%
+      </span>
+    </div>
+  );
+});
+
+// Ticker skeleton loading component
+const TickerSkeleton = () => (
+  <div className="ticker-skeleton">
+    <div className="ticker-symbol-skeleton"></div>
+    <div className="ticker-change-skeleton"></div>
+  </div>
+);
 
 const HeroSection = ({ setShowAuthModal }) => {
-  const [price, setPrice] = useState(9500);
-  const [tickerIndex, setTickerIndex] = useState(0);
+  // Use our custom hook for market data
+  const { 
+    visibleTickers, 
+    profitData, 
+    loading, 
+    refreshData, 
+    lastUpdated 
+  } = useMarketData({
+    refreshInterval: 60000, // Refresh market data every minute
+    tickerRotationInterval: 5000, // Rotate visible tickers every 5 seconds
+    initialTickerCount: 4, // Show 4 tickers on desktop
+    enableAutoRefresh: true // Auto-refresh enabled
+  });
 
-  // 📈 Simulate price movement
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPrice((prevPrice) => prevPrice + Math.random() * 50);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  // Animation variants
+  const titleVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0 },
+  };
+  
+  const featureVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
 
-  // 📊 Scrolling stock ticker
-  useEffect(() => {
-    const tickerInterval = setInterval(() => {
-      setTickerIndex((prevIndex) => (prevIndex + 1) % stockTickers.length);
-    }, 2000);
-    return () => clearInterval(tickerInterval);
-  }, []);
+  // Memoize the click handlers to prevent recreation on each render
+  const handleSignupClick = useCallback(() => {
+    setShowAuthModal("signup");
+  }, [setShowAuthModal]);
+
+  const handleLoginClick = useCallback(() => {
+    setShowAuthModal("login");
+  }, [setShowAuthModal]);
 
   return (
     <section className="hero-section">
-      {/* 📊 Scrolling Stock Ticker */}
-      <div className="stock-ticker">
-        <motion.div
-          key={tickerIndex}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 1 }}
+      {/* Market Data Ticker */}
+      <div className="market-ticker-container">
+        <div className="market-ticker-label">
+          LIVE MARKETS:
+          {lastUpdated && (
+            <span className="last-updated">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+        <div className="market-ticker">
+          <AnimatePresence mode="sync">
+            {loading && visibleTickers.length === 0 ? (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="ticker-wrapper"
+              >
+                <TickerSkeleton />
+                <TickerSkeleton />
+              </motion.div>
+            ) : (
+              visibleTickers.map((ticker) => (
+                <motion.div
+                  key={ticker.symbol}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.5 }}
+                  className="ticker-wrapper"
+                >
+                  <MarketTicker
+                    symbol={ticker.symbol}
+                    price={ticker.price}
+                    change={ticker.change}
+                    direction={ticker.direction}
+                  />
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
+        </div>
+        
+        {/* Manual refresh button */}
+        <button 
+          className="refresh-button" 
+          onClick={refreshData}
+          disabled={loading}
+          aria-label="Refresh market data"
         >
-          {stockTickers[tickerIndex]}
-        </motion.div>
+          <span className={`refresh-icon ${loading ? 'loading' : ''}`}>↻</span>
+        </button>
       </div>
 
-      {/* 🔥 Animated Profit Display */}
-      <motion.div
-        className="profit-display"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 0.5, repeat: Infinity }}
-      >
-        +${price.toFixed(2)}
-      </motion.div>
-
-      {/* 🔥 Glowing Title Effect */}
-      <motion.h1
-        className="hero-title"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        The Ultimate Trading Streaming Platform
-      </motion.h1>
-
-      <motion.p
-        className="hero-subtitle"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-      >
-        Join live trading rooms, learn from experts, and connect with top traders.
-      </motion.p>
-
-      <motion.div
-        className="hero-buttons"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Button className="hero-button join-now" onClick={() => setShowAuthModal("signup")}>
-          Join Now
+      {/* Mobile CTA buttons displayed at top for small screens */}
+      <div className="mobile-cta-container">
+        <Button 
+          className="hero-button join-now"
+          onClick={handleSignupClick}
+        >
+          Start Trading Now
         </Button>
-        <Button className="hero-button login" onClick={() => setShowAuthModal("login")}>
+        <Button 
+          className="hero-button login"
+          onClick={handleLoginClick}
+        >
           Login
         </Button>
+      </div>
+
+      {/* Profit Display with Animation */}
+      <motion.div 
+        className="profit-display"
+        animate={{ 
+          scale: [1, 1.02, 1],
+        }}
+        transition={{ duration: 2, repeat: Infinity }}
+      >
+        <span className="profit-label">DAILY PROFIT:</span>
+        <span className="profit-value">
+          +{profitData.amount.toFixed(2)} {profitData.currency}
+        </span>
       </motion.div>
+
+      {/* Main Content with Staggered Animation */}
+      <motion.div 
+        className="hero-content"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          visible: {
+            transition: {
+              staggerChildren: 0.2
+            }
+          }
+        }}
+      >
+        <motion.h1 
+          className="hero-title"
+          variants={titleVariants}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="title-row">
+            <span className="hero-title-regular">THE</span>&nbsp;
+            <span className="highlight">ULTIMATE</span>
+          </div>
+          <div className="title-row hero-title-regular">TRADING</div>
+          <div className="title-row hero-title-regular">STREAMING PLATFORM</div>
+        </motion.h1>
+
+        <motion.p
+          className="hero-subtitle"
+          variants={featureVariants}
+          transition={{ duration: 0.7 }}
+        >
+          Join live trading rooms, learn from experts, and connect with top traders worldwide
+        </motion.p>
+
+        <motion.div
+          className="hero-features"
+          variants={featureVariants}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="feature-item">
+            <span className="feature-icon">🔥</span>
+            <span>Live Trading Signals</span>
+          </div>
+          <div className="feature-item">
+            <span className="feature-icon">📊</span>
+            <span>Real-time Analysis</span>
+          </div>
+          <div className="feature-item">
+            <span className="feature-icon">👨‍🏫</span>
+            <span>Expert Mentorship</span>
+          </div>
+        </motion.div>
+
+        {/* Desktop CTA buttons */}
+        <div className="hero-buttons">
+          <Button 
+            className="hero-button join-now"
+            onClick={handleSignupClick}
+          >
+            Start Trading Now
+          </Button>
+          <Button 
+            className="hero-button login"
+            onClick={handleLoginClick}
+          >
+            Login
+          </Button>
+        </div>
+      </motion.div>
+      
+      {/* Background gradient effect */}
+      <div className="hero-background">
+        <div className="gradient-orb orb1"></div>
+        <div className="gradient-orb orb2"></div>
+      </div>
     </section>
   );
 };

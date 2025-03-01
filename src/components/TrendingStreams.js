@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebaseConfig";
 import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
@@ -37,31 +37,32 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
     trendingRooms: true
   });
 
-  // Fetch live streams, new rooms, and trending rooms from Firestore
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // 1. Fetch live streams
-        await fetchLiveStreams();
-        
-        // 2. Fetch new chat rooms (most recently created)
-        await fetchNewRooms();
-        
-        // 3. Fetch trending chat rooms (most members/active)
-        await fetchTrendingRooms();
-        
-      } catch (error) {
-        console.error("Error fetching trending data:", error);
-        // Handle errors by using placeholder data
-        fallbackToPlaceholders();
-      }
-    };
-    
-    fetchData();
-  }, [realStreams, realChats]);
+  // Helper function to get placeholder images based on category
+  const getPlaceholderImage = useCallback((category) => {
+    switch (category) {
+      case "Crypto Trading":
+        return img11;
+      case "Gold, Oil & Indices":
+        return img14;
+      default:
+        return img13;
+    }
+  }, []);
+
+  // Fallback to placeholders if all fetches fail
+  const fallbackToPlaceholders = useCallback(() => {
+    setLiveStreams(placeholderStreams);
+    setNewRooms(placeholderDiscussions.slice(0, 3));
+    setTrendingRooms(placeholderDiscussions);
+    setLoading({
+      streams: false,
+      newRooms: false,
+      trendingRooms: false
+    });
+  }, []);
 
   // Function to fetch live streams
-  const fetchLiveStreams = async () => {
+  const fetchLiveStreams = useCallback(async () => {
     try {
       // If we have real streams data from props, use it
       if (realStreams && realStreams.length > 0) {
@@ -95,10 +96,10 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
     } finally {
       setLoading(prev => ({ ...prev, streams: false }));
     }
-  };
+  }, [realStreams]);
 
   // Function to fetch new rooms
-  const fetchNewRooms = async () => {
+  const fetchNewRooms = useCallback(async () => {
     try {
       const roomsQuery = query(
         collection(db, "rooms"), 
@@ -138,10 +139,10 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
     } finally {
       setLoading(prev => ({ ...prev, newRooms: false }));
     }
-  };
+  }, [getPlaceholderImage]);
 
   // Function to fetch trending rooms (by member count)
-  const fetchTrendingRooms = async () => {
+  const fetchTrendingRooms = useCallback(async () => {
     try {
       // If we have real chats from props, use those
       if (realChats && realChats.length > 0) {
@@ -201,31 +202,30 @@ const TrendingStreams = ({ setSelectedStreamer, realStreams, realChats }) => {
     } finally {
       setLoading(prev => ({ ...prev, trendingRooms: false }));
     }
-  };
+  }, [realChats, getPlaceholderImage]);
 
-  // Fallback to placeholders if all fetches fail
-  const fallbackToPlaceholders = () => {
-    setLiveStreams(placeholderStreams);
-    setNewRooms(placeholderDiscussions.slice(0, 3));
-    setTrendingRooms(placeholderDiscussions);
-    setLoading({
-      streams: false,
-      newRooms: false,
-      trendingRooms: false
-    });
-  };
-
-  // Helper function to get placeholder images based on category
-  const getPlaceholderImage = (category) => {
-    switch (category) {
-      case "Crypto Trading":
-        return img11;
-      case "Gold, Oil & Indices":
-        return img14;
-      default:
-        return img13;
-    }
-  };
+  // Fetch live streams, new rooms, and trending rooms from Firestore
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 1. Fetch live streams
+        await fetchLiveStreams();
+        
+        // 2. Fetch new chat rooms (most recently created)
+        await fetchNewRooms();
+        
+        // 3. Fetch trending chat rooms (most members/active)
+        await fetchTrendingRooms();
+        
+      } catch (error) {
+        console.error("Error fetching trending data:", error);
+        // Handle errors by using placeholder data
+        fallbackToPlaceholders();
+      }
+    };
+    
+    fetchData();
+  }, [fetchLiveStreams, fetchNewRooms, fetchTrendingRooms, fallbackToPlaceholders]);
 
   // Navigate to chat room when clicked
   const handleRoomClick = (room) => {

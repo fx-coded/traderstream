@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Chat from "./Chat";
 import { db, auth } from "../firebaseConfig";
@@ -46,15 +46,18 @@ const TradingRoomsList = ({ filteredCategory }) => {
     return () => unsubscribe();
   }, []);
 
-  // Handle direct URL access
-  useEffect(() => {
-    if (roomId) {
-      loadRoomFromUrl(roomId);
-    }
-  }, [roomId, user]);
+  // Separate function to fetch trade setups - wrapped in useCallback to be reused
+  const fetchTradeSetups = useCallback((roomRef) => {
+    const unsubscribe = onSnapshot(roomRef, (doc) => {
+      if (doc.exists()) {
+        setTradeSetups(doc.data().tradeSetups || []);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
-  // Load room from URL parameter
-  const loadRoomFromUrl = async (roomId) => {
+  // Load room from URL parameter - wrapped in useCallback to prevent dependency issues
+  const loadRoomFromUrl = useCallback(async (roomId) => {
     try {
       // First check if it's a chat ID
       const roomsQuery = query(
@@ -84,7 +87,14 @@ const TradingRoomsList = ({ filteredCategory }) => {
     } catch (error) {
       console.error("Error loading room from URL:", error);
     }
-  };
+  }, [fetchTradeSetups]);
+
+  // Handle direct URL access with proper dependency array
+  useEffect(() => {
+    if (roomId) {
+      loadRoomFromUrl(roomId);
+    }
+  }, [roomId, user, loadRoomFromUrl]);
 
   // Fetch trading rooms
   useEffect(() => {
@@ -177,16 +187,6 @@ const TradingRoomsList = ({ filteredCategory }) => {
       // Fetch trade setups for the selected room
       fetchTradeSetups(roomRef);
     }
-  };
-
-  // Separate function to fetch trade setups
-  const fetchTradeSetups = (roomRef) => {
-    const unsubscribe = onSnapshot(roomRef, (doc) => {
-      if (doc.exists()) {
-        setTradeSetups(doc.data().tradeSetups || []);
-      }
-    });
-    return unsubscribe;
   };
 
   const uploadImage = async (file) => {
