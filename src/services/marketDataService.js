@@ -1,5 +1,6 @@
 // src/services/marketDataService.js
-const ALPHA_VANTAGE_API_KEY = 'F6B93QIT6EDBU4UX';
+// src/services/marketDataService.js
+const ALPHA_VANTAGE_API_KEY = process.env.REACT_APP_ALPHA_VANTAGE_API_KEY;
 const BASE_URL = 'https://www.alphavantage.co/query';
 
 // Configuration for different market symbols
