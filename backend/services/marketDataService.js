@@ -38,7 +38,7 @@ const marketCache = {
 
 // Alpha Vantage API configuration
 const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
-const BASE_URL = 'https://trading-backend-1059368735900.us-central1.run.app';
+const BASE_URL = 'https://www.alphavantage.co/query';
 
 // Configuration for different market symbols
 const MARKET_SYMBOLS = {

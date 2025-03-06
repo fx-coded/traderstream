@@ -22,7 +22,7 @@ const MARKET_SYMBOLS = {
 // API configuration
 const API_CONFIG = {
   // Main backend API
-  baseUrl: process.env.REACT_APP_API_BASE_URL || 'https://api.your-domain.com',
+  baseUrl: process.env.REACT_APP_API_BASE_URL || 'https://trading-backend-1059368735900.us-central1.run.app',
   marketDataEndpoint: '/api/market-data',
   
   // Enable direct Alpha Vantage fallback (not recommended for production)
