@@ -1,51 +1,9 @@
-import React, { memo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useCallback } from "react";
+import { motion } from "framer-motion";
 import Button from "./Button";
-import useMarketData from "../services/useMarketData";
 import "../styles/HeroSection.css";
 
-// Memoized ticker component for better performance
-const MarketTicker = memo(({ symbol, price, change, direction }) => {
-  const isPositive = direction === "up";
-  
-  return (
-    <div className={`ticker-item ${isPositive ? 'positive' : 'negative'}`}>
-      <span className="ticker-symbol">{symbol}:</span>
-      {price && (
-        <span className="ticker-price">
-          {symbol.includes('/USD') ? '$' : ''}{price.toFixed(2)}
-        </span>
-      )}
-      <span className="ticker-change">
-        {isPositive ? "▲" : "▼"} {Math.abs(change).toFixed(2)}%
-      </span>
-    </div>
-  );
-});
-
-// Ticker skeleton loading component
-const TickerSkeleton = () => (
-  <div className="ticker-skeleton">
-    <div className="ticker-symbol-skeleton"></div>
-    <div className="ticker-change-skeleton"></div>
-  </div>
-);
-
 const HeroSection = ({ setShowAuthModal }) => {
-  // Use our custom hook for market data
-  const { 
-    visibleTickers, 
-    profitData, 
-    loading, 
-    refreshData, 
-    lastUpdated 
-  } = useMarketData({
-    refreshInterval: 60000, // Refresh market data every minute
-    tickerRotationInterval: 5000, // Rotate visible tickers every 5 seconds
-    initialTickerCount: 4, // Show 4 tickers on desktop
-    enableAutoRefresh: true // Auto-refresh enabled
-  });
-
   // Animation variants
   const titleVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -68,61 +26,6 @@ const HeroSection = ({ setShowAuthModal }) => {
 
   return (
     <section className="hero-section">
-      {/* Market Data Ticker */}
-      <div className="market-ticker-container">
-        <div className="market-ticker-label">
-          LIVE MARKETS:
-          {lastUpdated && (
-            <span className="last-updated">
-              Updated {lastUpdated.toLocaleTimeString()}
-            </span>
-          )}
-        </div>
-        <div className="market-ticker">
-          <AnimatePresence mode="sync">
-            {loading && visibleTickers.length === 0 ? (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="ticker-wrapper"
-              >
-                <TickerSkeleton />
-                <TickerSkeleton />
-              </motion.div>
-            ) : (
-              visibleTickers.map((ticker) => (
-                <motion.div
-                  key={ticker.symbol}
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -40 }}
-                  transition={{ duration: 0.5 }}
-                  className="ticker-wrapper"
-                >
-                  <MarketTicker
-                    symbol={ticker.symbol}
-                    price={ticker.price}
-                    change={ticker.change}
-                    direction={ticker.direction}
-                  />
-                </motion.div>
-              ))
-            )}
-          </AnimatePresence>
-        </div>
-        
-        {/* Manual refresh button */}
-        <button 
-          className="refresh-button" 
-          onClick={refreshData}
-          disabled={loading}
-          aria-label="Refresh market data"
-        >
-          <span className={`refresh-icon ${loading ? 'loading' : ''}`}>↻</span>
-        </button>
-      </div>
-
       {/* Mobile CTA buttons displayed at top for small screens */}
       <div className="mobile-cta-container">
         <Button 
@@ -138,20 +41,6 @@ const HeroSection = ({ setShowAuthModal }) => {
           Login
         </Button>
       </div>
-
-      {/* Profit Display with Animation */}
-      <motion.div 
-        className="profit-display"
-        animate={{ 
-          scale: [1, 1.02, 1],
-        }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <span className="profit-label">DAILY PROFIT:</span>
-        <span className="profit-value">
-          +{profitData.amount.toFixed(2)} {profitData.currency}
-        </span>
-      </motion.div>
 
       {/* Main Content with Staggered Animation */}
       <motion.div 
@@ -192,6 +81,7 @@ const HeroSection = ({ setShowAuthModal }) => {
           variants={featureVariants}
           transition={{ duration: 0.6 }}
         >
+          {/* You can add feature highlights here if needed */}
         </motion.div>
 
         {/* Desktop CTA buttons */}

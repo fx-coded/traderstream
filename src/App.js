@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, createContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "./firebaseConfig";
-import { onAuthStateChanged, getIdToken } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { socket } from "./socketService"; // Import from separate file
 
 // Components
@@ -238,12 +238,13 @@ const App = () => {
     <ErrorBoundary>
       <AppContext.Provider value={contextValue}>
         <Router>
-          <ConnectionStatus socketConnected={socketConnected} connectionError={connectionError} />
-          
           {!user ? (
             <HeroSection setShowAuthModal={setShowAuthModal} />
           ) : (
             <div className="app-container">
+              {/* Connection status is now only shown for logged in users */}
+              <ConnectionStatus socketConnected={socketConnected} connectionError={connectionError} />
+              
               <Header 
                 activeTab={activeTab} 
                 setActiveTab={setActiveTab} 

@@ -3,7 +3,6 @@ const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 const admin = require("firebase-admin");
-const WebSocket = require("ws");
 const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
@@ -30,8 +29,7 @@ const requiredEnvVars = [
   "FIREBASE_CLIENT_EMAIL",
   "FIREBASE_CLIENT_ID",
   "STORAGE_BUCKET",
-  "FRONTEND_URL",
-  "ALPHA_VANTAGE_API_KEY"
+  "FRONTEND_URL"
 ];
 
 // Check for missing environment variables but don't crash immediately
@@ -272,9 +270,6 @@ io.on("connection", (socket) => {
     // Add to user's room for direct messaging
     socket.join(`user:${uid}`);
   }
-  
-  // Rest of socket event handlers...
-  // (keeping the existing socket event handlers as they are)
   
   // Handle starting a stream
   socket.on("start-stream", async (streamData) => {
@@ -615,15 +610,13 @@ io.on("connection", (socket) => {
 // ===================================
 
 // Safe importing of required services and routes
-let marketDataService, marketDataRoutes, streamRoutes;
+let streamRoutes;
 
 try {
-  // Import the market data service
-  marketDataService = require('./services/marketDataService');
-  marketDataRoutes = require('./routes/marketDataRoute');
+  // Import stream routes
   streamRoutes = require('./routes/streamRoute');
 } catch (importError) {
-  logger.error("Error importing routes or services:", importError);
+  logger.error("Error importing stream routes:", importError);
   
   // Create dummy routes to prevent crash
   const dummyRouter = express.Router();
@@ -632,16 +625,7 @@ try {
   });
   
   // Assign dummy routes if imports fail
-  marketDataRoutes = dummyRouter;
   streamRoutes = dummyRouter;
-  
-  // Create minimal market data service
-  marketDataService = {
-    fetchAllMarketData: async () => {
-      logger.warn("Market data service not available");
-      return [];
-    }
-  };
 }
 
 // ===================================
@@ -662,7 +646,6 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
     services: {
       streaming: "healthy",
-      marketData: marketDataService ? "healthy" : "degraded",
       firebase: firebaseStatus
     },
     environment: process.env.NODE_ENV || "development"
@@ -672,9 +655,6 @@ app.get("/health", (req, res) => {
 // API routes
 const apiRouter = express.Router();
 app.use("/api", apiRouter);
-
-// Market data routes
-app.use("/api/market-data", marketDataRoutes);
 
 // Stream routes
 app.use("/api/streams", streamRoutes);
@@ -701,47 +681,6 @@ apiRouter.get("/active-streams", optionalAuth, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch streams" });
   }
 });
-
-// Socket.IO market data updates
-// Set up a timer to send market updates to connected clients
-let marketDataUpdateInterval;
-
-const setupMarketDataBroadcast = () => {
-  if (marketDataUpdateInterval) {
-    clearInterval(marketDataUpdateInterval);
-  }
-  
-  // Update connected clients with market data every 30 seconds
-  marketDataUpdateInterval = setInterval(async () => {
-    try {
-      // Only fetch and broadcast if we have connected clients
-      if (io.engine.clientsCount > 0) {
-        const marketData = await marketDataService.fetchAllMarketData();
-        
-        if (marketData && marketData.length > 0) {
-          // Broadcast to all connected clients
-          io.emit('market-data-update', {
-            tickers: marketData,
-            timestamp: new Date().toISOString()
-          });
-          
-          logger.info(`Broadcast market data to ${io.engine.clientsCount} clients`);
-        }
-      }
-    } catch (error) {
-      logger.error("Error broadcasting market data:", error);
-      // Continue operation even if market data fails
-    }
-  }, 30000); // Every 30 seconds
-};
-
-// Don't crash on failed market data broadcast setup
-try {
-  // Setup market data broadcast on server start
-  setupMarketDataBroadcast();
-} catch (error) {
-  logger.error("Failed to set up market data broadcast:", error);
-}
 
 // Protected routes
 // Get user profile
@@ -862,11 +801,6 @@ const gracefulShutdown = () => {
   
   // Notify all connected clients
   io.emit("server-shutdown", { message: "Server is shutting down for maintenance" });
-  
-  // Clear market data interval
-  if (marketDataUpdateInterval) {
-    clearInterval(marketDataUpdateInterval);
-  }
   
   // Close HTTP server
   server.close(() => {
