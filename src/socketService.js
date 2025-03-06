@@ -9,7 +9,9 @@ export const socket = io(SOCKET_URL, {
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
   timeout: 10000,
-  autoConnect: false // Don't connect automatically
+  autoConnect: false, // Don't connect automatically
+  path: '/socket.io/', // Explicitly set the socket.io path
+  transports: ['websocket', 'polling'] // Try websocket first, fall back to polling
 });
 
 // Function to connect with authentication
@@ -23,7 +25,23 @@ export const connectSocket = async () => {
       
       // Set auth data
       socket.auth = { token };
+      console.log("✅ Authentication token set for socket");
+    } else {
+      console.log("❓ No user logged in for socket authentication");
     }
+    
+    // Add event listeners for connection status
+    socket.on("connect", () => {
+      console.log("✅ Socket connected:", socket.id);
+    });
+    
+    socket.on("connect_error", (error) => {
+      console.error("❌ Socket connection error:", error);
+    });
+    
+    socket.on("disconnect", (reason) => {
+      console.log("🔌 Socket disconnected:", reason);
+    });
     
     // Connect if not already connected
     if (!socket.connected) {
@@ -49,6 +67,40 @@ export const getSocketStatus = () => {
   return {
     connected: socket.connected,
     id: socket.id,
-    // Add any other useful socket state here
+    auth: socket.auth ? "Set" : "Not set",
+    url: SOCKET_URL,
+    transport: socket.io?.engine?.transport?.name || "Not connected"
   };
+};
+
+// Add a function to check server status
+export const checkServerStatus = async () => {
+  try {
+    const response = await fetch(`${SOCKET_URL}/health`);
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        status: "online",
+        details: data
+      };
+    } else {
+      return {
+        status: "error",
+        details: `Server returned ${response.status}`
+      };
+    }
+  } catch (error) {
+    return {
+      status: "offline",
+      details: error.message
+    };
+  }
+};
+
+export default {
+  socket,
+  connectSocket,
+  disconnectSocket,
+  getSocketStatus,
+  checkServerStatus
 };
