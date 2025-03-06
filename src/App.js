@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, createContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "./firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, getIdToken } from "firebase/auth";
 import { socket } from "./socketService"; // Import from separate file
 
 // Components
@@ -43,70 +43,6 @@ const App = () => {
   const [connectionError, setConnectionError] = useState(null);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
-  // Connect socket in useEffect with proper cleanup
-  useEffect(() => {
-    const connectSocket = () => {
-      // Only connect if not already connected
-      if (!socket.connected) {
-        socket.connect();
-      }
-      
-      const onConnect = () => {
-        console.log("✅ Socket connected");
-        setSocketConnected(true);
-        setConnectionError(null);
-      };
-      
-      const onConnectError = (error) => {
-        console.error("❌ Socket connection error:", error);
-        setSocketConnected(false);
-        setConnectionError(`Connection error: ${error.message}`);
-      };
-      
-      const onDisconnect = (reason) => {
-        console.log("❌ Socket disconnected:", reason);
-        setSocketConnected(false);
-      };
-      
-      // Setup event listeners
-      socket.on("connect", onConnect);
-      socket.on("connect_error", onConnectError);
-      socket.on("disconnect", onDisconnect);
-      
-      // Return cleanup function
-      return () => {
-        socket.off("connect", onConnect);
-        socket.off("connect_error", onConnectError);
-        socket.off("disconnect", onDisconnect);
-        socket.disconnect();
-      };
-    };
-    
-    // Start connection
-    const cleanup = connectSocket();
-    return cleanup;
-  }, []); // Empty dependency array - only run once
-
-  // Socket event listeners in a separate useEffect
-  useEffect(() => {
-    if (socketConnected) {
-      // Request initial streams data when connected
-      socket.emit("get-streams");
-      
-      // Listen for live streams updates
-      const handleStreamsUpdate = (streams) => {
-        setLiveStreams(Array.isArray(streams) ? streams : []);
-      };
-      
-      socket.on("update-streams", handleStreamsUpdate);
-      
-      // Cleanup listeners on unmount
-      return () => {
-        socket.off("update-streams", handleStreamsUpdate);
-      };
-    }
-  }, [socketConnected]); // Only depend on socketConnected, not socket itself
-
   // Authentication monitoring with timeout
   useEffect(() => {
     setIsLoading(true);
@@ -137,6 +73,99 @@ const App = () => {
     };
   }, [isLoading]); // Added isLoading to the dependency array
 
+  // Connect socket in useEffect with proper cleanup
+  // IMPORTANT: This now depends on user state to provide authentication token
+  useEffect(() => {
+    const connectSocket = async () => {
+      // Disconnect any existing connection
+      if (socket.connected) {
+        socket.disconnect();
+      }
+      
+      // Set authentication token if user is logged in
+      if (user) {
+        try {
+          const token = await user.getIdToken();
+          socket.auth = { token };
+          console.log("✅ Authentication token set for socket");
+        } catch (error) {
+          console.error("❌ Failed to get authentication token:", error);
+          setConnectionError("Authentication error: Failed to get token");
+          return () => {}; // Return empty cleanup if we can't get a token
+        }
+      } else {
+        console.log("❓ No user logged in for socket authentication");
+        // We won't connect the socket if no user is logged in
+        // since the backend requires authentication
+        setConnectionError("Authentication required: Please log in");
+        return () => {};
+      }
+      
+      // Only connect if we have a user with token
+      if (user) {
+        socket.connect();
+      
+        const onConnect = () => {
+          console.log("✅ Socket connected");
+          setSocketConnected(true);
+          setConnectionError(null);
+        };
+        
+        const onConnectError = (error) => {
+          console.error("❌ Socket connection error:", error);
+          setSocketConnected(false);
+          setConnectionError(`Connection error: ${error.message}`);
+        };
+        
+        const onDisconnect = (reason) => {
+          console.log("❌ Socket disconnected:", reason);
+          setSocketConnected(false);
+        };
+        
+        // Setup event listeners
+        socket.on("connect", onConnect);
+        socket.on("connect_error", onConnectError);
+        socket.on("disconnect", onDisconnect);
+        
+        // Return cleanup function
+        return () => {
+          socket.off("connect", onConnect);
+          socket.off("connect_error", onConnectError);
+          socket.off("disconnect", onDisconnect);
+          socket.disconnect();
+        };
+      }
+      
+      return () => {}; // Empty cleanup if no connection was established
+    };
+    
+    // Start connection
+    const setupCleanup = connectSocket();
+    return () => {
+      setupCleanup.then(cleanup => cleanup && cleanup());
+    };
+  }, [user]); // Now depends on user state
+
+  // Socket event listeners in a separate useEffect
+  useEffect(() => {
+    if (socketConnected) {
+      // Request initial streams data when connected
+      socket.emit("get-streams");
+      
+      // Listen for live streams updates
+      const handleStreamsUpdate = (streams) => {
+        setLiveStreams(Array.isArray(streams) ? streams : []);
+      };
+      
+      socket.on("update-streams", handleStreamsUpdate);
+      
+      // Cleanup listeners on unmount
+      return () => {
+        socket.off("update-streams", handleStreamsUpdate);
+      };
+    }
+  }, [socketConnected]); // Only depend on socketConnected, not socket itself
+
   // Handle room creation - with useCallback to prevent unnecessary rerenders
   const handleRoomCreated = useCallback((newRoom) => {
     if (!user) {
@@ -150,6 +179,12 @@ const App = () => {
   // User logout - with useCallback
   const logout = useCallback(async () => {
     try {
+      // Disconnect socket before logout
+      if (socket.connected) {
+        socket.disconnect();
+        setSocketConnected(false);
+      }
+      
       await auth.signOut();
       console.log("✅ User logged out");
       setUser(null);
