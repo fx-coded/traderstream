@@ -1,143 +1,112 @@
-// src/services/marketDataService.js
-// src/services/marketDataService.js
-const ALPHA_VANTAGE_API_KEY = process.env.REACT_APP_ALPHA_VANTAGE_API_KEY;
-const BASE_URL = 'https://www.alphavantage.co/query';
+/**
+ * Market Data Service for Frontend
+ * Browser-compatible implementation that connects to backend
+ */
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache in milliseconds
 
 // Configuration for different market symbols
 const MARKET_SYMBOLS = {
-  'BTC/USD': { symbol: 'BTCUSD', function: 'CRYPTO_INTRADAY', interval: '5min' },
-  'ETH/USD': { symbol: 'ETHUSD', function: 'CRYPTO_INTRADAY', interval: '5min' },
-  'SPX500': { symbol: 'SPX', function: 'TIME_SERIES_INTRADAY', interval: '5min' },
-  'TSLA': { symbol: 'TSLA', function: 'TIME_SERIES_INTRADAY', interval: '5min' },
-  'AAPL': { symbol: 'AAPL', function: 'TIME_SERIES_INTRADAY', interval: '5min' },
+  'BTC/USD': { symbol: 'BTCUSD', type: 'crypto' },
+  'ETH/USD': { symbol: 'ETHUSD', type: 'crypto' },
+  'SPX500': { symbol: 'SPX', type: 'index' },
+  'TSLA': { symbol: 'TSLA', type: 'stock' },
+  'AAPL': { symbol: 'AAPL', type: 'stock' },
+  'EUR/USD': { symbol: 'EURUSD', type: 'forex' },
+  'MSFT': { symbol: 'MSFT', type: 'stock' },
+  'AMZN': { symbol: 'AMZN', type: 'stock' },
+  'GOOGL': { symbol: 'GOOGL', type: 'stock' },
+  'SPY': { symbol: 'SPY', type: 'etf' }
+};
+
+// API configuration
+const API_CONFIG = {
+  // Main backend API
+  baseUrl: process.env.REACT_APP_API_BASE_URL || 'https://api.your-domain.com',
+  marketDataEndpoint: '/api/market-data',
+  
+  // Enable direct Alpha Vantage fallback (not recommended for production)
+  enableDirectFallback: process.env.REACT_APP_ENABLE_DIRECT_FALLBACK === 'true',
+  alphaVantageApiKey: process.env.REACT_APP_ALPHA_VANTAGE_API_KEY,
+  alphaVantageUrl: 'https://www.alphavantage.co/query'
 };
 
 /**
- * Formats a stock/crypto time series data point
- * @param {Object} latestData - Latest data point
- * @param {Object} prevData - Previous data point for comparison
- * @param {string} symbol - Market symbol
- * @returns {Object} Formatted market data
+ * Simple in-memory cache for browser
  */
-const formatTimeSeriesData = (latestData, prevData, symbol) => {
-  if (!latestData || !prevData) return null;
-  
-  // Extract close prices
-  const currentPrice = parseFloat(latestData['4. close'] || latestData['4. close (USD)']);
-  const previousPrice = parseFloat(prevData['4. close'] || prevData['4. close (USD)']);
-  
-  // Calculate percent change
-  const change = ((currentPrice - previousPrice) / previousPrice) * 100;
-  
-  return {
-    symbol,
-    price: currentPrice,
-    change: parseFloat(change.toFixed(2)),
-    direction: change >= 0 ? 'up' : 'down'
-  };
-};
+class BrowserCache {
+  constructor() {
+    this.cache = {};
+  }
+
+  get(key) {
+    const item = this.cache[key];
+    if (!item) return null;
+    
+    // Check if expired
+    if (Date.now() > item.expiry) {
+      delete this.cache[key];
+      return null;
+    }
+    
+    return item.value;
+  }
+
+  set(key, value, ttlMs = CACHE_DURATION) {
+    this.cache[key] = {
+      value,
+      expiry: Date.now() + ttlMs
+    };
+  }
+
+  clear() {
+    this.cache = {};
+  }
+}
+
+// Initialize cache
+const marketCache = new BrowserCache();
 
 /**
- * Processes crypto data from Alpha Vantage
+ * Fetches market data from backend API
+ * @returns {Promise<Array>} Array of ticker data objects
  */
-const processCryptoData = (data, symbol) => {
-  if (!data || !data['Time Series Crypto (5min)']) return null;
-  
-  const timeSeries = data['Time Series Crypto (5min)'];
-  const timeKeys = Object.keys(timeSeries).sort().reverse();
-  
-  if (timeKeys.length < 2) return null;
-  
-  return formatTimeSeriesData(
-    timeSeries[timeKeys[0]],
-    timeSeries[timeKeys[1]],
-    symbol
-  );
-};
-
-/**
- * Processes stock data from Alpha Vantage
- */
-const processStockData = (data, symbol) => {
-  if (!data || !data['Time Series (5min)']) return null;
-  
-  const timeSeries = data['Time Series (5min)'];
-  const timeKeys = Object.keys(timeSeries).sort().reverse();
-  
-  if (timeKeys.length < 2) return null;
-  
-  return formatTimeSeriesData(
-    timeSeries[timeKeys[0]],
-    timeSeries[timeKeys[1]],
-    symbol
-  );
-};
-
-/**
- * Fetches data for a single market symbol using browser's fetch API
- */
-const fetchSymbolData = async (displaySymbol) => {
+export const fetchMarketData = async () => {
   try {
-    const config = MARKET_SYMBOLS[displaySymbol];
-    if (!config) return null;
-    
-    const { symbol, function: func, interval } = config;
-    
-    // Build URL with query parameters
-    const url = new URL(BASE_URL);
-    url.searchParams.append('function', func);
-    url.searchParams.append('symbol', symbol);
-    url.searchParams.append('interval', interval);
-    url.searchParams.append('apikey', ALPHA_VANTAGE_API_KEY);
-    
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'User-Agent': 'TradeStream Platform'
-      }
-    });
+    // Check cache first
+    const cachedData = marketCache.get('market_data');
+    if (cachedData) {
+      console.log('Using cached market data');
+      return cachedData;
+    }
+
+    // Fetch from API
+    const response = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.marketDataEndpoint}/tickers`);
     
     if (!response.ok) {
-      throw new Error(`API response error: ${response.status}`);
+      throw new Error(`API error: ${response.status}`);
     }
     
     const data = await response.json();
     
-    // Process based on data type
-    if (func.includes('CRYPTO')) {
-      return processCryptoData(data, displaySymbol);
-    } else {
-      return processStockData(data, displaySymbol);
-    }
-  } catch (error) {
-    console.error(`Error fetching data for ${displaySymbol}:`, error);
-    return null;
-  }
-};
-
-/**
- * Fetches market data for all symbols
- * Implements rate limiting to prevent API quota issues
- */
-export const fetchMarketData = async () => {
-  const symbols = Object.keys(MARKET_SYMBOLS);
-  const results = [];
-  
-  // Alpha Vantage has strict rate limits (5 calls per minute for free tier)
-  // So we fetch one at a time with a delay
-  for (const symbol of symbols) {
-    const data = await fetchSymbolData(symbol);
-    if (data) {
-      results.push(data);
+    if (data && data.tickers && data.tickers.length > 0) {
+      // Cache valid results
+      marketCache.set('market_data', data.tickers);
+      return data.tickers;
     }
     
-    // Wait 12 seconds between requests to stay under rate limit
-    if (symbol !== symbols[symbols.length - 1]) {
-      await new Promise(resolve => setTimeout(resolve, 12000));
+    throw new Error('Invalid data received from API');
+  } catch (error) {
+    console.error('Error fetching market data from backend:', error);
+    
+    // Try direct Alpha Vantage fallback if enabled
+    if (API_CONFIG.enableDirectFallback) {
+      return directAlphaVantageFallback();
     }
+    
+    // Otherwise use static fallback
+    return getFallbackMarketData();
   }
-  
-  return results;
 };
 
 /**
@@ -150,32 +119,134 @@ export const getFallbackMarketData = () => {
     { symbol: 'ETH/USD', price: 3478.30, change: -0.39, direction: 'down' },
     { symbol: 'SPX500', price: 4975.12, change: -0.62, direction: 'down' },
     { symbol: 'TSLA', price: 202.89, change: -1.14, direction: 'down' },
+    { symbol: 'AAPL', price: 185.34, change: 0.24, direction: 'up' },
+    { symbol: 'EUR/USD', price: 1.0823, change: 0.11, direction: 'up' },
+    { symbol: 'MSFT', price: 407.52, change: 0.78, direction: 'up' },
+    { symbol: 'AMZN', price: 178.12, change: -0.88, direction: 'down' }
   ];
 };
 
 /**
- * Fetches a snapshot of the latest profit (simulated)
- * In a real app, this would connect to your backend
+ * Direct Alpha Vantage fallback (emergency use only)
+ * NOTE: This should not be used in production as it may expose API key
+ */
+const directAlphaVantageFallback = async () => {
+  try {
+    // Only try for one symbol to stay within rate limits
+    const symbol = 'BTC/USD';
+    const config = MARKET_SYMBOLS[symbol];
+    
+    // Build URL
+    const url = new URL(API_CONFIG.alphaVantageUrl);
+    url.searchParams.append('function', 'CRYPTO_INTRADAY');
+    url.searchParams.append('symbol', 'BTC');
+    url.searchParams.append('market', 'USD');
+    url.searchParams.append('interval', '5min');
+    url.searchParams.append('apikey', API_CONFIG.alphaVantageApiKey);
+    
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      throw new Error(`Alpha Vantage API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Check if there's an error or rate limit message
+    if (data['Note'] || data['Error Message']) {
+      throw new Error(data['Note'] || data['Error Message']);
+    }
+    
+    const timeSeries = data['Time Series Crypto (5min)'];
+    
+    if (!timeSeries) {
+      throw new Error('No time series data');
+    }
+    
+    // Get the most recent data points
+    const timeKeys = Object.keys(timeSeries).sort().reverse();
+    const latestData = timeSeries[timeKeys[0]];
+    const prevData = timeSeries[timeKeys[1]];
+    
+    // Calculate percent change
+    const currentPrice = parseFloat(latestData['4. close']);
+    const previousPrice = parseFloat(prevData['4. close']);
+    const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+    
+    // Return as an array with one item
+    return [{
+      symbol,
+      price: currentPrice,
+      change: parseFloat(change.toFixed(2)),
+      direction: change >= 0 ? 'up' : 'down'
+    }];
+  } catch (error) {
+    console.error('Alpha Vantage fallback failed:', error);
+    return getFallbackMarketData();
+  }
+};
+
+/**
+ * Fetches a snapshot of the latest profit (from backend or simulated)
  */
 export const fetchDailyProfit = async () => {
-  // Simulating an API call with randomized data
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const baseProfit = 9500;
-      const variation = Math.random() * 500 - 250; // Random variation between -250 and +250
-      resolve({
-        amount: baseProfit + variation,
-        currency: 'USD'
-      });
-    }, 1000);
-  });
+  try {
+    // Check cache first
+    const cachedData = marketCache.get('profit_data');
+    if (cachedData) {
+      return cachedData;
+    }
+
+    // Try to fetch from API
+    const response = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.marketDataEndpoint}/stats/profit`);
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data && data.amount) {
+      const profitData = {
+        amount: data.amount,
+        currency: data.currency || 'USD',
+        change: data.change || 0
+      };
+      
+      // Cache the data
+      marketCache.set('profit_data', profitData);
+      
+      return profitData;
+    }
+    
+    throw new Error('Invalid profit data');
+  } catch (error) {
+    console.error('Error fetching profit data:', error);
+    
+    // Return simulated data
+    return {
+      amount: 9500 + (Math.random() * 500 - 250), // Random variation between -250 and +250
+      currency: 'USD',
+      change: (Math.random() * 5 - 2.5).toFixed(2) // Random change between -2.5% and +2.5%
+    };
+  }
+};
+
+/**
+ * Force refresh market data by clearing cache
+ */
+export const refreshMarketData = () => {
+  marketCache.clear();
+  return fetchMarketData();
 };
 
 // Create a named object before exporting it as default
 const marketDataService = {
   fetchMarketData,
   getFallbackMarketData,
-  fetchDailyProfit
+  fetchDailyProfit,
+  refreshMarketData,
+  MARKET_SYMBOLS
 };
 
 export default marketDataService;

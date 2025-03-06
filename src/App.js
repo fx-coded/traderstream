@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, createContext } from 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
-import io from "socket.io-client";
+import { socket } from "./socketService"; // Import from separate file
 
 // Components
 import HeroSection from "./components/HeroSection";
@@ -16,22 +16,20 @@ import Chat from "./components/Chat";
 import Footer from "./components/Footer";
 import AuthModal from "./Profile/AuthModal";
 import AuthAction from "./Profile/AuthAction";
-import StreamerDashboard from "./components/StreamerDashboard";
+import StreamerDashboard from "./components/StreamerDashboard/StreamDashboard";
 import Viewer from "./components/Viewer";
 import PropFirms from "./components/TopPropFirms";
 import TopCryptoExchanges from "./components/TopCrypto";
 import TopBrokers from "./components/TopBrokers";
-import LoadingSpinner from "./components/LoadingSpinner"; // Assuming you have this component
-import ErrorBoundary from "./components/ErrorBoundary"; // Assuming you have this component
+import LoadingSpinner from "./components/LoadingSpinner";
+import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationsComponent from "./components/NotificationsComponent";
+import ConnectionStatus from "./components/ConnectionStatus"; // Add this new component
 
 import "./App.css";
 
 // Create context for global state
 export const AppContext = createContext(null);
-
-// Environment variables with fallbacks
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:4000";
 
 const App = () => {
   // State management
@@ -42,67 +40,102 @@ const App = () => {
   const [liveStreams, setLiveStreams] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [socketConnected, setSocketConnected] = useState(false);
-  
-  // Initialize socket connection with error handling
-  const socket = useMemo(() => {
-    const socketInstance = io(SOCKET_URL, { 
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      timeout: 10000,
-    });
-    
-    socketInstance.on("connect", () => {
-      console.log("✅ Socket connected");
-      setSocketConnected(true);
-    });
-    
-    socketInstance.on("connect_error", (error) => {
-      console.error("❌ Socket connection error:", error);
-      setSocketConnected(false);
-    });
-    
-    socketInstance.on("disconnect", (reason) => {
-      console.log("❌ Socket disconnected:", reason);
-      setSocketConnected(false);
-    });
-    
-    return socketInstance;
-  }, []);
+  const [connectionError, setConnectionError] = useState(null);
+  const [authTimedOut, setAuthTimedOut] = useState(false);
 
-  // Authentication monitoring
+  // Connect socket in useEffect with proper cleanup
+  useEffect(() => {
+    const connectSocket = () => {
+      // Only connect if not already connected
+      if (!socket.connected) {
+        socket.connect();
+      }
+      
+      const onConnect = () => {
+        console.log("✅ Socket connected");
+        setSocketConnected(true);
+        setConnectionError(null);
+      };
+      
+      const onConnectError = (error) => {
+        console.error("❌ Socket connection error:", error);
+        setSocketConnected(false);
+        setConnectionError(`Connection error: ${error.message}`);
+      };
+      
+      const onDisconnect = (reason) => {
+        console.log("❌ Socket disconnected:", reason);
+        setSocketConnected(false);
+      };
+      
+      // Setup event listeners
+      socket.on("connect", onConnect);
+      socket.on("connect_error", onConnectError);
+      socket.on("disconnect", onDisconnect);
+      
+      // Return cleanup function
+      return () => {
+        socket.off("connect", onConnect);
+        socket.off("connect_error", onConnectError);
+        socket.off("disconnect", onDisconnect);
+        socket.disconnect();
+      };
+    };
+    
+    // Start connection
+    const cleanup = connectSocket();
+    return cleanup;
+  }, []); // Empty dependency array - only run once
+
+  // Socket event listeners in a separate useEffect
+  useEffect(() => {
+    if (socketConnected) {
+      // Request initial streams data when connected
+      socket.emit("get-streams");
+      
+      // Listen for live streams updates
+      const handleStreamsUpdate = (streams) => {
+        setLiveStreams(Array.isArray(streams) ? streams : []);
+      };
+      
+      socket.on("update-streams", handleStreamsUpdate);
+      
+      // Cleanup listeners on unmount
+      return () => {
+        socket.off("update-streams", handleStreamsUpdate);
+      };
+    }
+  }, [socketConnected]); // Only depend on socketConnected, not socket itself
+
+  // Authentication monitoring with timeout
   useEffect(() => {
     setIsLoading(true);
+    
+    // Set a timeout to prevent indefinite loading
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        console.warn("Authentication timed out after 10 seconds");
+        setIsLoading(false);
+        setAuthTimedOut(true);
+      }
+    }, 10000); // 10 second timeout
     
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setIsLoading(false);
+      setAuthTimedOut(false);
+      clearTimeout(timeoutId); // Clear the timeout if auth responds
     }, (error) => {
       console.error("Authentication error:", error);
       setIsLoading(false);
+      clearTimeout(timeoutId); // Clear the timeout if we get an error
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  // Socket event listeners
-  useEffect(() => {
-    if (socket) {
-      // Listen for live streams updates
-      socket.on("update-streams", (streams) => {
-        setLiveStreams(Array.isArray(streams) ? streams : []);
-      });
-      
-      // Request initial streams data when connected
-      if (socketConnected) {
-        socket.emit("get-streams");
-      }
-
-      // Cleanup listeners on unmount
-      return () => {
-        socket.off("update-streams");
-      };
-    }
-  }, [socket, socketConnected]);
+    return () => {
+      unsubscribe();
+      clearTimeout(timeoutId); // Clean up the timeout
+    };
+  }, [isLoading]); // Added isLoading to the dependency array
 
   // Handle room creation - with useCallback to prevent unnecessary rerenders
   const handleRoomCreated = useCallback((newRoom) => {
@@ -138,17 +171,40 @@ const App = () => {
     setShowAuthModal,
     tradingRooms,
     setTradingRooms
-  }), [user, socket, socketConnected, liveStreams, activeTab, setActiveTab, logout, tradingRooms]);
+  }), [user, socketConnected, liveStreams, activeTab, logout, tradingRooms]);
 
-  // Loading screen
+  // Enhanced loading screen with timeout handling
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="loading-container">
+        <LoadingSpinner />
+        <p className="loading-message">Loading application...</p>
+      </div>
+    );
+  }
+
+  // Show auth error if timed out
+  if (authTimedOut) {
+    return (
+      <div className="auth-error-container">
+        <h2>Authentication Error</h2>
+        <p>There was a problem connecting to the authentication service.</p>
+        <button 
+          className="retry-button"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
     <ErrorBoundary>
       <AppContext.Provider value={contextValue}>
         <Router>
+          <ConnectionStatus socketConnected={socketConnected} connectionError={connectionError} />
+          
           {!user ? (
             <HeroSection setShowAuthModal={setShowAuthModal} />
           ) : (
@@ -241,7 +297,7 @@ const App = () => {
                       element={
                         user ? (
                           <ErrorBoundary>
-                            <StreamerDashboard user={user} socket={socket} />
+                            <StreamerDashboard user={user} />
                           </ErrorBoundary>
                         ) : (
                           <Navigate to="/" replace />
@@ -254,12 +310,12 @@ const App = () => {
                       path="/viewer/:streamId" 
                       element={
                         <ErrorBoundary>
-                          <Viewer socket={socket} user={user} />
+                          <Viewer user={user} />
                         </ErrorBoundary>
                       } 
                     />
 
-<Route 
+                    <Route 
                       path="/notifications" 
                       element={
                         <ErrorBoundary>

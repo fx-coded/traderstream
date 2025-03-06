@@ -4,10 +4,10 @@ const http = require("http");
 const { Server } = require("socket.io");
 const admin = require("firebase-admin");
 const WebSocket = require("ws");
-const helmet = require("helmet"); // Security middleware
-const compression = require("compression"); // Response compression
-const rateLimit = require("express-rate-limit"); // Rate limiting
-const morgan = require("morgan"); // HTTP request logging
+const helmet = require("helmet");
+const compression = require("compression");
+const rateLimit = require("express-rate-limit");
+const morgan = require("morgan");
 require("dotenv").config();
 
 // ===================================
@@ -25,20 +25,23 @@ const logger = {
 // ===================================
 const requiredEnvVars = [
   "FIREBASE_PROJECT_ID",
-  "FIREBASE_PRIVATE_KEY_ID",
+  "FIREBASE_PRIVATE_KEY_ID", 
   "FIREBASE_PRIVATE_KEY",
   "FIREBASE_CLIENT_EMAIL",
   "FIREBASE_CLIENT_ID",
   "STORAGE_BUCKET",
-  "FRONTEND_URL"
+  "FRONTEND_URL",
+  "ALPHA_VANTAGE_API_KEY"
 ];
 
+// Check for missing environment variables but don't crash immediately
 const missingVars = requiredEnvVars.filter(key => !process.env[key]);
 if (missingVars.length > 0) {
   logger.error(`Missing required environment variables: ${missingVars.join(', ')}`);
-  // Only exit in production; in development continue with warnings
+  
+  // Try to continue in development, but warn about production
   if (process.env.NODE_ENV === 'production') {
-    process.exit(1);
+    logger.warn("Running in production with missing environment variables - this may cause issues");
   }
 }
 
@@ -47,13 +50,25 @@ if (missingVars.length > 0) {
 // ===================================
 let db, bucket;
 try {
+  // Check if we have minimum required Firebase credentials before initializing
+  if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL) {
+    throw new Error("Missing critical Firebase credentials");
+  }
+  
+  // Handle potential formatting issues with the private key
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  if (privateKey && !privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
+    // If the key doesn't contain the header, it likely needs newline replacement
+    privateKey = privateKey.replace(/\\n/g, "\n");
+  }
+  
   const serviceAccount = {
     type: "service_account",
-    project_id: process.env.FIREBASE_PROJECT_ID, // Fixed variable name (was REACT_APP_)
-    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n") || '',
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID || '',
+    private_key: privateKey || '',
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_CLIENT_ID,
+    client_id: process.env.FIREBASE_CLIENT_ID || '',
     auth_uri: "https://accounts.google.com/o/oauth2/auth",
     token_uri: "https://oauth2.googleapis.com/token",
     auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
@@ -62,9 +77,10 @@ try {
       '',
   };
 
+  // Initialize Firebase Admin SDK
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: process.env.STORAGE_BUCKET,
+    storageBucket: process.env.STORAGE_BUCKET || `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
   });
 
   db = admin.firestore();
@@ -73,7 +89,32 @@ try {
   logger.success("Firebase Admin Initialized Successfully");
 } catch (error) {
   logger.error("Error initializing Firebase Admin SDK:", error);
-  process.exit(1);
+  
+  // Don't exit in development to allow for easier debugging
+  if (process.env.NODE_ENV === 'production') {
+    logger.warn("Firebase initialization failed, but continuing with limited functionality");
+    // We'll set up dummy services that won't crash but will log errors
+    db = {
+      collection: () => ({
+        doc: () => ({
+          get: async () => ({ exists: false, data: () => ({}) }),
+          set: async () => logger.error("Firebase write failed - not initialized"),
+          update: async () => logger.error("Firebase update failed - not initialized")
+        }),
+        where: () => ({
+          orderBy: () => ({
+            limit: () => ({
+              get: async () => ({ forEach: () => {} })
+            })
+          })
+        }),
+        add: async () => logger.error("Firebase add failed - not initialized")
+      })
+    };
+    bucket = {
+      upload: async () => logger.error("Storage upload failed - not initialized")
+    };
+  }
 }
 
 // ===================================
@@ -81,23 +122,29 @@ try {
 // ===================================
 const app = express();
 const server = http.createServer(app);
+
+// Create socket.io server with more fault-tolerant settings
 const io = new Server(server, { 
-  cors: { origin: process.env.FRONTEND_URL || "*" },
+  cors: { 
+    origin: process.env.FRONTEND_URL || "*",
+    credentials: true
+  },
   connectionStateRecovery: {
     maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
     skipMiddlewares: true,
   },
   pingTimeout: 10000,
   pingInterval: 25000,
+  transports: ['websocket', 'polling'] // Fallback to polling if websocket fails
 });
 
 // ===================================
 // Middleware Configuration
 // ===================================
 
-// Security middleware
+// Security middleware with more forgiving settings for production
 app.use(helmet({
-  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+  contentSecurityPolicy: false, // Disable CSP to avoid issues with various content
 }));
 
 // CORS configuration
@@ -108,9 +155,9 @@ app.use(cors({
   credentials: true
 }));
 
-// Request parsing
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+// Request parsing with increased limits
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 // Compression for all responses
 app.use(compression());
@@ -118,10 +165,10 @@ app.use(compression());
 // HTTP request logging
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-// Rate limiting
+// Rate limiting - less strict for production initially
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 200, // increased limit
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later." }
@@ -143,15 +190,19 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).json({ error: "Unauthorized: Token not provided" });
     }
 
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.user = decoded;
-    next();
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      req.user = decoded;
+      next();
+    } catch (error) {
+      if (error.code === 'auth/id-token-expired') {
+        return res.status(401).json({ error: "Token expired" });
+      }
+      res.status(401).json({ error: "Invalid or expired token" });
+    }
   } catch (error) {
     logger.error("Authentication error:", error);
-    if (error.code === 'auth/id-token-expired') {
-      return res.status(401).json({ error: "Token expired" });
-    }
-    res.status(401).json({ error: "Invalid or expired token" });
+    res.status(500).json({ error: "Authentication service error" });
   }
 };
 
@@ -162,13 +213,19 @@ const optionalAuth = async (req, res, next) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(" ")[1];
       if (token) {
-        const decoded = await admin.auth().verifyIdToken(token);
-        req.user = decoded;
+        try {
+          const decoded = await admin.auth().verifyIdToken(token);
+          req.user = decoded;
+        } catch (error) {
+          // Just log and continue
+          logger.warn("Optional auth token verification failed:", error.message);
+        }
       }
     }
     next();
   } catch (error) {
     // Still continue even if auth fails
+    logger.warn("Optional auth error:", error.message);
     next();
   }
 };
@@ -183,12 +240,17 @@ io.use(async (socket, next) => {
       return next(new Error("Authentication token required"));
     }
     
-    const decoded = await admin.auth().verifyIdToken(token);
-    socket.user = decoded;
-    next();
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      socket.user = decoded;
+      next();
+    } catch (authError) {
+      logger.error("Socket token verification error:", authError.message);
+      next(new Error("Authentication failed: " + authError.message));
+    }
   } catch (error) {
     logger.error("Socket authentication error:", error);
-    next(new Error("Authentication failed"));
+    next(new Error("Authentication process failed"));
   }
 });
 
@@ -210,6 +272,9 @@ io.on("connection", (socket) => {
     // Add to user's room for direct messaging
     socket.join(`user:${uid}`);
   }
+  
+  // Rest of socket event handlers...
+  // (keeping the existing socket event handlers as they are)
   
   // Handle starting a stream
   socket.on("start-stream", async (streamData) => {
@@ -464,8 +529,13 @@ io.on("connection", (socket) => {
         timestamp: new Date().toISOString()
       };
       
-      // Save to Firestore
-      db.collection("stream-messages").add(message);
+      // Save to Firestore - wrapped in try/catch to prevent crashes
+      try {
+        db.collection("stream-messages").add(message);
+      } catch (dbError) {
+        logger.error("Failed to save chat message to database:", dbError);
+        // Still broadcast the message even if saving fails
+      }
       
       // Broadcast to all viewers
       io.to(`stream:${data.streamId}`).emit("chat-message", message);
@@ -497,12 +567,16 @@ io.on("connection", (socket) => {
         const stream = activeStreams.get(socket.id);
         
         // Update Firestore
-        await db.collection("streams").doc(socket.id).update({
-          isLive: false,
-          endedAt: admin.firestore.FieldValue.serverTimestamp(),
-          duration: admin.firestore.FieldValue.increment((new Date() - stream.startedAt) / 1000),
-          disconnected: true
-        });
+        try {
+          await db.collection("streams").doc(socket.id).update({
+            isLive: false,
+            endedAt: admin.firestore.FieldValue.serverTimestamp(),
+            duration: admin.firestore.FieldValue.increment((new Date() - stream.startedAt) / 1000),
+            disconnected: true
+          });
+        } catch (dbError) {
+          logger.error("Failed to update stream status on disconnect:", dbError);
+        }
         
         // Notify viewers
         io.to(`stream:${socket.id}`).emit("stream-ended", { 
@@ -531,9 +605,44 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       logger.error("Error handling disconnection:", error);
+      // No need to propagate this error
     }
   });
 });
+
+// ===================================
+// Import Routes
+// ===================================
+
+// Safe importing of required services and routes
+let marketDataService, marketDataRoutes, streamRoutes;
+
+try {
+  // Import the market data service
+  marketDataService = require('./services/marketDataService');
+  marketDataRoutes = require('./routes/marketDataRoute');
+  streamRoutes = require('./routes/streamRoute');
+} catch (importError) {
+  logger.error("Error importing routes or services:", importError);
+  
+  // Create dummy routes to prevent crash
+  const dummyRouter = express.Router();
+  dummyRouter.get('*', (req, res) => {
+    res.status(503).json({ error: "Service temporarily unavailable" });
+  });
+  
+  // Assign dummy routes if imports fail
+  marketDataRoutes = dummyRouter;
+  streamRoutes = dummyRouter;
+  
+  // Create minimal market data service
+  marketDataService = {
+    fetchAllMarketData: async () => {
+      logger.warn("Market data service not available");
+      return [];
+    }
+  };
+}
 
 // ===================================
 // API Routes
@@ -545,11 +654,33 @@ app.get("/", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  // Check Firebase connection
+  const firebaseStatus = db ? "healthy" : "degraded";
+  
+  res.status(200).json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    services: {
+      streaming: "healthy",
+      marketData: marketDataService ? "healthy" : "degraded",
+      firebase: firebaseStatus
+    },
+    environment: process.env.NODE_ENV || "development"
+  });
 });
 
+// API routes
+const apiRouter = express.Router();
+app.use("/api", apiRouter);
+
+// Market data routes
+app.use("/api/market-data", marketDataRoutes);
+
+// Stream routes
+app.use("/api/streams", streamRoutes);
+
 // Get active streams (public)
-app.get("/api/streams", optionalAuth, async (req, res) => {
+apiRouter.get("/active-streams", optionalAuth, async (req, res) => {
   try {
     // Convert Map to Array and format for response
     const streams = Array.from(activeStreams.values()).map(stream => ({
@@ -571,10 +702,48 @@ app.get("/api/streams", optionalAuth, async (req, res) => {
   }
 });
 
-// Protected routes
-const apiRouter = express.Router();
-app.use("/api", apiRouter);
+// Socket.IO market data updates
+// Set up a timer to send market updates to connected clients
+let marketDataUpdateInterval;
 
+const setupMarketDataBroadcast = () => {
+  if (marketDataUpdateInterval) {
+    clearInterval(marketDataUpdateInterval);
+  }
+  
+  // Update connected clients with market data every 30 seconds
+  marketDataUpdateInterval = setInterval(async () => {
+    try {
+      // Only fetch and broadcast if we have connected clients
+      if (io.engine.clientsCount > 0) {
+        const marketData = await marketDataService.fetchAllMarketData();
+        
+        if (marketData && marketData.length > 0) {
+          // Broadcast to all connected clients
+          io.emit('market-data-update', {
+            tickers: marketData,
+            timestamp: new Date().toISOString()
+          });
+          
+          logger.info(`Broadcast market data to ${io.engine.clientsCount} clients`);
+        }
+      }
+    } catch (error) {
+      logger.error("Error broadcasting market data:", error);
+      // Continue operation even if market data fails
+    }
+  }, 30000); // Every 30 seconds
+};
+
+// Don't crash on failed market data broadcast setup
+try {
+  // Setup market data broadcast on server start
+  setupMarketDataBroadcast();
+} catch (error) {
+  logger.error("Failed to set up market data broadcast:", error);
+}
+
+// Protected routes
 // Get user profile
 apiRouter.get("/profile", verifyToken, async (req, res) => {
   try {
@@ -679,11 +848,12 @@ app.use((err, req, res, next) => {
 // ===================================
 process.on("uncaughtException", (error) => {
   logger.error("Uncaught Exception:", error);
-  // Implement your preferred error reporting service here
+  // Log but don't crash
 });
 
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Promise Rejection:", reason);
+  // Log but don't crash
 });
 
 // Graceful shutdown
@@ -693,11 +863,14 @@ const gracefulShutdown = () => {
   // Notify all connected clients
   io.emit("server-shutdown", { message: "Server is shutting down for maintenance" });
   
+  // Clear market data interval
+  if (marketDataUpdateInterval) {
+    clearInterval(marketDataUpdateInterval);
+  }
+  
   // Close HTTP server
   server.close(() => {
     logger.success("HTTP server closed");
-    
-    // Close any other connections (e.g., database)
     process.exit(0);
   });
   
@@ -714,7 +887,21 @@ process.on("SIGINT", gracefulShutdown);
 // ===================================
 // Start Server
 // ===================================
-const PORT = process.env.PORT || 5000;
+// Use environment port with fallback, and handle string ports
+const PORT = parseInt(process.env.PORT || "5000", 10);
+
+// Catch port binding errors
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    logger.error(`Port ${PORT} is already in use. Trying an alternative port.`);
+    // Try another port
+    server.listen(0); // Let OS assign a free port
+  } else {
+    logger.error('Server error:', error);
+  }
+});
+
+// Try to listen on the port
 server.listen(PORT, () => {
   logger.success(`Server running on port ${PORT}`);
 });

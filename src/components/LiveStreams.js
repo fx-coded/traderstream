@@ -4,7 +4,7 @@ import io from "socket.io-client";
 import "../styles/LiveStreams.css";
 
 // Create socket connection outside component to prevent multiple connections
-const SOCKET_SERVER = process.env.REACT_APP_SOCKET_URL || "http://localhost:4000";
+const SOCKET_SERVER = process.env.REACT_APP_SOCKET_URL || "https://trading-backend-1059368735900.us-central1.run.app";
 const socket = io(SOCKET_SERVER, {
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,

@@ -1,0 +1,31 @@
+FROM node:18-slim
+
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy application code
+COPY . ./
+
+# Set environment variables for Cloud Run
+ENV PORT=8080
+ENV NODE_ENV=production
+ENV FRONTEND_URL=https://www.traderstream.live
+
+# Firebase configuration
+ENV FIREBASE_PROJECT_ID=trader-stream-live
+ENV FIREBASE_CLIENT_ID=107330501328859026532
+ENV FIREBASE_PRIVATE_KEY_ID=d4f3344859d3faa657c22fcd85c006ea71d2f16b
+# The private key needs special handling for newlines
+ENV FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCoqz6/8A51A5Tg\n/IzYkwKlYkj7VEkWOvdnIQaZbZurYixW0nxb3+Hrvco3d0V1CSZ/p25B93Mc83ft\nGyoYMr1wvlBdg47nn4VYc9JyETTfn9BlZoNmlntX3T/ZEKz4HL29e25+9SzBcJe/\nfORQAZbQnj4JsXiFxOSzh7hu/3bnyO8q8MRiQTRPvlERMxgZCcfIRcET/sDAGPkC\nOAaqYfBjmrLR8i0xVJYhwh339gVxRGMWAaMtqa2gTYaPNjsLKgShH45mQex2japm\nlg+t+n77vI3j4NQ9FH3RJm6QuYFcQMzgzm7JPBp0xj1cZZr2gRAUFaANt/kLGEVN\ncNeeHs3HAgMBAAECggEAH3jIfh7oS6wt6Ocmzrhrm3lh3ceF1aiOBkeyyAkcLVfl\npxOiUbBOIuMoar4ODz70WIhgud1WtNW3EF5rtdUt5O4V58UG8rAgvPbrkw4j3AAh\nbfI5XXiBrkzhv3ptk+QlAUiZPwY3YibEod3HaihJwEZuk/dx4h/xfpA5+TggszHM\n5Lq42TMCO3nEBjq0ZrqHHY7OEPGdhqx2DfqdXzayl62aU8548cC+qN28jBno8+84\nYFdOPsHgRZqS6dMPxPoyxyg4B0uaOxJy/F6RiEYITza2LrS2M/FKEmVxoxFNfdXA\nJZDErYMFGyxkS3Uc3YfWTSe3whI2ikitaOxA1msgqQKBgQDS1kUqXxgFwn+knlfQ\nVPXux0Me5vJIDdHF6HiXVQflTGRM76J+pSyvBoalCAN0kkW4lMKFXmLMKrHwDsWT\nRkhjNVJIXrj3X+5zc06Ce/Y79qkS7ZRTtgOPnjOtSIyY75eOzQweJ7hdG4YWpnvO\nOpMZgdeD9Jzq69G7KD5qD3fNGQKBgQDMzJejhLKD0bDcqVA6tD3t/+mymsDTFh2x\nGOrV7XDdv6uBr+z1gD109STP+gn4QqabsTmeiSyres2ETRZ3eM4qmUhVlWge6YkI\neqRjdyGW7nH7UzA18cqZm8SakB5ozbrxcxZEu/DGi56ZShSgGSsgnmfALZ9OzMx5\nzb0ldFvt3wKBgQCoiFUDeL44JHBqA5TIWJG6TBgQRKXZCQrtO1XiCjtkhHsMsOVg\nfOJKClpo4w34CdCnqmoPuBIbh+lyriwq/JxyiTX72ZPbUhjGup5AWZzL8/DUy4qs\nm6sfC2PdmUeiHKs2oBuWo0ORUaYOxwfiIxpg4lSHC2q/sr+U7qdtmm22SQKBgCjM\nmWj6BpY8L//FuzX2sl+3m9b4/XEP9tpRHHeB1fpXNNOhOJOv+I5USAEmztWmcYqS\nw+fRbBS9YjP5J4ClkGzsHHzwRs3huGr4A8fM8+QdnJd0+yXEBZiUb5ZbH7PBSHzR\ncJ5A0ra7Gd1v5KwAV5cn94NRk2sfYZziX8wWYjoBAoGAHgB+fYfjG40L5Ef6lhAE\n+XuqHIjUEMcOzCDICYZYnc3OXHew22OWD7SnCxk2/K8qhN0W4K8Sq0sQvrlQvQ8g\nOC0lYfc7kFDyTO5Brgz1FzZ8g3RXu6sn/ZNm2MqP21pndYaepubVWmGAoKM1uXcU\ntQl8lqU1entKO9YPcpAbeKg=\n-----END PRIVATE KEY-----\n"
+ENV FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@trader-stream-live.iam.gserviceaccount.com
+ENV STORAGE_BUCKET=trader-stream-live.firebasestorage.app
+ENV ALPHA_VANTAGE_API_KEY=F6B93QIT6EDBU4UX
+
+# Expose the port
+EXPOSE 8080
+
+# Start the server
+CMD ["node", "server.js"]

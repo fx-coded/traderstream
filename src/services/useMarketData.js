@@ -1,6 +1,6 @@
 // src/hooks/useMarketData.js
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { fetchMarketData, getFallbackMarketData, fetchDailyProfit } from '../services/marketDataService';
+import marketDataService from '../services/marketDataService';
 
 /**
  * Custom hook to manage market data with caching and refresh functionality
@@ -58,7 +58,7 @@ const useMarketData = (options = {}) => {
     try {
       // Use fallback data immediately if requested or if we need immediate data
       if (useFallback) {
-        const fallbackData = getFallbackMarketData();
+        const fallbackData = marketDataService.getFallbackMarketData();
         setMarketData(fallbackData);
         setVisibleTickers(fallbackData);
         setLoading(false);
@@ -66,21 +66,21 @@ const useMarketData = (options = {}) => {
       }
       
       // Fetch real data from API
-      const data = await fetchMarketData();
+      const data = await marketDataService.fetchMarketData();
       
       if (data && data.length > 0) {
         setMarketData(data);
         setLastUpdated(new Date());
       } else {
         // If API returns empty data, use fallback
-        const fallbackData = getFallbackMarketData();
+        const fallbackData = marketDataService.getFallbackMarketData();
         setMarketData(fallbackData);
         setVisibleTickers(fallbackData);
       }
       
       // Also update profit data
       try {
-        const profit = await fetchDailyProfit();
+        const profit = await marketDataService.fetchDailyProfit();
         setProfitData(profit);
       } catch (profitError) {
         console.error("Error fetching profit data:", profitError);
@@ -90,7 +90,7 @@ const useMarketData = (options = {}) => {
       setError(fetchError.message || "Failed to fetch market data");
       
       // Use fallback data on error
-      const fallbackData = getFallbackMarketData();
+      const fallbackData = marketDataService.getFallbackMarketData();
       setMarketData(fallbackData);
       setVisibleTickers(fallbackData);
     } finally {
@@ -168,6 +168,24 @@ const useMarketData = (options = {}) => {
   const refreshData = useCallback(() => {
     fetchData(false);
   }, [fetchData]);
+
+  // Add socket.io listener for real-time updates if available
+  useEffect(() => {
+    // Check if socket.io is available globally
+    if (window.socket) {
+      // Listen for market data updates
+      window.socket.on('market-data-update', (data) => {
+        if (data && data.tickers && data.tickers.length > 0) {
+          setMarketData(data.tickers);
+          setLastUpdated(new Date(data.timestamp) || new Date());
+        }
+      });
+      
+      return () => {
+        window.socket.off('market-data-update');
+      };
+    }
+  }, []);
 
   return {
     marketData,
