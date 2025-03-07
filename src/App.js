@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, createContext } from 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
-import socketService from "./socketService"; // Import improved socket service
+import socketService from "./socketService";
 
 // Components
 import HeroSection from "./components/HeroSection";
@@ -95,6 +95,7 @@ const App = () => {
             setLiveStreams(Array.isArray(streams) ? streams : []);
           };
           
+          // Use the socket from socketService
           socketService.socket.on("update-streams", handleStreamsUpdate);
           
           // Request initial streams
@@ -119,7 +120,9 @@ const App = () => {
 
     // Cleanup listeners
     return () => {
-      socketService.socket.off("update-streams");
+      if (socketService.socket) {
+        socketService.socket.off("update-streams");
+      }
       socketService.disconnectSocket('Component unmount');
     };
   }, [user]);
