@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, createContext } from 
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
-import { socket } from "./socketService"; // Import from separate file
+import socketService from "./socketService"; // Import improved socket service
 
 // Components
 import HeroSection from "./components/HeroSection";
@@ -24,7 +24,7 @@ import TopBrokers from "./components/TopBrokers";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationsComponent from "./components/NotificationsComponent";
-import ConnectionStatus from "./components/ConnectionStatus"; // Add this new component
+import ConnectionStatus from "./components/ConnectionStatus";
 
 import "./App.css";
 
@@ -42,8 +42,9 @@ const App = () => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
   const [authTimedOut, setAuthTimedOut] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
-  // Authentication monitoring with timeout
+  // Authentication monitoring with enhanced timeout and error handling
   useEffect(() => {
     setIsLoading(true);
     
@@ -53,120 +54,77 @@ const App = () => {
         console.warn("Authentication timed out after 10 seconds");
         setIsLoading(false);
         setAuthTimedOut(true);
+        setAuthError(new Error("Authentication service is not responding"));
       }
-    }, 10000); // 10 second timeout
+    }, 10000);
     
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setIsLoading(false);
-      setAuthTimedOut(false);
-      clearTimeout(timeoutId); // Clear the timeout if auth responds
-    }, (error) => {
-      console.error("Authentication error:", error);
-      setIsLoading(false);
-      clearTimeout(timeoutId); // Clear the timeout if we get an error
-    });
+    const unsubscribe = onAuthStateChanged(
+      auth, 
+      (currentUser) => {
+        setUser(currentUser);
+        setIsLoading(false);
+        setAuthTimedOut(false);
+        setAuthError(null);
+        clearTimeout(timeoutId);
+      }, 
+      (error) => {
+        console.error("Authentication error:", error);
+        setIsLoading(false);
+        setAuthTimedOut(true);
+        setAuthError(error);
+        clearTimeout(timeoutId);
+      }
+    );
 
     return () => {
       unsubscribe();
-      clearTimeout(timeoutId); // Clean up the timeout
+      clearTimeout(timeoutId);
     };
-  }, [isLoading]); // Added isLoading to the dependency array
+  }, []);
 
-  // Connect socket in useEffect with proper cleanup
-  // IMPORTANT: This now depends on user state to provide authentication token
+  // Socket connection and event handling
   useEffect(() => {
-    const connectSocket = async () => {
-      // Disconnect any existing connection
-      if (socket.connected) {
-        socket.disconnect();
-      }
-      
-      // Set authentication token if user is logged in
+    const handleSocketConnection = async () => {
       if (user) {
         try {
-          const token = await user.getIdToken();
-          socket.auth = { token };
-          console.log("✅ Authentication token set for socket");
-        } catch (error) {
-          console.error("❌ Failed to get authentication token:", error);
-          setConnectionError("Authentication error: Failed to get token");
-          return () => {}; // Return empty cleanup if we can't get a token
-        }
-      } else {
-        console.log("❓ No user logged in for socket authentication");
-        // We won't connect the socket if no user is logged in
-        // since the backend requires authentication
-        setConnectionError("Authentication required: Please log in");
-        return () => {};
-      }
-      
-      // Only connect if we have a user with token
-      if (user) {
-        socket.connect();
-      
-        const onConnect = () => {
-          console.log("✅ Socket connected");
+          // Connect socket with user authentication
+          await socketService.connectSocket();
+          
+          // Set up stream update listener
+          const handleStreamsUpdate = (streams) => {
+            setLiveStreams(Array.isArray(streams) ? streams : []);
+          };
+          
+          socketService.socket.on("update-streams", handleStreamsUpdate);
+          
+          // Request initial streams
+          socketService.socket.emit("get-streams");
+          
+          // Update connection states
           setSocketConnected(true);
           setConnectionError(null);
-        };
-        
-        const onConnectError = (error) => {
-          console.error("❌ Socket connection error:", error);
+        } catch (error) {
+          console.error("Socket connection failed:", error);
+          setConnectionError(error.message);
           setSocketConnected(false);
-          setConnectionError(`Connection error: ${error.message}`);
-        };
-        
-        const onDisconnect = (reason) => {
-          console.log("❌ Socket disconnected:", reason);
-          setSocketConnected(false);
-        };
-        
-        // Setup event listeners
-        socket.on("connect", onConnect);
-        socket.on("connect_error", onConnectError);
-        socket.on("disconnect", onDisconnect);
-        
-        // Return cleanup function
-        return () => {
-          socket.off("connect", onConnect);
-          socket.off("connect_error", onConnectError);
-          socket.off("disconnect", onDisconnect);
-          socket.disconnect();
-        };
+        }
+      } else {
+        // Disconnect if no user
+        socketService.disconnectSocket('No authenticated user');
+        setSocketConnected(false);
       }
-      
-      return () => {}; // Empty cleanup if no connection was established
     };
-    
-    // Start connection
-    const setupCleanup = connectSocket();
+
+    handleSocketConnection();
+
+    // Cleanup listeners
     return () => {
-      setupCleanup.then(cleanup => cleanup && cleanup());
+      socketService.socket.off("update-streams");
+      socketService.disconnectSocket('Component unmount');
     };
-  }, [user]); // Now depends on user state
+  }, [user]);
 
-  // Socket event listeners in a separate useEffect
-  useEffect(() => {
-    if (socketConnected) {
-      // Request initial streams data when connected
-      socket.emit("get-streams");
-      
-      // Listen for live streams updates
-      const handleStreamsUpdate = (streams) => {
-        setLiveStreams(Array.isArray(streams) ? streams : []);
-      };
-      
-      socket.on("update-streams", handleStreamsUpdate);
-      
-      // Cleanup listeners on unmount
-      return () => {
-        socket.off("update-streams", handleStreamsUpdate);
-      };
-    }
-  }, [socketConnected]); // Only depend on socketConnected, not socket itself
-
-  // Handle room creation - with useCallback to prevent unnecessary rerenders
+  // Handle room creation with user authentication check
   const handleRoomCreated = useCallback((newRoom) => {
     if (!user) {
       alert("❌ You must be logged in to create a trading room!");
@@ -176,18 +134,23 @@ const App = () => {
     return true;
   }, [user]);
 
-  // User logout - with useCallback
+  // Enhanced logout method
   const logout = useCallback(async () => {
     try {
-      // Disconnect socket before logout
-      if (socket.connected) {
-        socket.disconnect();
-        setSocketConnected(false);
-      }
+      // Disconnect socket
+      socketService.disconnectSocket('User logout');
       
+      // Sign out of Firebase
       await auth.signOut();
-      console.log("✅ User logged out");
+      
+      // Reset application state
       setUser(null);
+      setSocketConnected(false);
+      setLiveStreams([]);
+      setTradingRooms([]);
+      setActiveTab("live");
+      
+      console.log("✅ User logged out successfully");
     } catch (error) {
       console.error("❌ Logout error:", error);
       alert("Failed to log out. Please try again.");
@@ -197,7 +160,7 @@ const App = () => {
   // Memoized context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({
     user,
-    socket,
+    socket: socketService.socket,
     socketConnected,
     liveStreams,
     activeTab,
@@ -206,7 +169,14 @@ const App = () => {
     setShowAuthModal,
     tradingRooms,
     setTradingRooms
-  }), [user, socketConnected, liveStreams, activeTab, logout, tradingRooms]);
+  }), [
+    user, 
+    socketConnected, 
+    liveStreams, 
+    activeTab, 
+    logout, 
+    tradingRooms
+  ]);
 
   // Enhanced loading screen with timeout handling
   if (isLoading) {
@@ -218,18 +188,29 @@ const App = () => {
     );
   }
 
-  // Show auth error if timed out
+  // Improved auth timeout error handling
   if (authTimedOut) {
     return (
       <div className="auth-error-container">
         <h2>Authentication Error</h2>
-        <p>There was a problem connecting to the authentication service.</p>
-        <button 
-          className="retry-button"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </button>
+        <p>{authError?.message || 'Failed to connect to authentication service'}</p>
+        <div className="error-actions">
+          <button 
+            className="retry-button"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+          <button 
+            className="support-button"
+            onClick={() => {
+              // Implement support contact or help mechanism
+              window.open('mailto:support@yourapp.com', '_blank');
+            }}
+          >
+            Contact Support
+          </button>
+        </div>
       </div>
     );
   }
@@ -243,7 +224,10 @@ const App = () => {
           ) : (
             <div className="app-container">
               {/* Connection status is now only shown for logged in users */}
-              <ConnectionStatus socketConnected={socketConnected} connectionError={connectionError} />
+              <ConnectionStatus 
+                socketConnected={socketConnected} 
+                connectionError={connectionError} 
+              />
               
               <Header 
                 activeTab={activeTab} 
@@ -261,7 +245,10 @@ const App = () => {
                       element={
                         <ErrorBoundary>
                           {activeTab === "rooms" ? (
-                            <TradingRoomsList tradingRooms={tradingRooms} user={user} />
+                            <TradingRoomsList 
+                              tradingRooms={tradingRooms} 
+                              user={user} 
+                            />
                           ) : (
                             <>
                               <TrendingStreams />
@@ -301,7 +288,10 @@ const App = () => {
                       path="/create-room" 
                       element={
                         <ErrorBoundary>
-                          <CreateTradingRoom onRoomCreated={handleRoomCreated} user={user} />
+                          <CreateTradingRoom 
+                            onRoomCreated={handleRoomCreated} 
+                            user={user} 
+                          />
                         </ErrorBoundary>
                       } 
                     />
@@ -325,7 +315,10 @@ const App = () => {
                     />
 
                     {/* Auth Action Route */}
-                    <Route path="/auth-action" element={<ErrorBoundary><AuthAction /></ErrorBoundary>} />
+                    <Route 
+                      path="/auth-action" 
+                      element={<ErrorBoundary><AuthAction /></ErrorBoundary>} 
+                    />
 
                     {/* Protected Routes */}
                     <Route 
