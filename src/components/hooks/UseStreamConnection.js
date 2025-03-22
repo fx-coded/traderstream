@@ -123,13 +123,13 @@ export const useStreamConnection = (streamId, options = {}) => {
       socketService.socket.off("disconnect", onDisconnect);
       socketService.socket.off("connect_error", onConnectError);
     };
-  }, [reconnectAttempts, reconnectDelay]);
+  }, [reconnectAttempts, reconnectDelay, reconnectionAttempt]); // Added reconnectionAttempt to dependencies
 
   // Initial connection effect
   useEffect(() => {
     const cleanup = handleConnection();
     return cleanup;
-  }, []); // Only run once on mount
+  }, [handleConnection]); // Added handleConnection to dependencies
 
   // Viewer count update effect
   useEffect(() => {
@@ -176,7 +176,8 @@ export const useStreamConnection = (streamId, options = {}) => {
     viewerCount,
     emitEvent,
     reconnectionAttempt
-  }), [connectionState, error, viewerCount, reconnectionAttempt]);
+  }), [connectionState, error, viewerCount, reconnectionAttempt, emitEvent]); // Added emitEvent to dependencies
+
 };
 
 export default useStreamConnection;

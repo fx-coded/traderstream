@@ -1,3 +1,6 @@
-node_modules
+Copynode_modules
 npm-debug.log
 .env
+.git
+.gitignore
+docker-compose.yml

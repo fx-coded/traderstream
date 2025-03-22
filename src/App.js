@@ -80,7 +80,7 @@ const App = () => {
       unsubscribe();
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [isLoading]); // Added isLoading as a dependency
 
   // Socket connection and event handling
   useEffect(() => {

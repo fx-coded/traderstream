@@ -1,25 +1,35 @@
 // Import Firebase SDKs
-import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { 
+  initializeApp, 
+  getApp, 
+  getApps 
+} from "firebase/app";
+import { 
+  getAnalytics, 
+  isSupported as isAnalyticsSupported
+} from "firebase/analytics";
 import { 
   getAuth, 
   setPersistence, 
-  browserLocalPersistence, 
-  initializeAuth,
-  browserPopupRedirectResolver
+  browserLocalPersistence 
 } from "firebase/auth";
-import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { 
+  getFirestore, 
+  enableIndexedDbPersistence 
+} from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Logger utility
 const logger = {
-  info: (message) => console.log(`🔥 ${message}`),
-  warn: (message) => console.warn(`⚠️ ${message}`),
-  error: (message) => console.error(`❌ ${message}`)
+  info: (message) => console.log(`🔥 ${new Date().toISOString()} - ${message}`),
+  warn: (message) => console.warn(`⚠️ ${new Date().toISOString()} - ${message}`),
+  error: (message, error) => {
+    console.error(`❌ ${new Date().toISOString()} - ${message}`, error || '');
+  }
 };
 
 // Firebase configuration using .env variables with fallback
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSyC-z96xX6Iue1iTAzwtM0B7VxxQMR-uNlc",
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "trader-stream-live.firebaseapp.com",
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "trader-stream-live",
@@ -29,79 +39,66 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID || "G-D3HL6SDZH7",
 };
 
-// Initialize Firebase app (prevent multiple initializations)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Initialize Firebase app immediately
+let firebaseApp;
+if (getApps().length === 0) {
+  logger.info(`Initializing Firebase for project: ${firebaseConfig.projectId}`);
+  firebaseApp = initializeApp(firebaseConfig);
+} else {
+  firebaseApp = getApp();
+  logger.info("Using existing Firebase app");
+}
 
-// Initialize Analytics (with support check)
-let analytics;
-const initAnalytics = async () => {
-  try {
-    if (await isSupported()) {
-      analytics = getAnalytics(app);
-      logger.info("Analytics initialized successfully");
-    } else {
-      logger.warn("Analytics not supported in this environment");
-    }
-  } catch (error) {
-    logger.error("Failed to initialize Analytics", error);
+// Initialize Firebase services immediately (not asynchronously)
+export const auth = getAuth(firebaseApp);
+export const db = getFirestore(firebaseApp);
+export const storage = getStorage(firebaseApp);
+let analytics = null;
+
+// Set up auth persistence
+setPersistence(auth, browserLocalPersistence)
+  .then(() => logger.info("Auth persistence set to LOCAL"))
+  .catch(error => logger.error("Auth persistence setup failed", error));
+
+// Try to enable Firestore persistence
+enableIndexedDbPersistence(db)
+  .then(() => logger.info("Firestore indexed DB persistence enabled"))
+  .catch(error => logger.warn("Firestore persistence setup failed", error));
+
+// Initialize analytics if supported
+isAnalyticsSupported().then(supported => {
+  if (supported) {
+    analytics = getAnalytics(firebaseApp);
+    logger.info("Analytics initialized");
+  } else {
+    logger.warn("Analytics not supported");
   }
-};
-
-// Initialize Auth with enhanced configuration
-const auth = initializeAuth(app, {
-  popupRedirectResolver: browserPopupRedirectResolver
+}).catch(error => {
+  logger.error("Analytics initialization failed", error);
 });
 
-// Initialize Firestore with persistence
-const db = getFirestore(app);
-const initFirestorePersistence = async () => {
-  try {
-    await enableIndexedDbPersistence(db);
-    logger.info("Firestore indexed DB persistence enabled");
-  } catch (error) {
-    logger.warn("Firestore persistence could not be enabled", error);
-  }
-};
+// Utility function to get analytics
+export const getAnalyticsService = () => analytics;
 
-// Initialize Storage
-const storage = getStorage(app);
-
-// Set Firebase Authentication Persistence
-const setupAuthPersistence = async () => {
-  try {
-    await setPersistence(auth, browserLocalPersistence);
-    logger.info("Firebase Auth persistence set to LOCAL");
-  } catch (error) {
-    logger.error("Error setting auth persistence", error);
-  }
-};
-
-// Initialize all services
-const initializeFirebaseServices = async () => {
-  try {
-    // Log project details
-    logger.info(`Initializing Firebase for project: ${firebaseConfig.projectId}`);
-
-    // Initialize services
-    await initAnalytics();
-    await initFirestorePersistence();
-    await setupAuthPersistence();
-
-    logger.info("All Firebase services initialized successfully");
-  } catch (error) {
-    logger.error("Failed to initialize Firebase services", error);
-  }
-};
-
-// Call initialization
-initializeFirebaseServices();
-
-// Export Firebase modules
-export { 
-  app, 
-  analytics, 
-  auth, 
-  db, 
+// Export the Firebase services manager for compatibility
+export const firebaseServices = {
+  app: firebaseApp,
+  auth,
+  db,
   storage,
-  firebaseConfig 
+  getService: (serviceName) => {
+    const serviceMap = {
+      app: firebaseApp,
+      auth,
+      db,
+      storage,
+      analytics
+    };
+
+    if (!serviceMap[serviceName]) {
+      logger.warn(`${serviceName} service not initialized`);
+    }
+
+    return serviceMap[serviceName];
+  }
 };
